@@ -11,7 +11,7 @@ typedef struct Player
 {
 	int x;
 	int y;
-};
+}Player;
 
-void GotoXY();
+COORD GotoXY(int x, int y);
 
