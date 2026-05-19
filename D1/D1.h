@@ -9,8 +9,17 @@ using namespace std;
 
 typedef struct Player
 {
-	int x;
-	int y;
+	// player pos
+	double x;
+	double y;
+
+	// player dir vec
+	double dirX;
+	double dirY;
+
+	// camera plane
+	double PlaneX;
+	double PlaneY;
 }Player;
 
 COORD GotoXY(int x, int y);
