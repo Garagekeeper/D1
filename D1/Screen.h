@@ -14,8 +14,8 @@ public :
 	int CurrentScreenBufferIndex;
 	// 버퍼의 크기를 가져오기위한 info
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
-	int horSize;
-	int verSize;
+	int HorSize;
+	int VerSize;
 
 public:
 	// 화면 클래스 생성자
@@ -23,8 +23,8 @@ public:
 		ScreenBuffer{ nullptr, nullptr },
 		CurrentScreenBufferIndex(0),
 		BufferInfo{},
-		horSize(0),
-		verSize(0)
+		HorSize(0),
+		VerSize(0)
 	{}
 
 	virtual ~Screen();

@@ -37,10 +37,9 @@ bool Screen::Init()
 	//버퍼의 정보를 info에 담아옴
 	if (GetConsoleScreenBufferInfo(ScreenBuffer[0], &BufferInfo))
 	{
-		horSize = BufferInfo.dwSize.X;
-		verSize = BufferInfo.dwSize.Y;
+		HorSize = BufferInfo.dwSize.X;
+		VerSize = BufferInfo.dwSize.Y;
 	}
-	return false;
 
 
 	return true;
@@ -55,7 +54,7 @@ void Screen::PrintString(const wstring& str, const COORD& position)
 		// 커서 위치 설정
 		SetConsoleCursorPosition(ScreenBuffer[CurrentScreenBufferIndex], position);
 		// WriteConsole을 통해서 Unicode 출력
-		WriteConsole(ScreenBuffer[CurrentScreenBufferIndex], str.c_str(), static_cast<DWORD>(str.size()), NULL, NULL);
+		WriteConsoleW(ScreenBuffer[CurrentScreenBufferIndex], str.c_str(), static_cast<DWORD>(str.size()), NULL, NULL);
 	}
 }
 
@@ -68,16 +67,13 @@ void Screen::PrintChar(const wchar_t ch, const COORD& position)
 		// 커서 위치 설정
 		SetConsoleCursorPosition(ScreenBuffer[CurrentScreenBufferIndex], position);
 		// WriteConsole을 통해서 Unicode 출력
-		WriteConsole(ScreenBuffer[CurrentScreenBufferIndex], &ch, 1, NULL, NULL);
+		WriteConsoleW(ScreenBuffer[CurrentScreenBufferIndex], &ch, 1, NULL, NULL);
 	}
 }
 
 void Screen::PrintHor(const wchar_t ch, const COORD& position, int length)
 {
-	string str(length, ch);
-	wstring wstr;
-
-	wstr.assign(str.begin(), str.end());
+	wstring wstr(length, ch);
 	PrintString(wstr, position);
 }
 

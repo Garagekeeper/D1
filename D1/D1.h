@@ -7,20 +7,20 @@
 
 using namespace std;
 
-typedef struct Player
+typedef struct FPlayer
 {
 	// player pos
-	double x;
-	double y;
+	double X;
+	double Y;
 
 	// player dir vec
-	double dirX;
-	double dirY;
+	double DirX;
+	double DirY;
 
 	// camera plane
 	double PlaneX;
 	double PlaneY;
-}Player;
+}FPlayer;
 
 COORD GotoXY(int x, int y);
 
