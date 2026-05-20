@@ -36,12 +36,19 @@ public:
 	bool Init();
 
 	/// <summary>
-	/// 버퍼에 픽셀값을 입력하는 함수
+	/// 버퍼에 스트링을 출력하는 함수
 	/// </summary>
-	/// <param name="str">입력할 픽셀값</param>
-	/// <param name="position">입력할 좌표</param>
-	void SetPixel(const wstring& str, const COORD& position);
-	void SetPixel(const wchar_t ch, const COORD& position, int length);
+	/// <param name="str">출력할 스트링</param>
+	/// <param name="position">출력할 좌표</param>
+	void PrintString(const wstring& str, const COORD& position);
+	/// <summary>
+	/// 버퍼에 문자를 출력하는 함수
+	/// </summary>
+	/// <param name="ch">출력할 문자</param>
+	/// <param name="position">출력할 위치</param>
+	void PrintChar(const wchar_t ch, const COORD& position);
+	void PrintHor(const wchar_t ch, const COORD& position, int length);
+	void PrintVer(const wchar_t ch, const COORD& position, int length);
 
 	/// <summary>
 	/// 버퍼를 교환하는 함수

@@ -82,7 +82,7 @@ enum Env
 
 void DrawPlayer()
 {
-	screen.SetPixel(L"※", GotoXY(player.x, player.y));
+	screen.PrintString(L"※", GotoXY(player.x, player.y));
 }
 
 void DrawGrid()
@@ -109,8 +109,8 @@ void DrawGrid()
 			double rayDirY = player.dirY + player.PlaneY * cameraX;
 
 			// 현재 우리가 서 있는 위치
-			int MapPosX = (int)player.x;
-			int MapPosY = (int)player.y;
+			int MapPosX = (int)player.y;
+			int MapPosY = (int)player.x;
 
 			// ray가 출발해서 처음으로 x에 수직인 선을 만난 위치까지의 거리
 			// ray가 출발해서 처음으로 y에 수직은 선을 만난 위치까지의 거리
@@ -241,22 +241,24 @@ void DrawGrid()
 			if (drawEnd >= HEIGHT)drawEnd = HEIGHT - 1;
 
 			//TODO Draw velLine
-
+			COORD startPos = { x, drawStart };
+			screen.PrintVer(L'■', startPos, drawEnd - drawStart);
 		}
 	}
-	for (int i = 0; i < 24; i++)
-	{
-		COORD pos = { 0, i };
-		wstring str;
-		for (int j = 0; j < 24; j++)
-		{
-			if (worldMap[i][j] == 1)
-				str.append(1 ,L'■');
-			else 
-				str.append(1, ' ');
-		}
-		screen.SetPixel(str, pos);
-	}
+	////Draw topDown Grid
+	//for (int i = 0; i < 24; i++)
+	//{
+	//	COORD pos = { 0, i };
+	//	wstring str;
+	//	for (int j = 0; j < 24; j++)
+	//	{
+	//		if (worldMap[i][j] == 1)
+	//			str.append(1 ,L'■');
+	//		else 
+	//			str.append(1, ' ');
+	//	}
+	//	screen.PrintString(str, pos);
+	//}
 }
 
 void ClearScreen()
@@ -266,7 +268,7 @@ void ClearScreen()
 
 void Init()
 {
-	player = { 22, 12, -1, 0, 0, 0.66 };
+	player = { 8, 8, 0, 1, -0.66, 0};
 	screen.Init();
 }
 
@@ -340,7 +342,7 @@ void Update()
 void Render()
 {
 	DrawGrid();
-	//DrawPlayer();
+	DrawPlayer();
 	ClearScreen();
 }
 
@@ -367,8 +369,8 @@ int main()
 	Init();
 	while (true)
 	{
-		//Input();
-		//Update();
+		Input();
+		Update();
 		Render();
 		ClearInput();
 	}

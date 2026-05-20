@@ -5,7 +5,7 @@ bool Screen::Init()
 	// 버퍼를 2개 생성하고
 	// 커서를 지움
 	// 그 뒤에 버퍼 정보를 가져옴
-	
+
 	// 스크린 버퍼 생성
 	ScreenBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
 		0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -40,13 +40,13 @@ bool Screen::Init()
 		horSize = BufferInfo.dwSize.X;
 		verSize = BufferInfo.dwSize.Y;
 	}
-		return false;
+	return false;
 
 
 	return true;
 }
 
-void Screen::SetPixel(const wstring& str, const COORD& position)
+void Screen::PrintString(const wstring& str, const COORD& position)
 {
 	// 버퍼의 크기를 벗어나면 버퍼에 쓰지 않는다.
 	if (position.X >= 0 && position.X < BufferInfo.dwSize.X
@@ -54,22 +54,44 @@ void Screen::SetPixel(const wstring& str, const COORD& position)
 	{
 		// 커서 위치 설정
 		SetConsoleCursorPosition(ScreenBuffer[CurrentScreenBufferIndex], position);
-
 		// WriteConsole을 통해서 Unicode 출력
 		WriteConsole(ScreenBuffer[CurrentScreenBufferIndex], str.c_str(), static_cast<DWORD>(str.size()), NULL, NULL);
 	}
 }
 
-void Screen::SetPixel(const wchar_t ch, const COORD& position, int length = 0)
+void Screen::PrintChar(const wchar_t ch, const COORD& position)
 {
-	if (length == 0)
+	// 버퍼의 크기를 벗어나면 버퍼에 쓰지 않는다.
+	if (position.X >= 0 && position.X < BufferInfo.dwSize.X
+		&& position.Y >= 0 && position.Y < BufferInfo.dwSize.Y)
 	{
-		length = BufferInfo.dwSize.X - position.X ;
+		// 커서 위치 설정
+		SetConsoleCursorPosition(ScreenBuffer[CurrentScreenBufferIndex], position);
+		// WriteConsole을 통해서 Unicode 출력
+		WriteConsole(ScreenBuffer[CurrentScreenBufferIndex], &ch, 1, NULL, NULL);
+	}
+}
+
+void Screen::PrintHor(const wchar_t ch, const COORD& position, int length)
+{
+	string str(length, ch);
+	wstring wstr;
+
+	wstr.assign(str.begin(), str.end());
+	PrintString(wstr, position);
+}
+
+void Screen::PrintVer(const wchar_t ch, const COORD& position, int length)
+{
+	for (int i = 0; i < length; i++)
+	{
+		COORD NewPos = { position.X, position.Y + i };
+		PrintChar(ch, NewPos);
 	}
 
-	wstring str(length, ch);
-	SetPixel(str, position);
 }
+
+
 
 bool Screen::ChangeScreenBuffer()
 {
