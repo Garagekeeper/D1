@@ -225,13 +225,14 @@ void DrawGrid()
 		int LineHeight = (int)(HEIGHT / PerpWallDist);
 
 		//세로로 벽을 그리는데, 그리기 시작하는 위치와 끝내는 위치를 정함
+		//사실 식이 어떻게 되는지는 잘 몰루
 		int DrawStart = -LineHeight / 2 + HEIGHT / 2;
 		if (DrawStart < 0)DrawStart = 0;
 		int DrawEnd = LineHeight / 2 + HEIGHT / 2;
 		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
 
 		//TODO Draw velLine
-		COORD StartPos = { static_cast<SHORT>(x), DrawStart };
+		COORD StartPos = { static_cast<SHORT>(x), static_cast<SHORT>(DrawStart) };
 		wchar_t WallChar = (Side == 1) ? L'\u25A0': L'\u25A8';
 		GScreen.PrintVer(WallChar, StartPos, DrawEnd - DrawStart);
 	}
@@ -254,7 +255,7 @@ void DrawGrid()
 
 void DrawFPS()
 {
-
+	GScreen.PrintString(std::to_wstring(static_cast<int>(1 / DeltaTime)), {0, 0});
 }
 
 void ClearScreen()
@@ -306,6 +307,8 @@ void HandleInput(double* Dx, double* Dy)
 	if (KeyState.RightArrow)	*Dx += MoveSpeed;
 	if (KeyState.DownArrow)		*Dy += MoveSpeed;
 	if (KeyState.LeftArrow)		*Dx -= MoveSpeed;
+
+	//TODO 회전 처리
 }
 
 void PlayerMove(double Dx, double Dy)

@@ -87,8 +87,6 @@ void Screen::PrintVer(const wchar_t ch, const COORD& position, int length)
 
 }
 
-
-
 bool Screen::ChangeScreenBuffer()
 {
 	// 쓰기 버퍼를 출력하여 읽기 버퍼로 바꾼다.
@@ -108,7 +106,7 @@ void Screen::ClearScreen()
 	// 공백문자로 채워서 초기화
 	DWORD written;
 	FillConsoleOutputCharacterA(
-		ScreenBuffer[CurrentScreenBufferIndex], ' ', 100 * 100, { 0,0 }, &written
+		ScreenBuffer[CurrentScreenBufferIndex], ' ', 120 * 30, { 0,0 }, &written
 	);
 }
 
