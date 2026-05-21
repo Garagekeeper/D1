@@ -346,15 +346,25 @@ void DrawInfo()
 {
 	GScreen.PrintHor(L'\u2500', { 0,0 }, 20);
 	//Draw FPS;
-	GScreen.PrintString(L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime)), {0, 1});
+	wstring TargetString  = L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime));
+	wstring SpacingString(20 - TargetString.size(), ' ');
+	GScreen.PrintString(TargetString + SpacingString, {0, 1});
 
 	//Draw Coordination
 
-	GScreen.PrintString(L"x : " + std::to_wstring(Player.X), { 0, 2 });
-	GScreen.PrintString(L"y : " + std::to_wstring(Player.Y), { 0, 3 });
+	wstring DoubleValString = to_wstring(Player.X);
+	DoubleValString = DoubleValString.substr(0, DoubleValString.find('.') + 2);
+	TargetString = L"x : " + DoubleValString;
+
+	DoubleValString = to_wstring(Player.Y);
+	DoubleValString = DoubleValString.substr(0, DoubleValString.find('.') + 2);
+	TargetString = TargetString + L", y : " + DoubleValString;
+
+	SpacingString.assign(20 - TargetString.size(), ' ');
+	GScreen.PrintString(TargetString + SpacingString, { 0, 2 });
 
 	//Draw theta;
-	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 4 });
+	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3});
 	GScreen.PrintHor(L'\u2500', { 0, 5 }, 20);
 	GScreen.PrintVer(L'\u2510', { 20,0 }, 1);
 	GScreen.PrintVer(L'\u2502', { 20,1 }, 4);
