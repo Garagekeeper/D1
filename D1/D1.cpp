@@ -160,8 +160,8 @@ void DrawPlayer()
 
 void DrawGrid()
 {
-	const int WIDTH		= GScreen.HorSize;
-	const int HEIGHT	= GScreen.VerSize;
+	const int WIDTH = GScreen.HorSize;
+	const int HEIGHT = GScreen.VerSize;
 	/*
 	y
 		\	     /
@@ -346,9 +346,9 @@ void DrawInfo()
 {
 	GScreen.PrintHor(L'\u2500', { 0,0 }, 20);
 	//Draw FPS;
-	wstring TargetString  = L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime));
+	wstring TargetString = L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime));
 	wstring SpacingString(20 - TargetString.size(), ' ');
-	GScreen.PrintString(TargetString + SpacingString, {0, 1});
+	GScreen.PrintString(TargetString + SpacingString, { 0, 1 });
 
 	//Draw Coordination
 
@@ -364,7 +364,7 @@ void DrawInfo()
 	GScreen.PrintString(TargetString + SpacingString, { 0, 2 });
 
 	//Draw theta;
-	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3});
+	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3 });
 	GScreen.PrintHor(L'\u2500', { 0, 5 }, 20);
 	GScreen.PrintVer(L'\u2510', { 20,0 }, 1);
 	GScreen.PrintVer(L'\u2502', { 20,1 }, 4);
@@ -381,7 +381,7 @@ void ClearScreen()
 
 void Init()
 {
-	Player = { 18, 12, 0.0, -1.0, -1.0, 0.0, 0.66, 0.0, 0 };
+	Player = { 18, 12, 0.0, -1.0, 1.0, 0.0, 0.66, 0.0, 0 };
 	GScreen.Init();
 }
 
@@ -471,23 +471,43 @@ void PlayerRotate()
 
 	if (KeyState.RightArrowDown)
 	{
-		FinalTheta +=  Theta * RotationSpeed * DeltaTime;
+		FinalTheta += Theta * RotationSpeed * DeltaTime;
 	}
 
-	double FinalRad = FinalTheta * PHI / 180.0 ;
+	double FinalRad = FinalTheta * PHI / 180.0;
+
 
 	// 회전 변환
 	// 플레이어가 바라보는 방향 회전
-	Player.DirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
-	Player.DirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
+	// 이런 실수는 하지 말자, 위에서  x 변경하고 밑에서 바로 사용하면 의미가 왜곡됨
+	// 이런 방식은 오차가 누적됨
+	//Player.DirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
+	//Player.DirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
+
+	auto NextDirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
+	auto NextDirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
+
+	auto Len = sqrt(NextDirX * NextDirX + NextDirY * NextDirY);
+
+	Player.DirX = NextDirX / Len;
+	Player.DirY = NextDirY / Len;
 
 	// 플레이어의 오른쪽을 가리키는 벡터 변환
-	Player.RightX = Player.RightX * cos(FinalRad) - Player.RightY * sin(FinalRad);
-	Player.RightY = Player.RightX * sin(FinalRad) + Player.RightY * cos(FinalRad);
+	///auto NextRightX = Player.RightX * cos(FinalRad) - Player.RightY * sin(FinalRad);
+	//auto NextRightY = Player.RightX * sin(FinalRad) + Player.RightY * cos(FinalRad);
 
-	// 카메라 평면 변환
-	Player.PlaneX = Player.PlaneX * cos(FinalRad) - Player.PlaneY * sin(FinalRad);
-	Player.PlaneY = Player.PlaneX * sin(FinalRad) + Player.PlaneY * cos(FinalRad);
+	Player.RightX = -Player.DirY;
+	Player.RightY = Player.DirX;
+
+	//카메라 평면 변환
+	//카메라 평면은 Right와 평행
+	//auto NextPlaneX = Player.PlaneX * cos(FinalRad) - Player.PlaneY * sin(FinalRad);
+	//auto NextPlaneY = Player.PlaneX * sin(FinalRad) + Player.PlaneY * cos(FinalRad);
+
+	const double PlaneSize = 0.66;
+
+	Player.PlaneX = Player.RightX * PlaneSize;
+	Player.PlaneY = Player.RightY * PlaneSize;
 
 	Player.PlayerTheta += FinalTheta;
 }
@@ -512,8 +532,8 @@ void PlayerMove()
 	}
 	if (KeyState.KEYD)
 	{
-		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
-		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime;
 	}
 	if (KeyState.KEYS)
 	{
@@ -522,8 +542,8 @@ void PlayerMove()
 	}
 	if (KeyState.KEYA)
 	{
-		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime;
-		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
 	}
 
 
@@ -622,4 +642,31 @@ int main()
 		Render();
 		ClearInput();
 	}
+
+	//TODO
+	/*
+	* DrawInfo 문자열 생성 깔끔하게 다듬기
+	* #include <sstream>
+
+	void DrawInfo()
+	{
+		std::wstringstream wss;
+	
+		// 소수점 아래 자릿수 고정 설정
+		wss.fixed;
+		wss.precision(2);
+	
+		wss << L"FPS: " << FPS
+			<< L" | Pos: (" << Player.X << L", " << Player.Y << L")"
+			<< L" | Theta: " << Player.PlayerTheta << L"°";
+	
+		COORD printPos = { 0, 0 };
+		GScreen.PrintString(wss.str(), printPos); // .str()으로 wstring 추출
+	}
+
+	움직임 + 회전 시 프레임 드랍 보완 방법
+	① 콘솔 API 호출 최소화
+	② 회전 연산(삼각함수)의 오버헤드 체크
+	③ DeltaTime 독립성 및 입력 루프 분리
+*/
 }
