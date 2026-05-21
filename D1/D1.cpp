@@ -7,19 +7,99 @@
 typedef struct FKeyState
 {
 	bool QKey = false;
-	bool LeftArrow = false;
-	bool RightArrow = false;
-	bool UpArrow = false;
-	bool DownArrow = false;
+	bool LeftArrowDown = false;
+	bool LeftArrowUP = true;
+	bool RightArrowDown = false;
+	bool RightArrowUP = true;
+	bool UpArrowDown = false;
+	bool UpArrowUP = true;
+	bool DownArrowDown = false;
+	bool DownArrowUP = true;
+	bool KEYW = false;
+	bool KEYD = false;
+	bool KEYS = false;
+	bool KEYA = false;
 }FKeyState;
 
-double MoveBaseSpeed = 5.0;
+typedef struct FPrevKeyInfo
+{
+	bool PrevLeftArrow = false;
+	bool PrevRightArrow = false;
+	bool PrevDownrrow = false;
+	bool PrevUpArrow = false;
 
-FPlayer Player;
-Screen GScreen;
-FKeyState KeyState;
+}FPrevKeyInfo;
+
+double MoveBaseSpeed = 5.0;
+double RotationSpeed = 5.0;
+
+const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
 
+FPlayer			Player;
+Screen			GScreen;
+FKeyState		KeyState;
+FPrevKeyInfo	PrevKeyInfo;
+
+void FPlayer::SetDirVec()
+{
+	int NumForDecision = static_cast<int>(PlayerTheta);
+	if (NumForDecision < 0)
+		NumForDecision += 360;
+	if (NumForDecision >= 360)
+		NumForDecision -= 360;
+	//  0.0, -1.0, 0.66, 0.0
+	switch (NumForDecision)
+	{
+		case 0:
+			DirX = 0.0;		DirY = -1.0;
+			PlaneX = 0.66, PlaneY = 0.0;
+			RightX = -1.0, RightY = 0.0;
+			break;
+
+		case 45:
+			DirX = 1.0;	DirY = -1.0;
+			PlaneX = 0.4667, PlaneY = 0.4667;
+			RightX = -1.0, RightY = -1.0;
+			break;
+
+		case 90:
+			DirX = 1.0;	DirY = 0.0;
+			PlaneX = 0.0, PlaneY = 0.66;
+			RightX = 0.0, RightY = -1.0;
+			break;
+
+		case 135:
+			DirX = 1.0;	DirY = 1.0;
+			PlaneX = -0.4667, PlaneY = 0.4667;
+			RightX = 1.0, RightY = -1.0;
+			break;
+
+		case 180:
+			DirX = 0.0;		DirY = 1.0;
+			PlaneX = -0.66, PlaneY = 0.0;
+			RightX = 1.0, RightY = 0.0;
+			break;
+
+		case 225:
+			DirX = -1.0;	DirY = 1.0;
+			PlaneX = -0.4667, PlaneY = -0.4667;
+			RightX = 1.0, RightY = 1.0;
+			break;
+
+		case 270:
+			DirX = -1.0;	DirY = 0.0;
+			PlaneX = 0.0, PlaneY = -0.66;
+			RightX = 0.0, RightY = 1.0;
+			break;
+
+		case 315:
+			DirX = -1.0;	DirY = -1.0;
+			PlaneX = 0.4667, PlaneY = -0.4667;
+			RightX = -1.0, RightY = 1.0;
+			break;
+	}
+}
 
 #define mapWidth 24
 #define mapHeight 24
@@ -60,6 +140,10 @@ enum EDir
 	UP = 72,
 	RIGHT = 77,
 	DOWN = 80,
+	NORTH = 'w',
+	EAST = 'd',
+	SOUTH = 's',
+	WEST = 'a',
 };
 
 enum Env
@@ -71,7 +155,7 @@ enum Env
 
 void DrawPlayer()
 {
-	GScreen.PrintString(L"※", GotoXY((int)Player.X, (int)Player.Y));
+	GScreen.PrintString(L"※", GotoXY(static_cast<SHORT>(Player.X), static_cast<SHORT>(Player.Y)));
 }
 
 void DrawGrid()
@@ -233,7 +317,7 @@ void DrawGrid()
 
 		//TODO Draw velLine
 		COORD StartPos = { static_cast<SHORT>(x), static_cast<SHORT>(DrawStart) };
-		wchar_t WallChar = (Side == 1) ? L'\u25A0': L'\u25A8';
+		wchar_t WallChar = (Side == 1) ? L'\u25A0' : L'\u25A8';
 		GScreen.PrintVer(WallChar, StartPos, DrawEnd - DrawStart);
 	}
 
@@ -253,9 +337,26 @@ void DrawGrid()
 	//}
 }
 
-void DrawFPS()
+double GetTheta()
 {
-	GScreen.PrintString(std::to_wstring(static_cast<int>(1 / DeltaTime)), {0, 0});
+	return Player.PlayerTheta;
+}
+
+void DrawInfo()
+{
+	//Draw FPS;
+	GScreen.PrintString(std::to_wstring(static_cast<int>(1 / DeltaTime)), { 0, 0 });
+
+	//Draw Coordination
+
+	GScreen.PrintString(L"x : " + std::to_wstring(Player.X), { 0, 1 });
+	GScreen.PrintString(L"y : " + std::to_wstring(Player.Y), { 0, 2 });
+
+	//Draw theta;
+	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3 });
+	//double CosTHeta
+
+
 }
 
 void ClearScreen()
@@ -265,7 +366,7 @@ void ClearScreen()
 
 void Init()
 {
-	Player = { 12, 12, 0.0, -1.0, 0.66, 0.0 };
+	Player = { 18, 12, 0.0, -1.0, -1.0, 0.0, 0.66, 0.0, 0 };
 	GScreen.Init();
 }
 
@@ -274,45 +375,113 @@ void Input()
 	int InKey = 0;
 	int XDir = 0;
 	int YDir = 0;
-	// TODO 키 입력을 winAPI로 변경
-	if (_kbhit())
+
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
-		InKey = _getch();
-		if (InKey == 224)
-			InKey = _getch();
-
-
-		if (InKey == 'q')
-			KeyState.QKey = true;
-		if (InKey == UP)
-			KeyState.UpArrow = true;
-		if (InKey == RIGHT)
-			KeyState.RightArrow = true;
-		if (InKey == DOWN)
-			KeyState.DownArrow = true;
-		if (InKey == LEFT)
-			KeyState.LeftArrow = true;
-
+		KeyState.UpArrowDown = true;
 	}
+	if (GetAsyncKeyState(VK_UP) & 1)
+	{
+		KeyState.UpArrowDown = false;
+	}
+
+
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		KeyState.RightArrowDown = true;
+	}
+	else
+	{
+		KeyState.RightArrowDown = false;
+	}
+
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		KeyState.DownArrowDown = true;
+	}
+	else
+	{
+		KeyState.DownArrowDown = false;
+	}
+
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		KeyState.LeftArrowDown = true;
+	}
+	else
+	{
+		KeyState.LeftArrowDown = false;
+	}
+
+	if (GetAsyncKeyState('Q') & 0x8000) exit(0);
+	if (GetAsyncKeyState('W') & 0x8001)	KeyState.KEYW = true;
+	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
+	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
+	if (GetAsyncKeyState('A') & 0x8001)	KeyState.KEYA = true;
 }
 
-void HandleInput(double* Dx, double* Dy)
+void PlayerRotate()
 {
-	if (KeyState.QKey)
-		exit(0);
 
-	double MoveSpeed = MoveBaseSpeed * DeltaTime;
+	// 회전 처리
+	// TODO 상하 처리는 나중에 하거나 안넣거나
+	//if (KeyState.UpArrow)			*Dy -= MoveSpeed;
+	//if (KeyState.DownArrow)		*Dy += MoveSpeed;
+	double Theta = 45.0;
+	if (KeyState.LeftArrowDown && !PrevKeyInfo.PrevLeftArrow)
+	{
+		Theta *= -1.0;
+		Player.PlayerTheta += Theta;
+	}
+	if (KeyState.RightArrowDown && !PrevKeyInfo.PrevRightArrow)
+	{
+		Player.PlayerTheta += Theta;
+	}
 
-	if (KeyState.UpArrow)		*Dy -= MoveSpeed;
-	if (KeyState.RightArrow)	*Dx += MoveSpeed;
-	if (KeyState.DownArrow)		*Dy += MoveSpeed;
-	if (KeyState.LeftArrow)		*Dx -= MoveSpeed;
-
-	//TODO 회전 처리
+	Player.SetDirVec();
+	PrevKeyInfo.PrevLeftArrow = KeyState.LeftArrowDown;
+	PrevKeyInfo.PrevRightArrow = KeyState.RightArrowDown;
 }
 
-void PlayerMove(double Dx, double Dy)
+void PlayerMove()
 {
+	double Dx = 0.0;
+	double Dy = 0.0;
+	double theta = 45;
+	double DirSize = pow(Player.DirX, 2) + pow(Player.DirY, 2);
+	DirSize = sqrt(DirSize);
+
+	double RightSize = pow(Player.RightX, 2) + pow(Player.RightY, 2);
+	RightSize = sqrt(RightSize);
+	//TODO move 쪽으로 옮기기
+	// 이동 처리
+	// 지금은 WASD가 북동남서의 절대 기준
+	// TODO 상대적인 방향으로 바꾸기
+	if (!KeyState.KEYW && !KeyState.KEYD && !KeyState.KEYS && !KeyState.KEYA) return;
+	if (KeyState.KEYW)
+	{
+		Dx = (Player.DirX / DirSize) * MoveBaseSpeed * DeltaTime;
+		Dy = (Player.DirY / DirSize) * MoveBaseSpeed * DeltaTime;
+	}
+	if (KeyState.KEYD)
+	{
+		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+	}
+	if (KeyState.KEYS)
+	{
+		Dx = (Player.DirX / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (Player.DirY / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
+	}
+	if (KeyState.KEYA)
+	{
+		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime;
+	}
+
+	// 11 -11 -1-1 1-1
+
+
 	double ColliderRadius = 0.3;
 
 	// 다음 좌표
@@ -343,12 +512,20 @@ void PlayerMove(double Dx, double Dy)
 	if (Player.Y > MapMaxY) Player.Y = MapMaxY;
 }
 
+void HandleInput(double* Dx, double* Dy)
+{
+	if (KeyState.QKey)
+		exit(0);
+}
+
+
 void Update()
 {
 	double Dx = 0.0;
 	double Dy = 0.0;
 	HandleInput(&Dx, &Dy);
-	PlayerMove(Dx, Dy);
+	PlayerRotate();
+	PlayerMove();
 }
 
 
@@ -356,7 +533,7 @@ void Render()
 {
 	DrawGrid();
 	//DrawPlayer();
-	DrawFPS();
+	DrawInfo();
 	ClearScreen();
 }
 
@@ -368,11 +545,10 @@ COORD GotoXY(int x, int y)
 
 void ClearInput()
 {
-	KeyState.QKey = false;
-	KeyState.UpArrow = false;
-	KeyState.RightArrow = false;
-	KeyState.DownArrow = false;
-	KeyState.LeftArrow = false;
+	KeyState.KEYW = false;
+	KeyState.KEYD = false;
+	KeyState.KEYS = false;
+	KeyState.KEYA = false;
 }
 
 int main()
@@ -398,5 +574,3 @@ int main()
 		ClearInput();
 	}
 }
-
-
