@@ -106,7 +106,7 @@ void Screen::ClearScreen()
 	// 공백문자로 채워서 초기화
 	DWORD written;
 	FillConsoleOutputCharacterA(
-		ScreenBuffer[CurrentScreenBufferIndex], ' ', 120 * 30, { 0,0 }, &written
+		ScreenBuffer[CurrentScreenBufferIndex], ' ', HorSize * VerSize, { 0,0 }, &written
 	);
 }
 

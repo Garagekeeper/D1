@@ -160,8 +160,8 @@ void DrawPlayer()
 
 void DrawGrid()
 {
-	const int WIDTH = 120;
-	const int HEIGHT = 30;
+	const int WIDTH		= GScreen.HorSize;
+	const int HEIGHT	= GScreen.VerSize;
 	/*
 	y
 		\	     /
@@ -344,17 +344,22 @@ double GetTheta()
 
 void DrawInfo()
 {
+	GScreen.PrintHor(L'\u2500', { 0,0 }, 20);
 	//Draw FPS;
-	GScreen.PrintString(std::to_wstring(static_cast<int>(1 / DeltaTime)), { 0, 0 });
+	GScreen.PrintString(L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime)), {0, 1});
 
 	//Draw Coordination
 
-	GScreen.PrintString(L"x : " + std::to_wstring(Player.X), { 0, 1 });
-	GScreen.PrintString(L"y : " + std::to_wstring(Player.Y), { 0, 2 });
+	GScreen.PrintString(L"x : " + std::to_wstring(Player.X), { 0, 2 });
+	GScreen.PrintString(L"y : " + std::to_wstring(Player.Y), { 0, 3 });
 
 	//Draw theta;
-	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3 });
-	//double CosTHeta
+	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 4 });
+	GScreen.PrintHor(L'\u2500', { 0, 5 }, 20);
+	GScreen.PrintVer(L'\u2510', { 20,0 }, 1);
+	GScreen.PrintVer(L'\u2502', { 20,1 }, 4);
+	GScreen.PrintVer(L'\u2518', { 20,5 }, 1);
+
 
 
 }
@@ -427,20 +432,54 @@ void PlayerRotate()
 	// TODO 상하 처리는 나중에 하거나 안넣거나
 	//if (KeyState.UpArrow)			*Dy -= MoveSpeed;
 	//if (KeyState.DownArrow)		*Dy += MoveSpeed;
-	double Theta = 45.0;
-	if (KeyState.LeftArrowDown && !PrevKeyInfo.PrevLeftArrow)
+	//// 아래는 45도 기준으로 
+	//double Theta = 45.0;
+	//if (KeyState.LeftArrowDown && !PrevKeyInfo.PrevLeftArrow)
+	//{
+	//	Theta *= -1.0;
+	//	Player.PlayerTheta += Theta;
+	//}
+	//if (KeyState.RightArrowDown && !PrevKeyInfo.PrevRightArrow)
+	//{
+	//	Player.PlayerTheta += Theta;
+	//}
+
+	//Player.SetDirVec();
+	//PrevKeyInfo.PrevLeftArrow = KeyState.LeftArrowDown;
+	//PrevKeyInfo.PrevRightArrow = KeyState.RightArrowDown;
+
+	// Theta * deltaTime을 곱하는 방식
+	// TODO 회전을 하면 할 수록 벽의 높이가 작아짐
+	double Theta = 35.0;
+	double FinalTheta = 0.0;
+	if (!KeyState.LeftArrowDown && !KeyState.RightArrowDown) return;
+
+	if (KeyState.LeftArrowDown)
 	{
-		Theta *= -1.0;
-		Player.PlayerTheta += Theta;
-	}
-	if (KeyState.RightArrowDown && !PrevKeyInfo.PrevRightArrow)
-	{
-		Player.PlayerTheta += Theta;
+		FinalTheta -= Theta * RotationSpeed * DeltaTime;
 	}
 
-	Player.SetDirVec();
-	PrevKeyInfo.PrevLeftArrow = KeyState.LeftArrowDown;
-	PrevKeyInfo.PrevRightArrow = KeyState.RightArrowDown;
+	if (KeyState.RightArrowDown)
+	{
+		FinalTheta +=  Theta * RotationSpeed * DeltaTime;
+	}
+
+	double FinalRad = FinalTheta * PHI / 180.0 ;
+
+	// 회전 변환
+	// 플레이어가 바라보는 방향 회전
+	Player.DirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
+	Player.DirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
+
+	// 플레이어의 오른쪽을 가리키는 벡터 변환
+	Player.RightX = Player.RightX * cos(FinalRad) - Player.RightY * sin(FinalRad);
+	Player.RightY = Player.RightX * sin(FinalRad) + Player.RightY * cos(FinalRad);
+
+	// 카메라 평면 변환
+	Player.PlaneX = Player.PlaneX * cos(FinalRad) - Player.PlaneY * sin(FinalRad);
+	Player.PlaneY = Player.PlaneX * sin(FinalRad) + Player.PlaneY * cos(FinalRad);
+
+	Player.PlayerTheta += FinalTheta;
 }
 
 void PlayerMove()
@@ -453,10 +492,8 @@ void PlayerMove()
 
 	double RightSize = pow(Player.RightX, 2) + pow(Player.RightY, 2);
 	RightSize = sqrt(RightSize);
-	//TODO move 쪽으로 옮기기
+	// 현재 바라보는 방향을 기준으로 앞뒤좌우 (상대적임)
 	// 이동 처리
-	// 지금은 WASD가 북동남서의 절대 기준
-	// TODO 상대적인 방향으로 바꾸기
 	if (!KeyState.KEYW && !KeyState.KEYD && !KeyState.KEYS && !KeyState.KEYA) return;
 	if (KeyState.KEYW)
 	{
@@ -479,7 +516,6 @@ void PlayerMove()
 		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime;
 	}
 
-	// 11 -11 -1-1 1-1
 
 
 	double ColliderRadius = 0.3;
@@ -553,6 +589,9 @@ void ClearInput()
 
 int main()
 {
+
+	//system("mode con cols=240 lines=60");
+
 	// delta time을위한  타이머(chrono)
 	LARGE_INTEGER Frequency;
 	LARGE_INTEGER PrevTime;
