@@ -43,6 +43,8 @@ bool Screen::Init()
 		VerSize = BufferInfo.dwSize.Y;
 	}
 
+	InnerBuffer = new int[HorSize * VerSize];
+
 
 	return true;
 }
@@ -108,13 +110,18 @@ void Screen::ClearScreen()
 	// 공백문자로 채워서 초기화
 	DWORD written;
 	FillConsoleOutputCharacterA(
-		ScreenBuffer[CurrentScreenBufferIndex], ' ', HorSize * VerSize, { 0,0 }, &written
+		ScreenBuffer[CurrentScreenBufferIndex], ' ', HorSize * 2 * VerSize, { 0,0 }, &written
 	);
 
-	COORD pos{ 0 , HorSize / 2 + 1 };
+	/*FillConsoleOutputCharacterA(
+		ScreenBuffer[CurrentScreenBufferIndex], ' ', HorSize / 2 * VerSize, { 0,0 }, &written
+	);*/
+
+	COORD pos{ 0 , VerSize / 2 + 1 };
 	FillConsoleOutputCharacterA(
-		ScreenBuffer[CurrentScreenBufferIndex], '.', HorSize / 2 * VerSize, pos, &written
+		ScreenBuffer[CurrentScreenBufferIndex], L'.', HorSize / 2 * VerSize, pos, &written
 	);
+	
 }
 
 Screen::~Screen()

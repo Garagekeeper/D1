@@ -16,6 +16,7 @@ public :
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
 	int HorSize;
 	int VerSize;
+	int* InnerBuffer;
 
 public:
 	// 화면 클래스 생성자
@@ -24,7 +25,8 @@ public:
 		CurrentScreenBufferIndex(0),
 		BufferInfo{},
 		HorSize(0),
-		VerSize(0)
+		VerSize(0),
+		InnerBuffer(nullptr)
 	{}
 
 	virtual ~Screen();
