@@ -9,6 +9,19 @@ bool Screen::Init()
 	int TargetWidth = 120;
 	int TargetHeight = 30;
 
+	// 터미널 크기 키우는 코드라는데, win11에서는 동작하지 않는 듯.
+	for (int i = 0; i < 2; i++)
+	{
+		SMALL_RECT minRect = { 0, 0, 0, 0 };
+		SetConsoleWindowInfo(ScreenBuffer[i], TRUE, &minRect);
+
+		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
+		SetConsoleScreenBufferSize(ScreenBuffer[i], bSize);
+
+		SMALL_RECT wRect = { 0, 0, static_cast<SHORT>(TargetWidth - 1), static_cast<SHORT>(TargetHeight - 1) };
+		SetConsoleWindowInfo(ScreenBuffer[i], TRUE, &wRect);
+	}
+
 	// 스크린 버퍼 생성
 	ScreenBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
 		0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -37,9 +50,8 @@ bool Screen::Init()
 		return false;
 	}
 
-	//SMALL_RECT wRect = { 0, 0,TargetWidth - 1, TargetHeight - 1 };
-	//SetConsoleWindowInfo(ScreenBuffer[0], TRUE, &wRect);
-	//SetConsoleWindowInfo(ScreenBuffer[1], TRUE, &wRect);
+	
+
 
 	//버퍼의 정보를 info에 담아옴
 	if (GetConsoleScreenBufferInfo(ScreenBuffer[0], &BufferInfo))

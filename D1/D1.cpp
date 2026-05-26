@@ -475,7 +475,7 @@ void DrawFloor()
 	const int WIDTH = GScreen.HorSize;
 	const int HEIGHT = GScreen.VerSize;
 
-	for (int Y = 29; Y < 30; Y++)
+	for (int Y = HEIGHT / 2; Y < HEIGHT; Y++)
 	{
 		// 플레이어 시야의 왼쪽 끝
 		double Ray_DirLeftEndX	= Player.DirX - Player.PlaneX;
@@ -532,14 +532,20 @@ void DrawFloor()
 		double FloorX = Player.X + HorDistFromCamToFloorRatio * Ray_DirLeftEndX;
 		double FloorY = Player.Y + HorDistFromCamToFloorRatio * Ray_DirLeftEndY;
 
-		for (int X = 0; X <= WIDTH; X++)
+		for (int X = 0; X < WIDTH; X++)
 		{
-			// 바닥 좌표의 정수부만 취함
+			// 바닥 좌표의 정수부만 취함 (월드 좌표, 월드 내부에서 벡터가 가리키는 좌표)
 			int CellX = static_cast<int>(FloorX);
 			int CellY = static_cast<int>(FloorY);
 
-			COORD pos{ CellX, CellY };
-			GScreen.PrintChar(L'#', pos);
+			// 결국 화면의 x,y가 Map의 Cellx, Celly의 지점을 그리고 있다 라고 해석이 가능
+			// 그래서 아래와 같이 체크무늬 모양도 가능
+
+			// 실제 출력할 좌표
+			COORD pos{ static_cast<int>(X),  static_cast<int> (Y)};
+			int checkerBoard = (std::abs(CellX) + std::abs(CellY)) % 2;
+			wchar_t tileChar = (checkerBoard == 0) ? L'·' : L' ';
+			GScreen.PrintChar(tileChar, pos);
 
 			FloorX += FloorStepX;
 			FloorY += FloorStepY;
@@ -568,7 +574,7 @@ void DrawWall()
 		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
 
 
-		DrawWallVer((OutSide == 1) ? L'\u25A0' : L'\u25A8', X, DrawStart, DrawEnd);
+		DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd);
 	}
 }
 
@@ -576,7 +582,7 @@ void Draw3dGrid()
 {
 	// 천장과 바닥이 벽보다 먼저 그려져야 함
 	//DrawCeiling();
-	//DrawFloor();
+	DrawFloor();
 	DrawWall();
 }
 
@@ -632,14 +638,28 @@ int main()
 	//TODO
 	/*
 
+	최적화
 	움직임 + 회전 시 프레임 드랍 보완 방법
-	1. 콘솔 API 호출 최소화
 	2. 회전 연산(삼각함수)의 오버헤드 체크
 	3. DeltaTime 독립성 및 입력 루프 분리
 
 	//TODO
-	1. 천장, 바닥 출력
-	2. 스프라이트 출력 방법
-	3. 콘솔 크기 조절시키기 (120,30)
+
+	1. !!!스프라이트 출력 방법 !!!
+		핵심 기술 - Z-버퍼(Z-Buffer)
+		스프라이트 투영 (참고자료 살펴볼것)
+	2. 1을 이용해서 적 출력 (근데 모양이 제한됨, 이미지를 띄우지 못하니까)
+	3. color 설정
+	글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
+
+구현 방법: 거리가 멀어질수록 벽과 바닥의 색상을 회색 ➡️ 어두운 회색 ➡️ 검은색으로 바꾸는 거리 기반 안개 효과(Fog Effect / Shading)를 줍니다.
+
+효과: 기호로만 보였던 그래픽에 실시간 음영이 들어가면서 갑자기 고전 패키지 게임 같은 엄청난 비주얼로 업그레이드됩니다.
+	4. 게임 방향성 정하기
+		- 슈팅
+		- 맵 탐험 요소가 있는 턴제 JRPG
+	
+	
+	3. 콘솔 크기 조절시키기 win11은 고정인듯 함.
 */
 }
