@@ -16,7 +16,7 @@ public :
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
 	int HorSize;
 	int VerSize;
-	int* InnerBuffer;
+	wchar_t* InnerBuffer;
 
 public:
 	// 화면 클래스 생성자
