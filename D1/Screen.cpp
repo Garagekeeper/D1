@@ -6,6 +6,8 @@ bool Screen::Init()
 	// 커서를 지움
 	// 그 뒤에 버퍼 정보를 가져옴
 
+
+
 	// 스크린 버퍼 생성
 	ScreenBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
 		0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -107,6 +109,11 @@ void Screen::ClearScreen()
 	DWORD written;
 	FillConsoleOutputCharacterA(
 		ScreenBuffer[CurrentScreenBufferIndex], ' ', HorSize * VerSize, { 0,0 }, &written
+	);
+
+	COORD pos{ 0 , HorSize / 2 + 1 };
+	FillConsoleOutputCharacterA(
+		ScreenBuffer[CurrentScreenBufferIndex], '.', HorSize / 2 * VerSize, pos, &written
 	);
 }
 

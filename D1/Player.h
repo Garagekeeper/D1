@@ -13,9 +13,13 @@ public:
 	double RightX;
 	double RightY;
 
-	// camera plane
+	// camera plane for wall casting
 	double PlaneX;
 	double PlaneY;
+
+	// camera plane for Florr, Ceiling castting
+	double VPlaneX;
+	double VPlaneY;
 
 	// double theta (rotation degree)
 	double PlayerTheta;

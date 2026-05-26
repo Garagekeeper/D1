@@ -49,7 +49,11 @@ int WorldMap[mapWidth][mapHeight] =
 
 void Init()
 {
-	Player = { 18, 12, 0.0, -1.0, 1.0, 0.0, 0.66, 0.0, 0 };
+	Player = { 18, 12, 
+		0.0, -1.0, 
+		1.0, 0.0, 
+		0.66, 0.0, 
+		0 };
 	GScreen.Init();
 }
 
@@ -113,7 +117,7 @@ void Update()
 void Render()
 {
 	//Draw2dGrid();
-	DrawPlayer();
+	//DrawPlayer();
 	Draw3dGrid();
 	DrawInfo();
 	ClearScreen();
@@ -126,7 +130,6 @@ void ClearInput()
 	KeyState.KEYS = false;
 	KeyState.KEYA = false;
 }
-
 
 void HandleInput()
 {
@@ -303,6 +306,18 @@ void Draw2dGrid()
 double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 {
 
+	/*
+	y
+		\	     /
+		 \ ____ /
+		  \    /
+		   \  /
+							x
+	여기서 카메라 플레인 (가로선)의 x범위를 -1 ~ 1로 만들어준다.
+	dir + Plane에 이 감소된 범위를 곱해서 방향을 결정해준다
+	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
+	*/
+
 	double CameraX = 2 * X / double(WIDTH) - 1;
 	double RayDirX = Player.DirX + Player.PlaneX * CameraX;
 	double RayDirY = Player.DirY + Player.PlaneY * CameraX;
@@ -450,25 +465,93 @@ void DrawCeiling()
 
 void DrawFloor()
 {
+	// 벽의 레이캐스팅은 X를 돌면서 벽에 ray를 쏴서 거리를 뽑아오고 그 거리에 비례해서 세로선을 그림
+	// 바닥의 레이캐스트는 현재 row(y)과 카메라 사이의 거리비를 구한다.(-1 < dist < 1)
+	//		- 최대 거리는 화면 정중앙	(height / 2)
+	//		- 최소는 화면 최하단 (플레이어의 발 바로 앞) (height)
+	//		- 이 값을 기준으로 현재 값을 뽑아 낼 수 있음
+	//		- current Dist = (0.5 * Height) / (y - Height / 2) (-1 =< Dist <= 1)
+	// 해당 거리를 통해서 실제 그 거리를 가진 맵 위의 점을 찾고 
 	const int WIDTH = GScreen.HorSize;
 	const int HEIGHT = GScreen.VerSize;
+
+	for (int Y = 29; Y < 30; Y++)
+	{
+		// 플레이어 시야의 왼쪽 끝
+		double Ray_DirLeftEndX	= Player.DirX - Player.PlaneX;
+		double Ray_DirLeftEndY	= Player.DirY - Player.PlaneY;
+
+		// 플레이어 시야의 오른쪽 끝
+		double Ray_DirRightEndX = Player.DirX + Player.PlaneX;
+		double Ray_DirRightEndY = Player.DirY + Player.PlaneY;
+
+
+
+		/*
+		0		Ceiling
+				------------------------------------
+		       /
+			  /
+			 /
+			/
+		Cam  < - Height / 2;
+			\
+			 \
+			  \
+			   \
+				------------------------------------- <- HEight
+		Height		Floor
+
+		높이가 Height / 2일때 거리 = 1 (무한)
+		그렇다면 CurrentY일때 거리는 = 1/x (반비례 관계라서)
+		1 : posZ = 1/x : p (반비례 관계니깐) 
+		posZ/x = p;
+		posZ/p = x;
+		----
+		\   | -
+		 \  | CurrentY
+		  \ | -
+		   -
+		*/
+
+		// 현재 카메라 평면의 Y좌표
+		double CameraY = 0.5 * HEIGHT;
+		// 카메라 평면을 기준으로 현재 Y 좌표가 얼마나 떨어져 있는지
+		int CurrentY = Y - HEIGHT/2;
+		// 카메라 평면에서 현재 Y(row) 까지의 거리
+		// Y가 Height/2일 때 무한(1) (가로 길이는 0)
+		// Y가 Height일 때 1(0) (가로 길이는 width)
+		//double HorDistFromCamToFloorRatio = CameraY / CurrentY;
+		double HorDistFromCamToFloorRatio = CameraY / CurrentY;
+
+		// x=0에서 x=width 로 한칸 이동할 때마다 X와 Y의 이동량 (delta)
+		double FloorStepX = HorDistFromCamToFloorRatio * (Ray_DirRightEndX - Ray_DirLeftEndX) / WIDTH;
+		double FloorStepY = HorDistFromCamToFloorRatio * (Ray_DirRightEndY - Ray_DirLeftEndY) / WIDTH;
+
+		// 시야각의 맨 왼쪽 방향의 방향 벡터쪽의 바닥(현재 시야각에서 가장 왼쪽 바닥)
+		double FloorX = Player.X + HorDistFromCamToFloorRatio * Ray_DirLeftEndX;
+		double FloorY = Player.Y + HorDistFromCamToFloorRatio * Ray_DirLeftEndY;
+
+		for (int X = 0; X <= WIDTH; X++)
+		{
+			// 바닥 좌표의 정수부만 취함
+			int CellX = static_cast<int>(FloorX);
+			int CellY = static_cast<int>(FloorY);
+
+			COORD pos{ CellX, CellY };
+			GScreen.PrintChar(L'#', pos);
+
+			FloorX += FloorStepX;
+			FloorY += FloorStepY;
+		}
+	}
 }
 
 void DrawWall()
 {
 	const int WIDTH = GScreen.HorSize;
 	const int HEIGHT = GScreen.VerSize;
-	/*
-	y
-		\	     /
-		 \ ____ /
-		  \    /
-		   \  /
-							x
-	여기서 카메라 플레인 (가로선)의 x범위를 -1 ~ 1로 만들어준다.
-	dir + Plane에 이 감소된 범위를 곱해서 방향을 결정해준다
-	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
-	*/
+	
 	for (int X = 0; X < WIDTH; X++)
 	{
 		int OutSide = 0;
@@ -493,10 +576,9 @@ void Draw3dGrid()
 {
 	// 천장과 바닥이 벽보다 먼저 그려져야 함
 	//DrawCeiling();
-	DrawFloor();
+	//DrawFloor();
 	DrawWall();
 }
-
 
 void DrawInfo()
 {
@@ -521,7 +603,6 @@ void ClearScreen()
 {
 	GScreen.ChangeScreenBuffer();
 }
-
 
 int main()
 {
@@ -556,6 +637,9 @@ int main()
 	2. 회전 연산(삼각함수)의 오버헤드 체크
 	3. DeltaTime 독립성 및 입력 루프 분리
 
-	4. 스프라이트 출력 방법
+	//TODO
+	1. 천장, 바닥 출력
+	2. 스프라이트 출력 방법
+	3. 콘솔 크기 조절시키기 (120,30)
 */
 }
