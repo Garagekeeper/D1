@@ -1,34 +1,10 @@
 #include "D1.h"
 #include "Screen.h"
+#include "Player.h"
 // 추후 키 입력을 winAPI로 변경시 제거
 #include <stdio.h>
 #include <conio.h>
-
-typedef struct FKeyState
-{
-	bool QKey = false;
-	bool LeftArrowDown = false;
-	bool LeftArrowUP = true;
-	bool RightArrowDown = false;
-	bool RightArrowUP = true;
-	bool UpArrowDown = false;
-	bool UpArrowUP = true;
-	bool DownArrowDown = false;
-	bool DownArrowUP = true;
-	bool KEYW = false;
-	bool KEYD = false;
-	bool KEYS = false;
-	bool KEYA = false;
-}FKeyState;
-
-typedef struct FPrevKeyInfo
-{
-	bool PrevLeftArrow = false;
-	bool PrevRightArrow = false;
-	bool PrevDownrrow = false;
-	bool PrevUpArrow = false;
-
-}FPrevKeyInfo;
+#include <sstream>
 
 double MoveBaseSpeed = 5.0;
 double RotationSpeed = 5.0;
@@ -41,71 +17,8 @@ Screen			GScreen;
 FKeyState		KeyState;
 FPrevKeyInfo	PrevKeyInfo;
 
-void FPlayer::SetDirVec()
-{
-	int NumForDecision = static_cast<int>(PlayerTheta);
-	if (NumForDecision < 0)
-		NumForDecision += 360;
-	if (NumForDecision >= 360)
-		NumForDecision -= 360;
-	//  0.0, -1.0, 0.66, 0.0
-	switch (NumForDecision)
-	{
-		case 0:
-			DirX = 0.0;		DirY = -1.0;
-			PlaneX = 0.66, PlaneY = 0.0;
-			RightX = -1.0, RightY = 0.0;
-			break;
-
-		case 45:
-			DirX = 1.0;	DirY = -1.0;
-			PlaneX = 0.4667, PlaneY = 0.4667;
-			RightX = -1.0, RightY = -1.0;
-			break;
-
-		case 90:
-			DirX = 1.0;	DirY = 0.0;
-			PlaneX = 0.0, PlaneY = 0.66;
-			RightX = 0.0, RightY = -1.0;
-			break;
-
-		case 135:
-			DirX = 1.0;	DirY = 1.0;
-			PlaneX = -0.4667, PlaneY = 0.4667;
-			RightX = 1.0, RightY = -1.0;
-			break;
-
-		case 180:
-			DirX = 0.0;		DirY = 1.0;
-			PlaneX = -0.66, PlaneY = 0.0;
-			RightX = 1.0, RightY = 0.0;
-			break;
-
-		case 225:
-			DirX = -1.0;	DirY = 1.0;
-			PlaneX = -0.4667, PlaneY = -0.4667;
-			RightX = 1.0, RightY = 1.0;
-			break;
-
-		case 270:
-			DirX = -1.0;	DirY = 0.0;
-			PlaneX = 0.0, PlaneY = -0.66;
-			RightX = 0.0, RightY = 1.0;
-			break;
-
-		case 315:
-			DirX = -1.0;	DirY = -1.0;
-			PlaneX = 0.4667, PlaneY = -0.4667;
-			RightX = -1.0, RightY = 1.0;
-			break;
-	}
-}
-
 #define mapWidth 24
 #define mapHeight 24
-#define screenWidth 640
-#define screenHeight 480
-
 int WorldMap[mapWidth][mapHeight] =
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -133,251 +46,6 @@ int WorldMap[mapWidth][mapHeight] =
   {1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
-
-enum EDir
-{
-	LEFT = 75,
-	UP = 72,
-	RIGHT = 77,
-	DOWN = 80,
-	NORTH = 'w',
-	EAST = 'd',
-	SOUTH = 's',
-	WEST = 'a',
-};
-
-enum Env
-{
-	EMPTY = 0,
-	WALL = 1,
-	PLAYER = 9,
-};
-
-void DrawPlayer()
-{
-	GScreen.PrintString(L"※", GotoXY(static_cast<SHORT>(Player.X), static_cast<SHORT>(Player.Y)));
-}
-
-void DrawGrid()
-{
-	const int WIDTH = GScreen.HorSize;
-	const int HEIGHT = GScreen.VerSize;
-	/*
-	y
-		\	     /
-		 \ ____ /
-		  \    /
-		   \  /
-							x
-	여기서 카메라 플레인 (가로선)의 x범위를 -1 ~ 1로 만들어준다.
-	dir + Plane에 이 감소된 범위를 곱해서 방향을 결정해준다
-	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
-	*/
-	for (int x = 0; x < WIDTH; x++)
-	{
-		double CameraX = 2 * x / double(WIDTH) - 1;
-		double RayDirX = Player.DirX + Player.PlaneX * CameraX;
-		double RayDirY = Player.DirY + Player.PlaneY * CameraX;
-
-		// 현재 우리가 서 있는 위치
-		int MapPosX = (int)Player.X;
-		int MapPosY = (int)Player.Y;
-
-		// ray가 출발해서 처음으로 x에 수직인 선을 만난 위치까지의 거리
-		// ray가 출발해서 처음으로 y에 수직은 선을 만난 위치까지의 거리
-		double SideDistX;
-		double SideDistY;
-
-		// ray가 그 다음으로 x축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
-		// ray가 그 다음으로 y축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
-
-		// 그림으로 보면 직각 삼각형 형태로 피타고라스로 계산할 수있다.
-		// deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
-		// deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
-
-		// 이를 단순화하면 (계산하고 정리하면 이렇게 됨)
-		// deltaDistX = abs(|rayDir|(길이) / rayDirX)
-		// deltaDistY = abs(|rayDir|(길이) / rayDirY)
-
-		// 여기서 한 술 더 떠서 |rayDir|을 1로 게산해 버리는데 DDA알고리즘에서
-		// 길이가 중요한게 아니라 비율이 중요한거라 둘다 길이로 나눠버린다고 한다.
-		// 0으로 나눌 수는 없으니까 큰 값을 넣어서 사실상 0으로 만든다.
-		double DeltaDistX = (RayDirX == 0) ? 1e30 : std::abs(1 / RayDirX);
-		double DeltaDistY = (RayDirY == 0) ? 1e30 : std::abs(1 / RayDirY);
-		// 나중에 Ray의 거리를 구하는데 사용
-		double PerpWallDist;
-
-		//DDA는 반복할 때마다 맵을 정확히 한칸씩 이동하는데 (대각선 안됨)
-		//한칸 넘었을 떄 X에 닿았는지 Y에 닿았는지 둘 중 하나만 먼저 발생
-		//이동 방향은 ray의 방향에따라서 결정되고, 그방향을 여기에 저장한다.
-		int StepX;
-		int StepY;
-
-		// 벽에 부딪혔나?
-		bool bHit = false;
-		// X에 수직선에 감지? Y수직선에 감지?
-		// X쪽이면 0, Y쪽이면 1
-		int Side;
-
-		//초기 sideDist 계산
-		//현재 위치에서 가장 가까운 다음 격자선까지 raY가 얼마나 가야하는가
-		if (RayDirX < 0)
-		{
-			StepX = -1;
-			// 왼쪽 방향으로 가면
-			// 처음 x를 만날때 까지의 실제 거리 * deltaDistX 인데
-			// deltaDistX는 다음과 같다 x가 +- 1증가할 때 ray의 전체 길이는 얼마나 증가했나?
-			// 원래는 그런데 길이를 나눠나서 모호하게 보일 수 있음
-			SideDistX = (Player.X - MapPosX) * DeltaDistX;
-		}
-		else
-		{
-			StepX = 1;
-			SideDistX = (MapPosX + 1.0 - Player.X) * DeltaDistX;
-		}
-
-		if (RayDirY < 0)
-		{
-			StepY = -1;
-			SideDistY = (Player.Y - MapPosY) * DeltaDistY;
-		}
-		else
-		{
-			StepY = 1;
-			SideDistY = (MapPosY + 1.0 - Player.Y) * DeltaDistY;
-		}
-
-		// 진짜 DDA시작
-		// 매 루프마다 격자 1칸을 이동(충돌할 때 까지)
-		while (bHit == false)
-		{
-			//다음 격자로 이동, x나 y 방향으로
-			if (SideDistX < SideDistY)
-			{
-				// 직전에 x를 먼저 만났으면 x 쪽으로 이동
-				// 직전에 Y를 먼저 만났으면 Y 쪽으로 이동
-
-				// ray 이동
-				SideDistX += DeltaDistX;
-				// 격자 이동
-				MapPosX += StepX;
-				// 직전에 x를 먼저 만나서 0으로 표시
-				Side = 0;
-			}
-			else
-			{
-				SideDistY += DeltaDistY;
-				MapPosY += StepY;
-				Side = 1;
-			}
-
-			// 해당 격자에 벽이 있는지 확인, 있으면 종료
-			if (WorldMap[MapPosY][MapPosX] == WALL) bHit = true;
-		}
-
-		// DDA가 끝나면 실제 Ray의 거리를 계산
-		// 유클리드 효과거리를 사용하면 어안효과고 있다고 하는데.. 잘 몰루
-		//		플레이어의 위치를 기준으로 유클리드 하면
-		//		ㅁㅁㅁ
-		//        p
-		//		이 상황에서 p에서 각 벽까지의 거리가 다 달라서 중간게 제일 커보이고
-		//		나머지는 작아보임 이러면 어안처럼 둥글게 보인다
-		// 카메라 평면을 사용하면 
-		//      ㅁㅁㅁ
-		//      
-		//      ------- 
-		// 평면에서 벽까지의 수직거리를 측정해서 어느 점에서나 같은 값이 나온다.
-		// 그래서 어안효과 사라짐.
-		// perpWallDist이 값이 벽에 수직인 거리를 말하는 것
-
-		// 벽을 발견했다? -> 벽에 들어와있다(한칸 더 갔다)
-		// 한칸 뒤로가자 (ray도 온 만큼 뒤돌아가자)
-		// 근데 왜 한칸 뒤로 가는게 실제 수직 거리이죠?
-		//		아까 double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
-		//		여기서 길이를 1로 바꿔버려서 대각선 성분이 없어지고 수직 성분만 남았다고!
-		//		(솔직히 좀 놀라움)
-
-		if (Side == 0)
-			PerpWallDist = (SideDistX - DeltaDistX);
-		else
-			PerpWallDist = (SideDistY - DeltaDistY);
-
-		if (PerpWallDist < 0.001)
-			PerpWallDist = 0.001;
-
-		// 화면에 그릴 높이 계산 (가까우면 길게)
-		int LineHeight = (int)(HEIGHT / PerpWallDist);
-
-		//세로로 벽을 그리는데, 그리기 시작하는 위치와 끝내는 위치를 정함
-		//사실 식이 어떻게 되는지는 잘 몰루
-		int DrawStart = -LineHeight / 2 + HEIGHT / 2;
-		if (DrawStart < 0)DrawStart = 0;
-		int DrawEnd = LineHeight / 2 + HEIGHT / 2;
-		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
-
-		//TODO Draw velLine
-		COORD StartPos = { static_cast<SHORT>(x), static_cast<SHORT>(DrawStart) };
-		wchar_t WallChar = (Side == 1) ? L'\u25A0' : L'\u25A8';
-		GScreen.PrintVer(WallChar, StartPos, DrawEnd - DrawStart);
-	}
-
-	////Draw topDown Grid
-	//for (int i = 0; i < 24; i++)
-	//{
-	//	COORD pos = { 0, i };
-	//	wstring str;
-	//	for (int j = 0; j < 24; j++)
-	//	{
-	//		if (worldMap[i][j] == 1)
-	//			str.append(1 ,L'■');
-	//		else 
-	//			str.append(1, ' ');
-	//	}
-	//	screen.PrintString(str, pos);
-	//}
-}
-
-double GetTheta()
-{
-	return Player.PlayerTheta;
-}
-
-void DrawInfo()
-{
-	GScreen.PrintHor(L'\u2500', { 0,0 }, 20);
-	//Draw FPS;
-	wstring TargetString = L"FPS : " + std::to_wstring(static_cast<int>(1 / DeltaTime));
-	wstring SpacingString(20 - TargetString.size(), ' ');
-	GScreen.PrintString(TargetString + SpacingString, { 0, 1 });
-
-	//Draw Coordination
-
-	wstring DoubleValString = to_wstring(Player.X);
-	DoubleValString = DoubleValString.substr(0, DoubleValString.find('.') + 2);
-	TargetString = L"x : " + DoubleValString;
-
-	DoubleValString = to_wstring(Player.Y);
-	DoubleValString = DoubleValString.substr(0, DoubleValString.find('.') + 2);
-	TargetString = TargetString + L", y : " + DoubleValString;
-
-	SpacingString.assign(20 - TargetString.size(), ' ');
-	GScreen.PrintString(TargetString + SpacingString, { 0, 2 });
-
-	//Draw theta;
-	GScreen.PrintString(L"theta : " + std::to_wstring(GetTheta()), { 0, 3 });
-	GScreen.PrintHor(L'\u2500', { 0, 5 }, 20);
-	GScreen.PrintVer(L'\u2510', { 20,0 }, 1);
-	GScreen.PrintVer(L'\u2502', { 20,1 }, 4);
-	GScreen.PrintVer(L'\u2518', { 20,5 }, 1);
-
-
-
-}
-
-void ClearScreen()
-{
-	GScreen.ChangeScreenBuffer();
-}
 
 void Init()
 {
@@ -433,6 +101,37 @@ void Input()
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
 	if (GetAsyncKeyState('A') & 0x8001)	KeyState.KEYA = true;
+}
+
+void Update()
+{
+	HandleInput();
+	PlayerRotate();
+	PlayerMove();
+}
+
+void Render()
+{
+	//Draw2dGrid();
+	DrawPlayer();
+	Draw3dGrid();
+	DrawInfo();
+	ClearScreen();
+}
+
+void ClearInput()
+{
+	KeyState.KEYW = false;
+	KeyState.KEYD = false;
+	KeyState.KEYS = false;
+	KeyState.KEYA = false;
+}
+
+
+void HandleInput()
+{
+	if (KeyState.QKey)
+		exit(0);
 }
 
 void PlayerRotate()
@@ -578,48 +277,254 @@ void PlayerMove()
 	if (Player.Y > MapMaxY) Player.Y = MapMaxY;
 }
 
-void HandleInput(double* Dx, double* Dy)
+void DrawPlayer()
 {
-	if (KeyState.QKey)
-		exit(0);
+	GScreen.PrintString(L"※", { static_cast<SHORT>(Player.X), static_cast<SHORT>(Player.Y) });
+}
+
+void Draw2dGrid()
+{
+	//Draw topDown Grid
+	for (int i = 0; i < 24; i++)
+	{
+		COORD pos = { 0, static_cast<SHORT>(i)};
+		wstring str;
+		for (int j = 0; j < 24; j++)
+		{
+			if (WorldMap[i][j] == 1)
+				str.append(1, L'■');
+			else
+				str.append(1, ' ');
+		}
+		GScreen.PrintString(str, pos);
+	}
+}
+
+double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
+{
+
+	double CameraX = 2 * X / double(WIDTH) - 1;
+	double RayDirX = Player.DirX + Player.PlaneX * CameraX;
+	double RayDirY = Player.DirY + Player.PlaneY * CameraX;
+
+	// 현재 우리가 서 있는 위치
+	int MapPosX = (int)Player.X;
+	int MapPosY = (int)Player.Y;
+
+	// ray가 출발해서 처음으로 x에 수직인 선을 만난 위치까지의 거리
+	// ray가 출발해서 처음으로 y에 수직은 선을 만난 위치까지의 거리
+	double SideDistX;
+	double SideDistY;
+
+	// ray가 그 다음으로 x축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
+	// ray가 그 다음으로 y축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
+
+	// 그림으로 보면 직각 삼각형 형태로 피타고라스로 계산할 수있다.
+	// deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
+	// deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
+
+	// 이를 단순화하면 (계산하고 정리하면 이렇게 됨)
+	// deltaDistX = abs(|rayDir|(길이) / rayDirX)
+	// deltaDistY = abs(|rayDir|(길이) / rayDirY)
+
+	// 여기서 한 술 더 떠서 |rayDir|을 1로 게산해 버리는데 DDA알고리즘에서
+	// 길이가 중요한게 아니라 비율이 중요한거라 둘다 길이로 나눠버린다고 한다.
+	// 0으로 나눌 수는 없으니까 큰 값을 넣어서 사실상 0으로 만든다.
+	double DeltaDistX = (RayDirX == 0) ? 1e30 : std::abs(1 / RayDirX);
+	double DeltaDistY = (RayDirY == 0) ? 1e30 : std::abs(1 / RayDirY);
+	// 나중에 Ray의 거리를 구하는데 사용
+	double PerpWallDist;
+
+	//DDA는 반복할 때마다 맵을 정확히 한칸씩 이동하는데 (대각선 안됨)
+	//한칸 넘었을 떄 X에 닿았는지 Y에 닿았는지 둘 중 하나만 먼저 발생
+	//이동 방향은 ray의 방향에따라서 결정되고, 그방향을 여기에 저장한다.
+	int StepX;
+	int StepY;
+
+	// 벽에 부딪혔나?
+	bool bHit = false;
+	// X에 수직선에 감지? Y수직선에 감지?
+	// X쪽이면 0, Y쪽이면 1
+
+	//초기 sideDist 계산
+	//현재 위치에서 가장 가까운 다음 격자선까지 raY가 얼마나 가야하는가
+	if (RayDirX < 0)
+	{
+		StepX = -1;
+		// 왼쪽 방향으로 가면
+		// 처음 x를 만날때 까지의 실제 거리 * deltaDistX 인데
+		// deltaDistX는 다음과 같다 x가 +- 1증가할 때 ray의 전체 길이는 얼마나 증가했나?
+		// 원래는 그런데 길이를 나눠나서 모호하게 보일 수 있음
+		SideDistX = (Player.X - MapPosX) * DeltaDistX;
+	}
+	else
+	{
+		StepX = 1;
+		SideDistX = (MapPosX + 1.0 - Player.X) * DeltaDistX;
+	}
+
+	if (RayDirY < 0)
+	{
+		StepY = -1;
+		SideDistY = (Player.Y - MapPosY) * DeltaDistY;
+	}
+	else
+	{
+		StepY = 1;
+		SideDistY = (MapPosY + 1.0 - Player.Y) * DeltaDistY;
+	}
+
+	// 진짜 DDA시작
+	// 매 루프마다 격자 1칸을 이동(충돌할 때 까지)
+	while (bHit == false)
+	{
+		//다음 격자로 이동, x나 y 방향으로
+		if (SideDistX < SideDistY)
+		{
+			// 직전에 x를 먼저 만났으면 x 쪽으로 이동
+			// 직전에 Y를 먼저 만났으면 Y 쪽으로 이동
+
+			// ray 이동
+			SideDistX += DeltaDistX;
+			// 격자 이동
+			MapPosX += StepX;
+			// 직전에 x를 먼저 만나서 0으로 표시
+			Side = 0;
+		}
+		else
+		{
+			SideDistY += DeltaDistY;
+			MapPosY += StepY;
+			Side = 1;
+		}
+
+		// 해당 격자에 벽이 있는지 확인, 있으면 종료
+		if (WorldMap[MapPosY][MapPosX] == WALL) bHit = true;
+	}
+
+	// DDA가 끝나면 실제 Ray의 거리를 계산
+	// 유클리드 효과거리를 사용하면 어안효과고 있다고 하는데.. 잘 몰루
+	//		플레이어의 위치를 기준으로 유클리드 하면
+	//		ㅁㅁㅁ
+	//        p
+	//		이 상황에서 p에서 각 벽까지의 거리가 다 달라서 중간게 제일 커보이고
+	//		나머지는 작아보임 이러면 어안처럼 둥글게 보인다
+	// 카메라 평면을 사용하면 
+	//      ㅁㅁㅁ
+	//      
+	//      ------- 
+	// 평면에서 벽까지의 수직거리를 측정해서 어느 점에서나 같은 값이 나온다.
+	// 그래서 어안효과 사라짐.
+	// perpWallDist이 값이 벽에 수직인 거리를 말하는 것
+
+	// 벽을 발견했다? -> 벽에 들어와있다(한칸 더 갔다)
+	// 한칸 뒤로가자 (ray도 온 만큼 뒤돌아가자)
+	// 근데 왜 한칸 뒤로 가는게 실제 수직 거리이죠?
+	//		아까 double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
+	//		여기서 길이를 1로 바꿔버려서 대각선 성분이 없어지고 수직 성분만 남았다고!
+	//		(솔직히 좀 놀라움)
+
+	if (Side == 0)
+		PerpWallDist = (SideDistX - DeltaDistX);
+	else
+		PerpWallDist = (SideDistY - DeltaDistY);
+
+	if (PerpWallDist < 0.001)
+		PerpWallDist = 0.001;
+
+	return PerpWallDist;
+}
+
+void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd)
+{
+	COORD StartPos = { static_cast<SHORT>(X), static_cast<SHORT>(DrawStart) };
+	int Length = DrawEnd - DrawStart;
+	GScreen.PrintVer(Wchar, StartPos, Length);
+}
+
+void DrawCeiling()
+{
+	const int WIDTH = GScreen.HorSize;
+	const int HEIGHT = GScreen.VerSize;
+}
+
+void DrawFloor()
+{
+	const int WIDTH = GScreen.HorSize;
+	const int HEIGHT = GScreen.VerSize;
+}
+
+void DrawWall()
+{
+	const int WIDTH = GScreen.HorSize;
+	const int HEIGHT = GScreen.VerSize;
+	/*
+	y
+		\	     /
+		 \ ____ /
+		  \    /
+		   \  /
+							x
+	여기서 카메라 플레인 (가로선)의 x범위를 -1 ~ 1로 만들어준다.
+	dir + Plane에 이 감소된 범위를 곱해서 방향을 결정해준다
+	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
+	*/
+	for (int X = 0; X < WIDTH; X++)
+	{
+		int OutSide = 0;
+		double PerpWallDist = DDA(X, WIDTH, HEIGHT, OutSide);
+
+		// 화면에 그릴 높이 계산 (가까우면 길게)
+		int LineHeight = (int)(HEIGHT / PerpWallDist);
+
+		//세로로 벽을 그리는데, 그리기 시작하는 위치와 끝내는 위치를 정함
+		//사실 식이 어떻게 되는지는 잘 몰루
+		int DrawStart = -LineHeight / 2 + HEIGHT / 2;
+		if (DrawStart < 0)DrawStart = 0;
+		int DrawEnd = LineHeight / 2 + HEIGHT / 2;
+		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
+
+
+		DrawWallVer((OutSide == 1) ? L'\u25A0' : L'\u25A8', X, DrawStart, DrawEnd);
+	}
+}
+
+void Draw3dGrid()
+{
+	// 천장과 바닥이 벽보다 먼저 그려져야 함
+	//DrawCeiling();
+	DrawFloor();
+	DrawWall();
 }
 
 
-void Update()
+void DrawInfo()
 {
-	double Dx = 0.0;
-	double Dy = 0.0;
-	HandleInput(&Dx, &Dy);
-	PlayerRotate();
-	PlayerMove();
+	wstringstream Wss;
+	// 소수점 아래 자리 고정
+	Wss.fixed;
+	Wss.precision(3);
+
+	int FPS = static_cast<int>(1 / DeltaTime);
+	wstring Wstr = to_wstring(FPS);
+
+	Wss << L"FPS : " << Wstr
+		<< L"| Pos (" << Player.X << L", " << Player.Y << L")"
+		<< L"| Theta : " << Player.PlayerTheta << L"°";
+
+	COORD printPos = { 0, 0 };
+	GScreen.PrintString(Wss.str(), printPos);
+
 }
 
-
-void Render()
+void ClearScreen()
 {
-	DrawGrid();
-	//DrawPlayer();
-	DrawInfo();
-	ClearScreen();
+	GScreen.ChangeScreenBuffer();
 }
 
-COORD GotoXY(int x, int y)
-{
-	COORD Pos = { (short)x, (short)y };
-	return Pos;
-}
-
-void ClearInput()
-{
-	KeyState.KEYW = false;
-	KeyState.KEYD = false;
-	KeyState.KEYS = false;
-	KeyState.KEYA = false;
-}
 
 int main()
 {
-
 	//system("mode con cols=240 lines=60");
 
 	// delta time을위한  타이머(chrono)
@@ -645,28 +550,12 @@ int main()
 
 	//TODO
 	/*
-	* DrawInfo 문자열 생성 깔끔하게 다듬기
-	* #include <sstream>
-
-	void DrawInfo()
-	{
-		std::wstringstream wss;
-	
-		// 소수점 아래 자릿수 고정 설정
-		wss.fixed;
-		wss.precision(2);
-	
-		wss << L"FPS: " << FPS
-			<< L" | Pos: (" << Player.X << L", " << Player.Y << L")"
-			<< L" | Theta: " << Player.PlayerTheta << L"°";
-	
-		COORD printPos = { 0, 0 };
-		GScreen.PrintString(wss.str(), printPos); // .str()으로 wstring 추출
-	}
 
 	움직임 + 회전 시 프레임 드랍 보완 방법
-	① 콘솔 API 호출 최소화
-	② 회전 연산(삼각함수)의 오버헤드 체크
-	③ DeltaTime 독립성 및 입력 루프 분리
+	1. 콘솔 API 호출 최소화
+	2. 회전 연산(삼각함수)의 오버헤드 체크
+	3. DeltaTime 독립성 및 입력 루프 분리
+
+	4. 스프라이트 출력 방법
 */
 }

@@ -8,29 +8,82 @@
 
 using namespace std;
 
-typedef struct FPlayer
+typedef struct FKeyState
 {
-public:
-	// player pos
-	double X;
-	double Y;
+	bool QKey = false;
+	bool LeftArrowDown = false;
+	bool LeftArrowUP = true;
+	bool RightArrowDown = false;
+	bool RightArrowUP = true;
+	bool UpArrowDown = false;
+	bool UpArrowUP = true;
+	bool DownArrowDown = false;
+	bool DownArrowUP = true;
+	bool KEYW = false;
+	bool KEYD = false;
+	bool KEYS = false;
+	bool KEYA = false;
+}FKeyState;
 
-	// player dir vec
-	double DirX;
-	double DirY;
-	double RightX;
-	double RightY;
+typedef struct FPrevKeyInfo
+{
+	bool PrevLeftArrow = false;
+	bool PrevRightArrow = false;
+	bool PrevDownrrow = false;
+	bool PrevUpArrow = false;
 
-	// camera plane
-	double PlaneX;
-	double PlaneY;
+}FPrevKeyInfo;
 
-	// double theta (rotation degree)
-	double PlayerTheta;
+enum EDir
+{
+	LEFT = 75,
+	UP = 72,
+	RIGHT = 77,
+	DOWN = 80,
+	NORTH = 'w',
+	EAST = 'd',
+	SOUTH = 's',
+	WEST = 'a',
+};
 
-public:
-	void SetDirVec();
-}FPlayer;
+enum Env
+{
+	EMPTY = 0,
+	WALL = 1,
+	PLAYER = 9,
+};
 
-COORD GotoXY(int x, int y);
+
+void Init();
+
+#pragma region Game loop
+void Input();
+void Update();
+void Render();
+void ClearInput();
+#pragma endregion
+
+#pragma region Update loop
+void HandleInput();
+void PlayerRotate();
+void PlayerMove();
+#pragma endregion
+
+#pragma region Render loop
+void DrawPlayer();
+void Draw2dGrid();
+
+double DDA(int X, const int WIDTH, const int HEIGHT, int& Side);
+void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd);
+void DrawCeiling();
+void DrawFloor();
+void DrawWall();
+void Draw3dGrid();
+
+void DrawInfo();
+void ClearScreen();
+#pragma endregion
+
+
+
 
