@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ public :
 	int HorSize;
 	int VerSize;
 	wchar_t* InnerBuffer;
+	vector<double> Zbuffer;
 
 public:
 	// 화면 클래스 생성자
@@ -42,15 +44,15 @@ public:
 	/// </summary>
 	/// <param name="str">출력할 스트링</param>
 	/// <param name="position">출력할 좌표</param>
-	void PrintString(const wstring& str, const COORD& position);
+	void PrintString(const wstring& str, const int x, const int y);
 	/// <summary>
 	/// 버퍼에 문자를 출력하는 함수
 	/// </summary>
 	/// <param name="ch">출력할 문자</param>
 	/// <param name="position">출력할 위치</param>
-	void PrintChar(const wchar_t ch, const COORD& position);
-	void PrintHor(const wchar_t ch, const COORD& position, int length);
-	void PrintVer(const wchar_t ch, const COORD& position, int length);
+	void PrintChar(const wchar_t ch, const int X, const int Y);
+	void PrintHor(const wchar_t ch, const int x, const int y, int length);
+	void PrintVer(const wchar_t ch, const int x, const int y, int length);
 
 	/// <summary>
 	/// 버퍼를 교환하는 함수

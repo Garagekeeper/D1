@@ -1,6 +1,7 @@
 #include "D1.h"
 #include "Screen.h"
 #include "Player.h"
+#include "Sprite.h"
 // 추후 키 입력을 winAPI로 변경시 제거
 #include <stdio.h>
 #include <conio.h>
@@ -11,11 +12,16 @@ double RotationSpeed = 5.0;
 
 const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
+const int NumOfSprite = 3;
+const int SpriteTextureTest_RowSize = 3;
 
 FPlayer			Player;
 Screen			GScreen;
 FKeyState		KeyState;
 FPrevKeyInfo	PrevKeyInfo;
+FSprite*		Sprites;
+vector<int>		SpriteOrder;
+vector<double>	SpriteDistance;
 
 #define mapWidth 24
 #define mapHeight 24
@@ -54,6 +60,42 @@ void Init()
 		1.0, 0.0, 
 		0.66, 0.0, 
 		0 };
+
+	Sprites = new FSprite[NumOfSprite]
+	{
+		{
+			5.5, 2.5, new const wchar_t* [SpriteTextureTest_RowSize]
+			{
+				{L"***" },
+				{L"* *" },
+				{L"***" },
+			}
+		},
+
+		{
+			22.5, 11.5, new const wchar_t* [SpriteTextureTest_RowSize]
+			{
+				{L"###" },
+				{L"# #" },
+				{L"###" },
+			}	
+		},
+
+		{
+			19, 3, new const wchar_t* [SpriteTextureTest_RowSize]
+			{
+				{L"@@@" },
+				{L"@ @" },
+				{L"@@@" },
+			}
+		},
+
+	};
+
+	SpriteOrder = vector<int>(NumOfSprite);
+	SpriteDistance = vector<double>(NumOfSprite);
+	
+
 	GScreen.Init();
 }
 
@@ -119,6 +161,7 @@ void Render()
 	//Draw2dGrid();
 	//DrawPlayer();
 	Draw3dGrid();
+	DrawSprite();
 	DrawInfo();
 	ClearScreen();
 }
@@ -282,7 +325,7 @@ void PlayerMove()
 
 void DrawPlayer()
 {
-	GScreen.PrintString(L"※", { static_cast<SHORT>(Player.X), static_cast<SHORT>(Player.Y) });
+	GScreen.PrintString(L"※", (int)Player.X, (int)Player.Y);
 }
 
 void Draw2dGrid()
@@ -290,7 +333,6 @@ void Draw2dGrid()
 	//Draw topDown Grid
 	for (int i = 0; i < 24; i++)
 	{
-		COORD pos = { 0, static_cast<SHORT>(i)};
 		wstring str;
 		for (int j = 0; j < 24; j++)
 		{
@@ -299,7 +341,7 @@ void Draw2dGrid()
 			else
 				str.append(1, ' ');
 		}
-		GScreen.PrintString(str, pos);
+		GScreen.PrintString(str, 0, i);
 	}
 }
 
@@ -452,9 +494,8 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 
 void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd)
 {
-	COORD StartPos = { static_cast<SHORT>(X), static_cast<SHORT>(DrawStart) };
 	int Length = DrawEnd - DrawStart;
-	GScreen.PrintVer(Wchar, StartPos, Length);
+	GScreen.PrintVer(Wchar, X, DrawStart, Length);
 }
 
 void DrawCeiling()
@@ -542,10 +583,9 @@ void DrawFloor()
 			// 그래서 아래와 같이 체크무늬 모양도 가능
 
 			// 실제 출력할 좌표
-			COORD pos{ static_cast<int>(X),  static_cast<int> (Y)};
 			int checkerBoard = (std::abs(CellX) + std::abs(CellY)) % 2;
 			wchar_t tileChar = (checkerBoard == 0) ? L'·' : L' ';
-			GScreen.PrintChar(tileChar, pos);
+			GScreen.PrintChar(tileChar, X, Y);
 
 			FloorX += FloorStepX;
 			FloorY += FloorStepY;
@@ -573,7 +613,8 @@ void DrawWall()
 		int DrawEnd = LineHeight / 2 + HEIGHT / 2;
 		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
 
-
+		// 현재 X좌표에서 만난 벽까지의 거리
+		GScreen.Zbuffer[X] = PerpWallDist;
 		DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd);
 	}
 }
@@ -584,6 +625,130 @@ void Draw3dGrid()
 	//DrawCeiling();
 	DrawFloor();
 	DrawWall();
+}
+
+void SortSprite(vector<int>* OrderVec, vector<double> *DistVec, int Amount)
+{
+	vector<pair<double, int>> Sprites(Amount);
+	for (int i = 0; i < Amount; i++)
+	{
+		Sprites[i].first = (*DistVec)[i];
+		Sprites[i].second = (*OrderVec)[i];
+	}
+
+	sort(Sprites.begin(), Sprites.end());
+	for (int i = 0; i < Amount; i++)
+	{
+		(*DistVec)[i] = Sprites[Amount - i - 1].first;
+		(*OrderVec)[i] = Sprites[Amount - i - 1].second;
+	}
+}
+
+void DrawSprite()
+{
+	// sortSprite Far to Close (가장 먼거부터 그려야, 가려질 수 있음, 앞에서부터 그리면 전부 다 나옴)
+	// 벡터 거리 저장
+	// 벡터 우선순위 초기화
+
+	for (int i = 0; i < NumOfSprite; i++)
+	{
+		SpriteOrder[i] = i;
+		SpriteDistance[i] = ((Player.X - Sprites[i].X) * (Player.X - Sprites[i].X) + (Player.Y - Sprites[i].Y) * (Player.Y - Sprites[i].Y));
+	}
+
+	SortSprite(&SpriteOrder, &SpriteDistance, NumOfSprite);
+
+	for (int i = 0; i < NumOfSprite; i++)
+	{
+
+		// 카메라에서 스프라이트 까지의 상대적인 위치
+		double SpriteX = Sprites[SpriteOrder[i]].X - Player.X;
+		double SpriteY = Sprites[SpriteOrder[i]].Y - Player.Y;
+
+		// 상대위치에 카메라의 역행렬을 곱해서 카메라 좌표의 X,Y를 구할 수 있다.(Y는 깊이, 화면 안쪽으로 들어가는)
+		// 생각해봤는데, 스프라이트에 이걸 곱하면 스프라이트가 항상 플레이어를 바라보게 되는듯
+		 //transform sprite with the inverse camera matrix
+		// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
+		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+		// [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+		double invDet = 1.0 / (Player.PlaneX * Player.DirY - Player.DirX * Player.PlaneY);
+
+		// 카메라 중심에서 좌우로 얼마나 떨어져 있는가
+		double transformX = invDet * (Player.DirY * SpriteX - Player.DirX * SpriteY); // 화면의 좌우 (양수면 오른쪽)
+		// 카메라 중심에서 앞뒤로 얼마나 떨어져 있는가.
+		double transformY = invDet * (-Player.PlaneY * SpriteX + Player.PlaneX * SpriteY); // 화면 안쪽으로 얼마나 들어가 있는지
+
+		// ????
+		// 원근투영
+		// 어떤 물체가 왼쪽으로 2미터 떨어진 위치에 있다.
+		// 화면에 가까울때는 화면을 많이 돌려야하고, 크게 보인다.
+		// 화면에서 멀때는 화면의 중앙에 가까운곳에 작게 보인다.
+		// transformX / transformY 이게 화면에서 멀수록 가운데로오게 해준다.
+		// 이 값은 -1 < X < 1인데 화면에는 음수 좌표계가 없으니까 +1
+		// 0 < x < 2 범위의 X를 0~130까지의 정수로 변환
+		// 스프라이트가 찍힐 X 좌표
+		int SpriteScrrenX = int((GScreen.HorSize / 2) * (1 + transformX / transformY));
+
+		// 스프라이트의 높이
+		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
+		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
+		int SpriteHeight = abs(int(GScreen.VerSize / transformY));
+
+		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2;
+		if (DrawStartY < 0) DrawStartY = 0;
+		int DrawEndY = +SpriteHeight / 2 + GScreen.VerSize / 2;
+		if (DrawEndY >= GScreen.VerSize) DrawStartY = GScreen.VerSize - 1;
+
+		// 스프라이트의 너비
+		int SpriteWidth = abs(int(GScreen.HorSize / transformY));
+
+		int DrawStartX = -SpriteWidth / 2 + GScreen.HorSize / 2;
+		if (DrawStartX < 0) DrawStartX = 0;
+		int DrawEndX = +SpriteWidth / 2 + GScreen.HorSize / 2;
+		if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize - 1;
+
+		for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
+		{
+			for (int j = DrawStartY; j < DrawEndY; j++)
+			{
+				// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
+				// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
+				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + GScreen.HorSize / 2)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
+
+				// 경계 안으로 들어 오도록
+				if (texX < 0) texX = 0;
+				if (texX >= SpriteTextureTest_RowSize) texX = SpriteTextureTest_RowSize - 1;
+
+				// 1. transformY이 0이하면 화면의 뒤쪽
+				// 2. i가 화면에 있는지
+				// 3. 벽보다 가까이 있는지
+				if (transformY > 0 && Stripe > 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
+				{
+					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
+					int d = j * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+					int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
+
+					// 경계 안으로 들어 오도록
+					if (texY < 0) texY = 0;
+					if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
+
+					wchar_t SpriteChar = Sprites[SpriteOrder[i]].SpriteTexture[texY][texX];
+
+
+					GScreen.PrintChar(SpriteChar, j, Stripe);
+
+					//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+					//if (SpriteChar != L' ')
+					//{
+					//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+					//	// 예시: GScreen.Buffer[j][i] = spriteChar;
+					//	GScreen.PrintChar(SpriteChar,  j, Stripe );
+					//}
+				}
+			}
+		}
+	}
 }
 
 void DrawInfo()
@@ -600,8 +765,7 @@ void DrawInfo()
 		<< L"| Pos (" << Player.X << L", " << Player.Y << L")"
 		<< L"| Theta : " << Player.PlayerTheta << L"°";
 
-	COORD printPos = { 0, 0 };
-	GScreen.PrintString(Wss.str(), printPos);
+	GScreen.PrintString(Wss.str(), 0, 0);
 
 }
 
@@ -635,6 +799,9 @@ int main()
 		ClearInput();
 	}
 
+	delete[] Sprites;
+	Sprites = nullptr;
+
 	//TODO
 	/*
 
@@ -662,4 +829,27 @@ int main()
 	
 	3. 콘솔 크기 조절시키기 win11은 고정인듯 함.
 */
+
+
+	/*
+	Sprite render 기초
+	1: While raycasting the walls, store the perpendicular distance of each vertical stripe in a 1D ZBuffer
+	2: Calculate the distance of each sprite to the player
+	3: Use this distance to sort the sprites, from furthest away to closest to the camera
+	4: Project the sprite on the camera plane (in 2D): subtract the player position from the sprite position, then multiply the result with the inverse of the 2x2 camera matrix
+	5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
+	6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
+	7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
+
+	1. 벽을 레이캐스팅 하는동안 각 X의 수직거리를 1차원 벡터 (ZBuffer)에 저장한다.
+	2. 각 스프라이트와 플레이어간의 거리를 계산한다.
+	3. 위에서 계산한 거리를 스프라이트 정렬에 사용한다. 가장 먼거에서 가장 가까운 순으루
+	4. 스프라이트를 카메라 평면에 투영한다. (SpritePos - PlayerPos) * inverse of the 2x2 camera matrix
+		-									여기서 스프라이트의 상대 위치가 나오고, 스프라이트를 플레이어 방향으로 회전 시켜야함(정확히 말하면 트랜스포메이션).
+											카메라 행렬의 인버스(역행렬)을 곱해서 구한다. ...?
+											그러면 카메라 좌표의 X,Y를 구할 수 있다.(Y는 깊이, 화면 안쪽으로 들어가는)
+	5. 수직 거리를 이용해서 스프라이트의 사이즈를 계산한다. (X,Y 방향 둘다)
+	6. 스프라이트를 수직선으로 하나씩 그린다. (Z버퍼의 벽보다 멀면 안그린다.)
+	7. 수직선의 픽셀을 하나씩 그린다. 
+	*/
 }

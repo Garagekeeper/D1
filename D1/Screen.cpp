@@ -50,8 +50,6 @@ bool Screen::Init()
 		return false;
 	}
 
-	
-
 
 	//버퍼의 정보를 info에 담아옴
 	if (GetConsoleScreenBufferInfo(ScreenBuffer[0], &BufferInfo))
@@ -60,43 +58,43 @@ bool Screen::Init()
 		VerSize = BufferInfo.dwSize.Y;
 	}
 
-	// Screen 버퍼에 쓰기 전에 여기에 써놓고
-	// Screen 버퍼에 쓸 때 배열을 한번에 출력
 	InnerBuffer = new wchar_t[HorSize * VerSize];
+
+	Zbuffer = vector<double>(HorSize);
 	ClearScreen();
 
 	return true;
 }
 
-void Screen::PrintString(const wstring& str, const COORD& position)
+void Screen::PrintString(const wstring& str, const int x, const int y)
 {
 	for (int i = 0; i < str.length(); i++)
-		PrintChar(str[i], { static_cast<SHORT>(position.X + i), position.Y });
+		PrintChar(str[i], x + i, y);
 }
 
-void Screen::PrintChar(const wchar_t ch, const COORD& position)
+void Screen::PrintChar(const wchar_t ch, const int X, const int Y)
 {
 	// 버퍼의 크기를 벗어나면 버퍼에 쓰지 않는다.
-	if (position.X >= 0 && position.X < HorSize
-		&& position.Y >= 0 && position.Y < VerSize)
+	if (X >= 0 && X < HorSize
+		&& Y >= 0 && Y < VerSize)
 	{
 		// 스크린버퍼에 쓰는게 아니라 내부 버퍼의 기록
-		InnerBuffer[position.Y * HorSize + position.X] = ch;
+		InnerBuffer[Y * HorSize + X ] = ch;
 	}
 }
 
-void Screen::PrintHor(const wchar_t ch, const COORD& position, int length)
+void Screen::PrintHor(const wchar_t ch, const int x, const int y, int length)
 {
 	wstring wstr(length, ch);
-	PrintString(wstr, position);
+	PrintString(wstr, x, y);
 }
 
-void Screen::PrintVer(const wchar_t ch, const COORD& position, int length)
+void Screen::PrintVer(const wchar_t ch, const int x, const int y, int length)
 {
 	for (int i = 0; i < length; i++)
 	{
-		COORD NewPos = { position.X, position.Y + i };
-		PrintChar(ch, NewPos);
+		
+		PrintChar(ch, x, y + i);
 	}
 
 }
@@ -130,10 +128,16 @@ void Screen::ClearScreen()
 	// 공백문자로 채워서 초기화
 	for (int i = 0; i < HorSize * VerSize; i++)
 		InnerBuffer[i] = L' ';
+
+	// Z버퍼 초기화
+	for (int i = 0; i < HorSize; i++)
+		Zbuffer[i] = 0.0;
 }
 
 Screen::~Screen()
 {
 	CloseHandle(ScreenBuffer[0]);
 	CloseHandle(ScreenBuffer[1]);
+	delete[] InnerBuffer;
+	InnerBuffer = nullptr;
 }

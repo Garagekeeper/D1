@@ -79,6 +79,8 @@ void DrawCeiling();
 void DrawFloor();
 void DrawWall();
 void Draw3dGrid();
+void SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
+void DrawSprite();
 
 void DrawInfo();
 void ClearScreen();
