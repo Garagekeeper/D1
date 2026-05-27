@@ -66,9 +66,9 @@ void Init()
 		{
 			5.5, 2.5, new const wchar_t* [SpriteTextureTest_RowSize]
 			{
-				{L"***" },
-				{L"* *" },
-				{L"***" },
+				L" ▄ ",
+				L"█O█",
+				L" ▀ ",
 			}
 		},
 
@@ -694,19 +694,21 @@ void DrawSprite()
 		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
 		int SpriteHeight = abs(int(GScreen.VerSize / transformY));
-
+		//세로 비율 조정
+		//SpriteHeight = static_cast<int>(SpriteHeight * 0.7);
 		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2;
 		if (DrawStartY < 0) DrawStartY = 0;
 		int DrawEndY = +SpriteHeight / 2 + GScreen.VerSize / 2;
-		if (DrawEndY >= GScreen.VerSize) DrawStartY = GScreen.VerSize - 1;
+		if (DrawEndY >= GScreen.VerSize) DrawEndY = GScreen.VerSize - 1;
 
 		// 스프라이트의 너비
-		int SpriteWidth = abs(int(GScreen.HorSize / transformY));
-
-		int DrawStartX = -SpriteWidth / 2 + GScreen.HorSize / 2;
+		int SpriteWidth = abs(int(GScreen.VerSize / transformY));
+		// 가로 비율 조장
+		//SpriteWidth = static_cast<int>(SpriteWidth * 2.0);
+		int DrawStartX = -SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawStartX < 0) DrawStartX = 0;
-		int DrawEndX = +SpriteWidth / 2 + GScreen.HorSize / 2;
-		if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize - 1;
+		int DrawEndX = +SpriteWidth / 2 + SpriteScrrenX;
+		if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
 
 		for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
 		{
@@ -714,7 +716,8 @@ void DrawSprite()
 			{
 				// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
 				// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
-				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + GScreen.HorSize / 2)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
+				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
+				//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
 
 				// 경계 안으로 들어 오도록
 				if (texX < 0) texX = 0;
@@ -723,7 +726,7 @@ void DrawSprite()
 				// 1. transformY이 0이하면 화면의 뒤쪽
 				// 2. i가 화면에 있는지
 				// 3. 벽보다 가까이 있는지
-				if (transformY > 0 && Stripe > 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
+				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
 					int d = j * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
@@ -736,15 +739,15 @@ void DrawSprite()
 					wchar_t SpriteChar = Sprites[SpriteOrder[i]].SpriteTexture[texY][texX];
 
 
-					GScreen.PrintChar(SpriteChar, j, Stripe);
+					//GScreen.PrintChar(SpriteChar, Stripe, j );
 
-					//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
-					//if (SpriteChar != L' ')
-					//{
-					//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
-					//	// 예시: GScreen.Buffer[j][i] = spriteChar;
-					//	GScreen.PrintChar(SpriteChar,  j, Stripe );
-					//}
+					// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+					if (SpriteChar != L' ')
+					{
+						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+						// 예시: GScreen.Buffer[j][i] = spriteChar;
+						GScreen.PrintChar(SpriteChar, Stripe, j);
+					}
 				}
 			}
 		}
@@ -812,16 +815,13 @@ int main()
 
 	//TODO
 
-	1. !!!스프라이트 출력 방법 !!!
-		핵심 기술 - Z-버퍼(Z-Buffer)
-		스프라이트 투영 (참고자료 살펴볼것)
 	2. 1을 이용해서 적 출력 (근데 모양이 제한됨, 이미지를 띄우지 못하니까)
 	3. color 설정
-	글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
+		글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
 
-구현 방법: 거리가 멀어질수록 벽과 바닥의 색상을 회색 ➡️ 어두운 회색 ➡️ 검은색으로 바꾸는 거리 기반 안개 효과(Fog Effect / Shading)를 줍니다.
+		구현 방법: 거리가 멀어질수록 벽과 바닥의 색상을 회색 ➡️ 어두운 회색 ➡️ 검은색으로 바꾸는 거리 기반 안개 효과(Fog Effect / Shading)를 줍니다.
 
-효과: 기호로만 보였던 그래픽에 실시간 음영이 들어가면서 갑자기 고전 패키지 게임 같은 엄청난 비주얼로 업그레이드됩니다.
+		효과: 기호로만 보였던 그래픽에 실시간 음영이 들어가면서 갑자기 고전 패키지 게임 같은 엄청난 비주얼로 업그레이드됩니다.
 	4. 게임 방향성 정하기
 		- 슈팅
 		- 맵 탐험 요소가 있는 턴제 JRPG
