@@ -115,31 +115,6 @@ void Init()
 			}
 		},*/
 
-		/*
-		⠀⠀⠀⠀⠀⠀⡖⡆⡴⡒⡄
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡆⣇⠱⡷
-⠀⠀⠀⠀⣀⣀⡤⠤⠼⢻⣿⡀⣧⣤⣄⠀⢇
-⢠⣿⣿⣿⣿⡆⠀⠀⠀⠐⠿⠇⠙⠿⠂⠀⠘⡄
-
-⢸⣿⣿⣿⣿⣟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇
-⠘⢿⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⢀⠠⢀⠀⠇
-⠀⠈⠙⠻⢏⣀⣀⡀⠀⠀⠠⢤⢖⠊⠁⠀⢸
-⠀⠀⠀⠀⠀⠀⠀⣸⠤⣀⣈⣉⣉⢤⣴⡾⠛⠢⡀
-
-⠀⠀⠀⠀⠀⠀⢰⢱⠀⠀⠉⠉⠉⠉⠀⢰⠇⠀⢁
-
-⠀⠀⠀⠀⠀⠀⠰⢦⠀⠀⠀⠀⠀⠀⠀⠀⡆⡄⠀⡆
-⠀⠀⠀⠀⠀⠀⠐⢬⠦⣤⣤⢄⣠⣠⣤⢼⡀⠀⡰⠁
-⠀⠀⠀⠀⠀⠀⠀⠈⡆⠈⠻⠿⡭⠁⠀⠀⠩⠉⡇
-
-⠀⠀⠀⠀⠀⠀⠀⠀⠱⠠⡀⠀⣃⠀⡀⠀⠀⢰⡇
-⠀⠀⠀⠀⠀⠀⠀⠀⠘⠤⠀⠀⠸⠄⣈⣀⣀⣽⠃
-⠀⠀⠀⠀⠀⠀⠀⠀⣤⣶⣤⣤⣤⠂⠀⡄⣤⣤⡆
-⠀⠀⠀⠀⠀⠀⠀⢊⠀⠀⠙⠿⣭⠟⠛⠿⣯⣷⡅
-⠀⠀⠀⠀⠀⠀⠀⠈⠑⠒⠒⠉⠙⢂⣀⣀⡊⠟
-
-		*/
-
 		/*{
 			22.5, 11.5, 0,new const wchar_t* [SpriteTextureTest_RowSize]
 			{
@@ -714,6 +689,18 @@ void SortSprite(vector<int>* OrderVec, vector<double> *DistVec, int Amount)
 
 void DrawSprite()
 {
+
+	/*
+	Sprite render 기초
+	1: While raycasting the walls, store the perpendicular distance of each vertical stripe in a 1D ZBuffer
+	2: Calculate the distance of each sprite to the player
+	3: Use this distance to sort the sprites, from furthest away to closest to the camera
+	4: Project the sprite on the camera plane (in 2D): subtract the player position from the sprite position, then multiply the result with the inverse of the 2x2 camera matrix
+	5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
+	6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
+	7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
+	*/
+
 	// sortSprite Far to Close (가장 먼거부터 그려야, 가려질 수 있음, 앞에서부터 그리면 전부 다 나옴)
 	// 벡터 거리 저장
 	// 벡터 우선순위 초기화
@@ -920,8 +907,6 @@ int main()
 	3. DeltaTime 독립성 및 입력 루프 분리
 
 	//TODO
-
-	2. 1을 이용해서 적 출력 (근데 모양이 제한됨, 이미지를 띄우지 못하니까)
 	3. color 설정
 		글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
 
@@ -937,25 +922,4 @@ int main()
 */
 
 
-	/*
-	Sprite render 기초
-	1: While raycasting the walls, store the perpendicular distance of each vertical stripe in a 1D ZBuffer
-	2: Calculate the distance of each sprite to the player
-	3: Use this distance to sort the sprites, from furthest away to closest to the camera
-	4: Project the sprite on the camera plane (in 2D): subtract the player position from the sprite position, then multiply the result with the inverse of the 2x2 camera matrix
-	5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
-	6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
-	7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
-
-	1. 벽을 레이캐스팅 하는동안 각 X의 수직거리를 1차원 벡터 (ZBuffer)에 저장한다.
-	2. 각 스프라이트와 플레이어간의 거리를 계산한다.
-	3. 위에서 계산한 거리를 스프라이트 정렬에 사용한다. 가장 먼거에서 가장 가까운 순으루
-	4. 스프라이트를 카메라 평면에 투영한다. (SpritePos - PlayerPos) * inverse of the 2x2 camera matrix
-		-									여기서 스프라이트의 상대 위치가 나오고, 스프라이트를 플레이어 방향으로 회전 시켜야함(정확히 말하면 트랜스포메이션).
-											카메라 행렬의 인버스(역행렬)을 곱해서 구한다. ...?
-											그러면 카메라 좌표의 X,Y를 구할 수 있다.(Y는 깊이, 화면 안쪽으로 들어가는)
-	5. 수직 거리를 이용해서 스프라이트의 사이즈를 계산한다. (X,Y 방향 둘다)
-	6. 스프라이트를 수직선으로 하나씩 그린다. (Z버퍼의 벽보다 멀면 안그린다.)
-	7. 수직선의 픽셀을 하나씩 그린다. 
-	*/
 }
