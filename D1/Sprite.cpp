@@ -1,9 +1,10 @@
 #include "Sprite.h"
 
-FSprite::FSprite(double X, double Y, const wchar_t** SpriteTexture)
+FSprite::FSprite(double X, double Y, double VMove, const wchar_t** SpriteTexture)
 {
 	this->X = X;
 	this->Y = Y;
+	this->VMove = VMove;
 	this->SpriteTexture = SpriteTexture;
 }
 

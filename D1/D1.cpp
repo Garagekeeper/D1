@@ -12,8 +12,8 @@ double RotationSpeed = 5.0;
 
 const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
-const int NumOfSprite = 3;
-const int SpriteTextureTest_RowSize = 3;
+const int NumOfSprite = 1;
+const int SpriteTextureTest_RowSize = 12;
 
 FPlayer			Player;
 Screen			GScreen;
@@ -64,16 +64,84 @@ void Init()
 	Sprites = new FSprite[NumOfSprite]
 	{
 		{
-			5.5, 2.5, new const wchar_t* [SpriteTextureTest_RowSize]
+			5.5, 2.5, 0, new const wchar_t* [SpriteTextureTest_RowSize]
 			{
-				L" ▄ ",
-				L"█O█",
-				L" ▀ ",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"▒▒▒▒▓▒▒▓▒▒▒▒",
+			L"▒▒▒▒▓▒▒▓▒▒▒▒",
+			L"▒▒▒▒▓▒▒▓▒▒▒▒",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"▒▓▒▒▒▒▒▒▒▒▓▒",
+			L"▒▒▓▒▒▒▒▒▒▓▒▒",
+			L"▒▒▒▓▓▓▓▓▓▒▒▒",
+			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+
 			}
 		},
+		/*{
+			5.5, 2.5, 0, new const wchar_t* [SpriteTextureTest_RowSize]
+			{
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                ⡖⡆⡴⡒⡄      ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡆⣇⠱⡷          ",
+				L"⠀⠀⠀⠀⣀⣀⡤⠤⠼⢻⣿⡀⣧⣤⣄⠀⢇          ",
+				L"⢠⣿⣿⣿⣿⡆⠀⠀⠀⠐⠿⠇⠙⠿⠂⠀⠘⡄         ",
+				L"⢸⣿⣿⣿⣿⣟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⡇        ",
+				L"⠘⢿⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⢀⠠⢀⠇⢇         ",
+				L"⠀⠈⠙⠻⢏⣀⣀⡀⠀⠀⠠⢤⢖⠊⠁⠀⢸          ",
+				L"⠀⠀⠀⠀⠀⠀⠀⣸⠤⣀⣈⣉⣉⢤⣴⡾⠛⠢⡀        ",
+				L"⠀⠀⠀⠀⠀⠀⢰⢱⠀⠀⠉⠉⠉⠉⠀⢰⠇⠀⢁        ",
+				L"⠀⠀⠀⠀⠀⠀⠰⢦⠀⠀⠀⠀⠀⠀⠀⠀⡆⡄⠀⡆       ",
+				L"⠀⠀⠀⠀⠀⠀⠐⢬⠦⣤⣤⢄⣠⣠⣤⢼⡀⠀⡰        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠈⡆⠈⠻⠿⡭⠁⠀⠀⠩⠉⡇        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠀⠱⠠⡀⠀⣃⠀⡀⠀⠀⢰⡇        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠀⠘⠤⠀⠀⠸⠄⣈⣀⣀⣽⠃        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠀⣤⣶⣤⣤⣤⠂⠀⡄⣤⣤⡆        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⢊⠀⠀⠙⠿⣭⠟⠛⠿⣯⣷⡅        ",
+				L"⠀⠀⠀⠀⠀⠀⠀⠈⠑⠒⠒⠉⠙⢂⣀⣀⡊⠟         ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+				L"                           ",
+			}
+		},*/
 
-		{
-			22.5, 11.5, new const wchar_t* [SpriteTextureTest_RowSize]
+		/*
+		⠀⠀⠀⠀⠀⠀⡖⡆⡴⡒⡄
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡆⣇⠱⡷
+⠀⠀⠀⠀⣀⣀⡤⠤⠼⢻⣿⡀⣧⣤⣄⠀⢇
+⢠⣿⣿⣿⣿⡆⠀⠀⠀⠐⠿⠇⠙⠿⠂⠀⠘⡄
+
+⢸⣿⣿⣿⣿⣟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇
+⠘⢿⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⢀⠠⢀⠀⠇
+⠀⠈⠙⠻⢏⣀⣀⡀⠀⠀⠠⢤⢖⠊⠁⠀⢸
+⠀⠀⠀⠀⠀⠀⠀⣸⠤⣀⣈⣉⣉⢤⣴⡾⠛⠢⡀
+
+⠀⠀⠀⠀⠀⠀⢰⢱⠀⠀⠉⠉⠉⠉⠀⢰⠇⠀⢁
+
+⠀⠀⠀⠀⠀⠀⠰⢦⠀⠀⠀⠀⠀⠀⠀⠀⡆⡄⠀⡆
+⠀⠀⠀⠀⠀⠀⠐⢬⠦⣤⣤⢄⣠⣠⣤⢼⡀⠀⡰⠁
+⠀⠀⠀⠀⠀⠀⠀⠈⡆⠈⠻⠿⡭⠁⠀⠀⠩⠉⡇
+
+⠀⠀⠀⠀⠀⠀⠀⠀⠱⠠⡀⠀⣃⠀⡀⠀⠀⢰⡇
+⠀⠀⠀⠀⠀⠀⠀⠀⠘⠤⠀⠀⠸⠄⣈⣀⣀⣽⠃
+⠀⠀⠀⠀⠀⠀⠀⠀⣤⣶⣤⣤⣤⠂⠀⡄⣤⣤⡆
+⠀⠀⠀⠀⠀⠀⠀⢊⠀⠀⠙⠿⣭⠟⠛⠿⣯⣷⡅
+⠀⠀⠀⠀⠀⠀⠀⠈⠑⠒⠒⠉⠙⢂⣀⣀⡊⠟
+
+		*/
+
+		/*{
+			22.5, 11.5, 0,new const wchar_t* [SpriteTextureTest_RowSize]
 			{
 				{L"###" },
 				{L"# #" },
@@ -82,13 +150,13 @@ void Init()
 		},
 
 		{
-			19, 3, new const wchar_t* [SpriteTextureTest_RowSize]
+			19.5, 3.5,16, new const wchar_t* [SpriteTextureTest_RowSize]
 			{
 				{L"@@@" },
 				{L"@ @" },
 				{L"@@@" },
 			}
-		},
+		},*/
 
 	};
 
@@ -660,14 +728,40 @@ void DrawSprite()
 
 	for (int i = 0; i < NumOfSprite; i++)
 	{
+		auto *CurrentSprite = &Sprites[SpriteOrder[i]];
 
 		// 카메라에서 스프라이트 까지의 상대적인 위치
-		double SpriteX = Sprites[SpriteOrder[i]].X - Player.X;
-		double SpriteY = Sprites[SpriteOrder[i]].Y - Player.Y;
+		double SpriteX = CurrentSprite->X - Player.X;
+		double SpriteY = CurrentSprite->Y - Player.Y;
 
-		// 상대위치에 카메라의 역행렬을 곱해서 카메라 좌표의 X,Y를 구할 수 있다.(Y는 깊이, 화면 안쪽으로 들어가는)
-		// 생각해봤는데, 스프라이트에 이걸 곱하면 스프라이트가 항상 플레이어를 바라보게 되는듯
-		 //transform sprite with the inverse camera matrix
+		// 카메라 행렬(카메라 좌표계)
+		// 카메라의 정면 (스크린 안쪽)은 플레이어의 방향벡터
+		// 카메라의 오른쪽 (스크린의 오른쪽)은 카메라 평면 벡터
+		// 카메라 좌표계 기준 정면으로 1 이동한건 월드 입장에서는 1 * 플레이어 방향벡터 만큼 이동한 것
+		// 카메라 좌표계 기준 우측으로 1 이동한건 월드 입장에서는 1 * 카메라 평면의 방향벡터 만큼 이동한 것
+
+		// 카메라 기준으로 Cx, Cy 이동 했으면 최종 월드좌표 Wx,Wy 는 다음과 같다.
+		//[Wx]   [PlaneX  DirX]   [Cx]	Wx = PlaneX * Cx + DirX * Cy
+		//[  ] = [            ] x [  ]
+		//[Wy]   [PlaneY  DirY]   [Cy]	Wx = PlaneY * Cx + DirY * Cy
+		// 
+		// 여기서 Wx를 계산하는데, DirX * Cy는 왜 들어가는지 고민했는데, 이건 카메라 자체가 회전된 상태일 때 유효하다
+		// 카메라가 회전하지 않았다면 초기 방향에따라서 DirX혹은 DirY가 0이다. (방향 벡터가 (1,0) (-1,0) 이런식으로 나오니까)
+		// 그래서 (1,0)인 경우에 Wx = PlaneX * Cx + 0 * Cy가 되어서 Wx = PlaneX 가 된다. 하지만 방향 벡터가 회전했다면 
+		// 예를 들어 (1,1)이라고 하면 카메라 평면은 (1,-1)이된다. 여기서 카메라의 좌표가 (0,0) 에서 (1,1)이 되면
+		// 카메라 기준으로는 오른쪽으로 한칸 안쪽으로 한칸 이동한다. 이걸 월드 입장에서 보면 (1,-1) 방향으로 이동 후 (1,1) 방향으로 이동한게 된다.
+		// 맨 처음에는 PlaneX * Cx 만큼 이동하고 1,1 방향으로 이동할 때, DirX * Cy 만큼 이동한다
+		//          y  ▲
+		//             |  ↘(Plane 방향)    ↗ (Dir 방향) 
+		//	           |    ↘            ↗
+		//             |      ↘        ↗
+		//             |        ↘    ↗
+		//             |          ↘↗
+		//             -------------------▶ x
+		//  방금 말한 상황이 이 그림인데 Wx는 Plane의 x방향으로 Cx만큼 이동한 것 +  Dir의 x방향으로 Cy 이동한 것 
+		//  Wy는 Plane의 y방향으로 Cx만큼 이동, 으로 이동한 것 + dir의 y Cy만큼 이동방향으로 이동
+		//  상대위치에 카메라의 역행렬을 곱해서 카메라 좌표의 X,Y를 구할 수 있다.(Y는 깊이, 화면 안쪽으로 들어가는)
+		//transform sprite with the inverse camera matrix
 		// [ planeX   dirX ] -1                                       [ dirY      -dirX ]
 		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
 		// [ planeY   dirY ]                                          [ -planeY  planeX ]
@@ -690,24 +784,35 @@ void DrawSprite()
 		// 스프라이트가 찍힐 X 좌표
 		int SpriteScrrenX = int((GScreen.HorSize / 2) * (1 + transformX / transformY));
 
+		//--------------------------
+		//Scailing					|
+		//--------------------------
+		// 세로로 몇배 줄일건지
+		const float uDiv = .25;
+		// 가로로 몇배 줄일건지
+		const float vDiv = .5;
+		// 위로 몇칸 갈건지 
+		// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
+		int vMoveScrren = int(-CurrentSprite->VMove / transformY);
+
+
 		// 스프라이트의 높이
 		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-		int SpriteHeight = abs(int(GScreen.VerSize / transformY));
+		int SpriteHeight = abs(int(GScreen.VerSize / transformY)) / vDiv;
 		//세로 비율 조정
-		//SpriteHeight = static_cast<int>(SpriteHeight * 0.7);
-		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2;
+
+		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2 + vMoveScrren;
 		if (DrawStartY < 0) DrawStartY = 0;
-		int DrawEndY = +SpriteHeight / 2 + GScreen.VerSize / 2;
+		int DrawEndY = SpriteHeight / 2 + GScreen.VerSize / 2 + vMoveScrren;
 		if (DrawEndY >= GScreen.VerSize) DrawEndY = GScreen.VerSize - 1;
 
 		// 스프라이트의 너비
-		int SpriteWidth = abs(int(GScreen.VerSize / transformY));
-		// 가로 비율 조장
-		//SpriteWidth = static_cast<int>(SpriteWidth * 2.0);
+		int SpriteWidth = abs(int(GScreen.VerSize / transformY)) / uDiv;
+
 		int DrawStartX = -SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawStartX < 0) DrawStartX = 0;
-		int DrawEndX = +SpriteWidth / 2 + SpriteScrrenX;
+		int DrawEndX = SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
 
 		for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
@@ -729,25 +834,26 @@ void DrawSprite()
 				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
-					int d = j * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+					int d = (j- vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
 					int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
 
 					// 경계 안으로 들어 오도록
 					if (texY < 0) texY = 0;
 					if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
 
-					wchar_t SpriteChar = Sprites[SpriteOrder[i]].SpriteTexture[texY][texX];
+
+					wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
 
 
-					//GScreen.PrintChar(SpriteChar, Stripe, j );
+					GScreen.PrintChar(SpriteChar, Stripe, j );
 
-					// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
-					if (SpriteChar != L' ')
-					{
-						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
-						// 예시: GScreen.Buffer[j][i] = spriteChar;
-						GScreen.PrintChar(SpriteChar, Stripe, j);
-					}
+					//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+					//if (SpriteChar != L' ')
+					//{
+					//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+					//	// 예시: GScreen.Buffer[j][i] = spriteChar;
+					//	GScreen.PrintChar(SpriteChar, Stripe, j);
+					//}
 				}
 			}
 		}
