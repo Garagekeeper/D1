@@ -61,13 +61,15 @@ void Init()
 		0.66, 0.0, 
 		0 };
 
+	GScreen.Init();
+
 	Sprites = new FSprite[NumOfSprite]
 	{
 		{
-			5.5, 2.5, 0, new const wchar_t* [SpriteTextureTest_RowSize]
+			5.5, 2.5, GScreen.VerSize / (float)4, new const wchar_t* [SpriteTextureTest_RowSize]
 			{
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L"  ▒▒▒▒▒▒▒▒  ",
+			L" ▒▒▒▒▒▒▒▒▒▒ ",
 			L"▒▒▒▒▓▒▒▓▒▒▒▒",
 			L"▒▒▒▒▓▒▒▓▒▒▒▒",
 			L"▒▒▒▒▓▒▒▓▒▒▒▒",
@@ -76,8 +78,8 @@ void Init()
 			L"▒▒▒▒▒▒▒▒▒▒▒▒",
 			L"▒▓▒▒▒▒▒▒▒▒▓▒",
 			L"▒▒▓▒▒▒▒▒▒▓▒▒",
-			L"▒▒▒▓▓▓▓▓▓▒▒▒",
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
+			L" ▒▒▓▓▓▓▓▓▒▒",
+			L"  ▒▒▒▒▒▒▒▒  ",
 
 			}
 		},
@@ -139,7 +141,7 @@ void Init()
 	SpriteDistance = vector<double>(NumOfSprite);
 	
 
-	GScreen.Init();
+	
 }
 
 void Input()
@@ -774,10 +776,10 @@ void DrawSprite()
 		//--------------------------
 		//Scailing					|
 		//--------------------------
+		// rkfh로 몇배 줄일건지
+		const float uDiv = 1 / (float)4;
 		// 세로로 몇배 줄일건지
-		const float uDiv = .25;
-		// 가로로 몇배 줄일건지
-		const float vDiv = .5;
+		const float vDiv = 1 / (float)2;
 		// 위로 몇칸 갈건지 
 		// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
 		int vMoveScrren = int(-CurrentSprite->VMove / transformY);
@@ -786,7 +788,7 @@ void DrawSprite()
 		// 스프라이트의 높이
 		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-		int SpriteHeight = abs(int(GScreen.VerSize / transformY)) / vDiv;
+		int SpriteHeight = (int)(abs(int(GScreen.VerSize / transformY)) / vDiv);
 		//세로 비율 조정
 
 		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2 + vMoveScrren;
@@ -795,7 +797,7 @@ void DrawSprite()
 		if (DrawEndY >= GScreen.VerSize) DrawEndY = GScreen.VerSize - 1;
 
 		// 스프라이트의 너비
-		int SpriteWidth = abs(int(GScreen.VerSize / transformY)) / uDiv;
+		int SpriteWidth = (int)(abs(int(GScreen.VerSize / transformY)) / uDiv);
 
 		int DrawStartX = -SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawStartX < 0) DrawStartX = 0;
