@@ -501,6 +501,7 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 		}
 
 		// 해당 격자에 벽이 있는지 확인, 있으면 종료
+		// TODO 색 정보를 위해서 1만 체크하면 안댐
 		if (WorldMap[MapPosY][MapPosX] == WALL) bHit = true;
 	}
 

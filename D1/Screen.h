@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const int SCREEN_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+
 class Screen
 {
 public : 
@@ -17,7 +19,7 @@ public :
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
 	int HorSize;
 	int VerSize;
-	wchar_t* InnerBuffer;
+	CHAR_INFO* CharInfoBuffer;
 	vector<double> Zbuffer;
 
 public:
@@ -28,7 +30,7 @@ public:
 		BufferInfo{},
 		HorSize(0),
 		VerSize(0),
-		InnerBuffer(nullptr)
+		CharInfoBuffer(nullptr)
 	{}
 
 	virtual ~Screen();
@@ -46,16 +48,20 @@ public:
 	/// <param name="position">출력할 좌표</param>
 	void PrintString(const wstring& str, const int x, const int y);
 	/// <summary>
-	/// 버퍼에 문자를 출력하는 함수
+	/// CHAR_INFO 버퍼에 문자를 출력하는 함수
+	/// 스크린버퍼에 바로 뿌리는 것이 아님.
 	/// </summary>
 	/// <param name="ch">출력할 문자</param>
-	/// <param name="position">출력할 위치</param>
-	void PrintChar(const wchar_t ch, const int X, const int Y);
+	/// <param name="X">출력할 X 위치</param>
+	/// <param name="Y">출력할 Y 위치</param>
+	/// <param name="Attributes">해당 문자의 어트리뷰트 (컬러) 7 = WHITE</param>
+	void PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes = WHITE);
 	void PrintHor(const wchar_t ch, const int x, const int y, int length);
 	void PrintVer(const wchar_t ch, const int x, const int y, int length);
 
 	/// <summary>
 	/// 버퍼를 교환하는 함수
+	/// CHAR_INFO 버퍼를 스크린 버퍼에 출력하고 스크린 버퍼를 교환
 	/// </summary>
 	/// <returns>성공 여부를 반환한다.</returns>
 	bool ChangeScreenBuffer();

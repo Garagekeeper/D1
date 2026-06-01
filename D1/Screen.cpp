@@ -58,7 +58,8 @@ bool Screen::Init()
 		VerSize = BufferInfo.dwSize.Y;
 	}
 
-	InnerBuffer = new wchar_t[HorSize * VerSize];
+	CharInfoBuffer = new CHAR_INFO[HorSize * VerSize];
+
 
 	Zbuffer = vector<double>(HorSize);
 	ClearScreen();
@@ -72,14 +73,16 @@ void Screen::PrintString(const wstring& str, const int x, const int y)
 		PrintChar(str[i], x + i, y);
 }
 
-void Screen::PrintChar(const wchar_t ch, const int X, const int Y)
+void Screen::PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes)
 {
 	// 버퍼의 크기를 벗어나면 버퍼에 쓰지 않는다.
 	if (X >= 0 && X < HorSize
 		&& Y >= 0 && Y < VerSize)
 	{
 		// 스크린버퍼에 쓰는게 아니라 내부 버퍼의 기록
-		InnerBuffer[Y * HorSize + X ] = ch;
+		//InnerBuffer[Y * HorSize + X ] = ch;
+		CharInfoBuffer[Y * HorSize + X].Char.UnicodeChar = ch;
+		CharInfoBuffer[Y * HorSize + X].Attributes = Attributes;
 	}
 }
 
@@ -93,7 +96,6 @@ void Screen::PrintVer(const wchar_t ch, const int x, const int y, int length)
 {
 	for (int i = 0; i < length; i++)
 	{
-		
 		PrintChar(ch, x, y + i);
 	}
 
@@ -102,16 +104,17 @@ void Screen::PrintVer(const wchar_t ch, const int x, const int y, int length)
 bool Screen::ChangeScreenBuffer()
 {
 	DWORD dwWritenByte = 0;
-	COORD Pos = { 0,0 };
+	COORD BufferSize = { static_cast<SHORT>(HorSize), static_cast<SHORT>(VerSize) };
+	COORD BufferCoord = { 0, 0};
+	SMALL_RECT WriteRegion = { 0, 0, static_cast<SHORT>(HorSize - 1), static_cast<SHORT>(VerSize - 1) };
 	
-	WriteConsoleOutputCharacterW(
+	WriteConsoleOutputW(
 		ScreenBuffer[CurrentScreenBufferIndex],
-		InnerBuffer,
-		HorSize * VerSize,
-		Pos,
-		&dwWritenByte
+		CharInfoBuffer,
+		BufferSize,
+		BufferCoord,
+		&WriteRegion
 	);
-
 
 	// 쓰기 버퍼를 출력하여 읽기 버퍼로 바꾼다.
 	if (SetConsoleActiveScreenBuffer(ScreenBuffer[CurrentScreenBufferIndex]) == false)
@@ -127,7 +130,10 @@ void Screen::ClearScreen()
 	// 다음 프레임에 쓸 버퍼를 초기화한다.
 	// 공백문자로 채워서 초기화
 	for (int i = 0; i < HorSize * VerSize; i++)
-		InnerBuffer[i] = L' ';
+	{
+		CharInfoBuffer[i].Char.UnicodeChar = ' ';
+		CharInfoBuffer[i].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+	}
 
 	// Z버퍼 초기화
 	for (int i = 0; i < HorSize; i++)
@@ -138,6 +144,8 @@ Screen::~Screen()
 {
 	CloseHandle(ScreenBuffer[0]);
 	CloseHandle(ScreenBuffer[1]);
-	delete[] InnerBuffer;
-	InnerBuffer = nullptr;
+
+
+	delete[] CharInfoBuffer;
+	CharInfoBuffer = nullptr;
 }
