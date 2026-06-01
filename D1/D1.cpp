@@ -864,15 +864,15 @@ void DrawSprite()
 					wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
 
 
-					GScreen.PrintChar(SpriteChar, Stripe, j);
+					//GScreen.PrintChar(SpriteChar, Stripe, j);
 
-					//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
-					//if (SpriteChar != L' ')
-					//{
-					//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
-					//	// 예시: GScreen.Buffer[j][i] = spriteChar;
-					//	GScreen.PrintChar(SpriteChar, Stripe, j);
-					//}
+					// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+					if (SpriteChar != L' ')
+					{
+						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+						// 예시: GScreen.Buffer[j][i] = spriteChar;
+						GScreen.PrintChar(SpriteChar, Stripe, j);
+					}
 				}
 			}
 		}
@@ -1032,10 +1032,13 @@ int main()
 	//TODO
 	3. color 설정
 		글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
-
 		구현 방법: 거리가 멀어질수록 벽과 바닥의 색상을 회색 ➡️ 어두운 회색 ➡️ 검은색으로 바꾸는 거리 기반 안개 효과(Fog Effect / Shading)를 줍니다.
-
 		효과: 기호로만 보였던 그래픽에 실시간 음영이 들어가면서 갑자기 고전 패키지 게임 같은 엄청난 비주얼로 업그레이드됩니다.
+
+		CHAR_INFO 알아보고 도입하기
+		WORD WallColor;
+		거리에 따른 음영 넣기
+
 	4. 게임 방향성 정하기
 		- 슈팅
 		- 맵 탐험 요소가 있는 턴제 JRPG
