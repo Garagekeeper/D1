@@ -6,9 +6,6 @@ bool Screen::Init()
 	// 커서를 지움
 	// 그 뒤에 버퍼 정보를 가져옴
 
-	int TargetWidth = 240;
-	int TargetHeight = 60;
-
 	// 스크린 버퍼 생성
 	ScreenBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
 		0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -26,18 +23,13 @@ bool Screen::Init()
 	{
 		HANDLE ConsoleHandle = ScreenBuffer[i];
 
-
-
-
-		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
 		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
 
 		HWND hwnd = GetConsoleWindow();
 		Sleep(10);
 		HWND owner = GetWindow(hwnd, GW_OWNER);
-		RECT Rect = { 0, 0, screenWidth, screenHeight };
+		RECT Rect = { 0, 0, TargetScreenWidth, TargetScreenHeight };
 
 		//폰트 변경(적용 안됨)
 		//CONSOLE_FONT_INFOEX fontInfo;

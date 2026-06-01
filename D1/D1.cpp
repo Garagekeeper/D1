@@ -7,9 +7,6 @@
 #include <conio.h>
 #include <sstream>
 
-double MoveBaseSpeed = 5.0;
-double RotationSpeed = 100.0;
-
 const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
 const int NumOfSprite = 1;
@@ -55,12 +52,6 @@ int WorldMap[mapWidth][mapHeight] =
 
 void Init()
 {
-	/*Player = { 18, 12,
-		0.0, -1.0,
-		1.0, 0.0,
-		0.66, 0.0,
-		0 };*/
-
 	FCreatureBaseStat PlayerStat = { 30, 100, 100 };
 	FPos PlayerPos = { 18, 12 };
 	FVec PlayerDirVec = { 0.0, -1.0 };
@@ -146,9 +137,6 @@ void Init()
 
 	SpriteOrder = vector<int>(NumOfSprite);
 	SpriteDistance = vector<double>(NumOfSprite);
-
-
-
 }
 
 void Input()
@@ -891,6 +879,93 @@ void DrawSprite()
 	}
 }
 
+void DrawPlayerHUD()
+{
+	// 이거 고쳐서 HUD 그리기
+	/*
+	   ( + )
+	   _|_|_
+	.-'     '-.
+   /   ▒▒▒▒▒   \
+  /   ▒▒▒▒▒▒▒   \
+ |    ░░░░░░░    |
+ |===░░░░░░░░░===|
+	*/
+	//--------------------------
+	//Scailing					|
+	//--------------------------
+	// rkfh로 몇배 줄일건지
+	const float uDiv = 1 / (float)4;
+	// 세로로 몇배 줄일건지
+	const float vDiv = 1 / (float)2;
+	// 위로 몇칸 갈건지 
+	// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
+
+
+	// 스프라이트의 높이
+	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
+	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
+	//TODO 하드코딩 변경
+	int SpriteHeight = 7;
+	//세로 비율 조정
+
+	int DrawStartY = GScreen.VerSize - SpriteHeight;
+	if (DrawStartY < 0) DrawStartY = 0;
+	int DrawEndY = GScreen.VerSize - 1;
+
+	// 스프라이트의 너비
+	//TODO 하드코딩 변경
+	int SpriteWidth = 17;
+
+	int DrawStartX = GScreen.HorSize / 2 - SpriteWidth / 2;
+	if (DrawStartX < 0) DrawStartX = 0;
+	int DrawEndX = GScreen.HorSize / SpriteWidth / 22;
+	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
+
+	for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
+	{
+		for (int j = DrawStartY; j < DrawEndY; j++)
+		{
+			// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
+			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
+			int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
+			//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+
+			// 경계 안으로 들어 오도록
+			if (texX < 0) texX = 0;
+			if (texX >= SpriteTextureTest_RowSize) texX = SpriteTextureTest_RowSize - 1;
+
+			// 1. transformY이 0이하면 화면의 뒤쪽
+			// 2. i가 화면에 있는지
+			// 3. 벽보다 가까이 있는지
+			if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
+			{
+				//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
+				int d = (j) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+				int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
+
+				// 경계 안으로 들어 오도록
+				if (texY < 0) texY = 0;
+				if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
+
+
+				wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
+
+
+				GScreen.PrintChar(SpriteChar, Stripe, j);
+
+				//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+				//if (SpriteChar != L' ')
+				//{
+				//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+				//	// 예시: GScreen.Buffer[j][i] = spriteChar;
+				//	GScreen.PrintChar(SpriteChar, Stripe, j);
+				//}
+			}
+		}
+	}
+}
+
 void DrawInfo()
 {
 	wstringstream Wss;
@@ -967,6 +1042,18 @@ int main()
 
 
 	3. 콘솔 크기 조절시키기 win11은 고정인듯 함.
+
+	1단계: 플레이어 HUD 무기 그리기 (가장 쉬움)
+
+	레이캐스팅 신경 쓰지 말고, Render() 마지막 단계에 화면 정중앙 최하단 좌표에 문자 무리(칼이나 총 모양)를 고정으로 출력해 봅니다.
+
+	2단계: 입력과 타이머 연동
+
+	Space바를 누르면 무기 모양 문자가 변경되었다가 0.2초 뒤에 원래대로 돌아오는 간단한 프레임 전환을 DeltaTime을 이용해 구현해 봅니다.
+
+	3단계: 히트스캔 판정 연결
+
+	공격 애니메이션이 활성화된 타이밍에 화면 정중앙에 있는 적과의 거리 정보를 확인해 데미지를 입히는 로직을 작성합니다.
 */
 
 
