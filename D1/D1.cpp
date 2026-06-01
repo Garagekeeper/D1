@@ -8,18 +8,18 @@
 #include <sstream>
 
 double MoveBaseSpeed = 5.0;
-double RotationSpeed = 5.0;
+double RotationSpeed = 100.0;
 
 const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
 const int NumOfSprite = 1;
 const int SpriteTextureTest_RowSize = 12;
 
-FPlayer			Player;
+FPlayer* Player;
 Screen			GScreen;
 FKeyState		KeyState;
 FPrevKeyInfo	PrevKeyInfo;
-FSprite*		Sprites;
+FSprite* Sprites;
 vector<int>		SpriteOrder;
 vector<double>	SpriteDistance;
 
@@ -55,11 +55,18 @@ int WorldMap[mapWidth][mapHeight] =
 
 void Init()
 {
-	Player = { 18, 12, 
-		0.0, -1.0, 
-		1.0, 0.0, 
-		0.66, 0.0, 
-		0 };
+	/*Player = { 18, 12,
+		0.0, -1.0,
+		1.0, 0.0,
+		0.66, 0.0,
+		0 };*/
+
+	FCreatureBaseStat PlayerStat = { 30, 100, 100 };
+	FPos PlayerPos = { 18, 12 };
+	FVec PlayerDirVec = { 0.0, -1.0 };
+	double PlaneSize = 0.66;
+
+	Player = new FPlayer(PlayerStat, PlayerPos, PlayerDirVec, PlaneSize);
 
 	GScreen.Init();
 
@@ -123,7 +130,7 @@ void Init()
 				{L"###" },
 				{L"# #" },
 				{L"###" },
-			}	
+			}
 		},
 
 		{
@@ -139,9 +146,9 @@ void Init()
 
 	SpriteOrder = vector<int>(NumOfSprite);
 	SpriteDistance = vector<double>(NumOfSprite);
-	
 
-	
+
+
 }
 
 void Input()
@@ -256,12 +263,12 @@ void PlayerRotate()
 
 	if (KeyState.LeftArrowDown)
 	{
-		FinalTheta -= Theta * RotationSpeed * DeltaTime;
+		FinalTheta -= RotationSpeed * DeltaTime;
 	}
 
 	if (KeyState.RightArrowDown)
 	{
-		FinalTheta += Theta * RotationSpeed * DeltaTime;
+		FinalTheta += RotationSpeed * DeltaTime;
 	}
 
 	double FinalRad = FinalTheta * PHI / 180.0;
@@ -274,32 +281,14 @@ void PlayerRotate()
 	//Player.DirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
 	//Player.DirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
 
-	auto NextDirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
-	auto NextDirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
+	FVec PlayerPos = Player->GetDirVec();
+	double PlayerX = PlayerPos.DirX;
+	double PlayerY = PlayerPos.DirY;
 
-	auto Len = sqrt(NextDirX * NextDirX + NextDirY * NextDirY);
+	auto NextDirX = PlayerX * cos(FinalRad) - PlayerY * sin(FinalRad);
+	auto NextDirY = PlayerX * sin(FinalRad) + PlayerY * cos(FinalRad);
 
-	Player.DirX = NextDirX / Len;
-	Player.DirY = NextDirY / Len;
-
-	// 플레이어의 오른쪽을 가리키는 벡터 변환
-	///auto NextRightX = Player.RightX * cos(FinalRad) - Player.RightY * sin(FinalRad);
-	//auto NextRightY = Player.RightX * sin(FinalRad) + Player.RightY * cos(FinalRad);
-
-	Player.RightX = -Player.DirY;
-	Player.RightY = Player.DirX;
-
-	//카메라 평면 변환
-	//카메라 평면은 Right와 평행
-	//auto NextPlaneX = Player.PlaneX * cos(FinalRad) - Player.PlaneY * sin(FinalRad);
-	//auto NextPlaneY = Player.PlaneX * sin(FinalRad) + Player.PlaneY * cos(FinalRad);
-
-	const double PlaneSize = 0.66;
-
-	Player.PlaneX = Player.RightX * PlaneSize;
-	Player.PlaneY = Player.RightY * PlaneSize;
-
-	Player.PlayerTheta += FinalTheta;
+	Player->RotateTo(NextDirX, NextDirY, FinalTheta);
 }
 
 void PlayerMove()
@@ -307,54 +296,65 @@ void PlayerMove()
 	double Dx = 0.0;
 	double Dy = 0.0;
 	double theta = 45;
-	double DirSize = pow(Player.DirX, 2) + pow(Player.DirY, 2);
+
+	FVec PlayerDirVec = Player->GetDirVec();
+	double PlayerDirX = PlayerDirVec.DirX;
+	double PlayerDirY = PlayerDirVec.DirY;
+
+	FVec PlayerRightDirVec = Player->GetRightDirVec();
+	double PlayerRightX = PlayerRightDirVec.DirX;
+	double PlayerRightY = PlayerRightDirVec.DirY;
+
+	FPos PlayerPos = Player->GetPos();
+	double PlayerPosX = PlayerPos.X;
+	double PlayerPosY = PlayerPos.Y;
+
+	double DirSize = Player->GetDirVec().GEtSqrLen();
 	DirSize = sqrt(DirSize);
 
-	double RightSize = pow(Player.RightX, 2) + pow(Player.RightY, 2);
+	double RightSize = Player->GetRightDirVec().GEtSqrLen();
 	RightSize = sqrt(RightSize);
 	// 현재 바라보는 방향을 기준으로 앞뒤좌우 (상대적임)
 	// 이동 처리
 	if (!KeyState.KEYW && !KeyState.KEYD && !KeyState.KEYS && !KeyState.KEYA) return;
 	if (KeyState.KEYW)
 	{
-		Dx = (Player.DirX / DirSize) * MoveBaseSpeed * DeltaTime;
-		Dy = (Player.DirY / DirSize) * MoveBaseSpeed * DeltaTime;
+		Dx = (PlayerDirX / DirSize) * MoveBaseSpeed * DeltaTime;
+		Dy = (PlayerDirY / DirSize) * MoveBaseSpeed * DeltaTime;
 	}
 	if (KeyState.KEYD)
 	{
-		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime;
-		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dx = (PlayerRightX / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dy = (PlayerRightY / RightSize) * MoveBaseSpeed * DeltaTime;
 	}
 	if (KeyState.KEYS)
 	{
-		Dx = (Player.DirX / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
-		Dy = (Player.DirY / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dx = (PlayerDirX / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (PlayerDirY / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
 	}
 	if (KeyState.KEYA)
 	{
-		Dx = (Player.RightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
-		Dy = (Player.RightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dx = (PlayerRightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (PlayerRightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
 	}
-
-
 
 	double ColliderRadius = 0.3;
 
 	// 다음 좌표
-	double NextX = Player.X + Dx;
-	double NextY = Player.Y + Dy;
+	double NextX = PlayerPosX + Dx;
+	double NextY = PlayerPosY + Dy;
 
 	// 다음 좌표의 충돌 체크
 	double ColliderEdgeX = NextX + (Dx > 0 ? ColliderRadius : -ColliderRadius);
-	if (WorldMap[(int)Player.Y][(int)ColliderEdgeX] != WALL)
+	if (WorldMap[(int)PlayerPosY][(int)ColliderEdgeX] != WALL)
 	{
-		Player.X = NextX;
+		PlayerPosX = NextX;
 	}
 
 	double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
-	if (WorldMap[(int)ColliderEdgeY][(int)Player.X] != WALL)
+	if (WorldMap[(int)ColliderEdgeY][(int)PlayerPosX] != WALL)
 	{
-		Player.Y = NextY;
+		PlayerPosY = NextY;
 	}
 
 	// 콘솔 바운더리를 넘어가지는 못한다.
@@ -362,15 +362,17 @@ void PlayerMove()
 	double MapMaxX = GScreen.HorSize - 0.3;
 	double MapMaxY = GScreen.VerSize - 0.3;
 
-	if (Player.X < ColliderRadius) Player.X = ColliderRadius;
-	if (Player.X > MapMaxX) Player.X = MapMaxX;
-	if (Player.Y < ColliderRadius) Player.Y = ColliderRadius;
-	if (Player.Y > MapMaxY) Player.Y = MapMaxY;
+	if (PlayerPosX < ColliderRadius) PlayerPosX = ColliderRadius;
+	if (PlayerPosX > MapMaxX) PlayerPosX = MapMaxX;
+	if (PlayerPosY < ColliderRadius) PlayerPosY = ColliderRadius;
+	if (PlayerPosY > MapMaxY) PlayerPosY = MapMaxY;
+
+	Player->MoveTo(PlayerPosX, PlayerPosY);
 }
 
 void DrawPlayer()
 {
-	GScreen.PrintString(L"※", (int)Player.X, (int)Player.Y);
+	//GScreen.PrintString(L"※", (int)Player.X, (int)Player.Y);
 }
 
 void Draw2dGrid()
@@ -405,13 +407,22 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
 	*/
 
+	double PlayerDirX = Player->GetDirVec().DirX;
+	double PlayerDirY = Player->GetDirVec().DirY;
+
+	double CameraDirX = Player->GetCameraDirVec().DirX;
+	double CameraDirY = Player->GetCameraDirVec().DirY;
+
+	float PlayerPosX = Player->GetPos().X;
+	float PlayerPosY = Player->GetPos().Y;
+
 	double CameraX = 2 * X / double(WIDTH) - 1;
-	double RayDirX = Player.DirX + Player.PlaneX * CameraX;
-	double RayDirY = Player.DirY + Player.PlaneY * CameraX;
+	double RayDirX = PlayerDirX + CameraDirX * CameraX;
+	double RayDirY = PlayerDirY + CameraDirY * CameraX;
 
 	// 현재 우리가 서 있는 위치
-	int MapPosX = (int)Player.X;
-	int MapPosY = (int)Player.Y;
+	int MapPosX = (int)Player->GetPos().X;
+	int MapPosY = (int)Player->GetPos().Y;
 
 	// ray가 출발해서 처음으로 x에 수직인 선을 만난 위치까지의 거리
 	// ray가 출발해서 처음으로 y에 수직은 선을 만난 위치까지의 거리
@@ -457,23 +468,23 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 		// 처음 x를 만날때 까지의 실제 거리 * deltaDistX 인데
 		// deltaDistX는 다음과 같다 x가 +- 1증가할 때 ray의 전체 길이는 얼마나 증가했나?
 		// 원래는 그런데 길이를 나눠나서 모호하게 보일 수 있음
-		SideDistX = (Player.X - MapPosX) * DeltaDistX;
+		SideDistX = (PlayerPosX - MapPosX) * DeltaDistX;
 	}
 	else
 	{
 		StepX = 1;
-		SideDistX = (MapPosX + 1.0 - Player.X) * DeltaDistX;
+		SideDistX = (MapPosX + 1.0 - PlayerPosX) * DeltaDistX;
 	}
 
 	if (RayDirY < 0)
 	{
 		StepY = -1;
-		SideDistY = (Player.Y - MapPosY) * DeltaDistY;
+		SideDistY = (PlayerPosY - MapPosY) * DeltaDistY;
 	}
 	else
 	{
 		StepY = 1;
-		SideDistY = (MapPosY + 1.0 - Player.Y) * DeltaDistY;
+		SideDistY = (MapPosY + 1.0 - PlayerPosY) * DeltaDistY;
 	}
 
 	// 진짜 DDA시작
@@ -541,7 +552,7 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute)
 {
 	int Length = DrawEnd - DrawStart;
-	GScreen.PrintVer(Wchar, X, DrawStart, Length , Attribute);
+	GScreen.PrintVer(Wchar, X, DrawStart, Length, Attribute);
 }
 
 void DrawCeiling()
@@ -559,25 +570,35 @@ void DrawFloor()
 	//		- 이 값을 기준으로 현재 값을 뽑아 낼 수 있음
 	//		- current Dist = (0.5 * Height) / (y - Height / 2) (-1 =< Dist <= 1)
 	// 해당 거리를 통해서 실제 그 거리를 가진 맵 위의 점을 찾고 
+
+	double PlayerDirX = Player->GetDirVec().DirX;
+	double PlayerDirY = Player->GetDirVec().DirY;
+
+	double CameraDirX = Player->GetCameraDirVec().DirX;
+	double CameraDirY = Player->GetCameraDirVec().DirY;
+
+	float PlayerPosX = Player->GetPos().X;
+	float PlayerPosY = Player->GetPos().Y;
+
 	const int WIDTH = GScreen.HorSize;
 	const int HEIGHT = GScreen.VerSize;
 
 	for (int Y = HEIGHT / 2; Y < HEIGHT; Y++)
 	{
 		// 플레이어 시야의 왼쪽 끝
-		double Ray_DirLeftEndX	= Player.DirX - Player.PlaneX;
-		double Ray_DirLeftEndY	= Player.DirY - Player.PlaneY;
+		double Ray_DirLeftEndX = PlayerDirX - CameraDirX;
+		double Ray_DirLeftEndY = PlayerDirY - CameraDirY;
 
 		// 플레이어 시야의 오른쪽 끝
-		double Ray_DirRightEndX = Player.DirX + Player.PlaneX;
-		double Ray_DirRightEndY = Player.DirY + Player.PlaneY;
+		double Ray_DirRightEndX = PlayerDirX + CameraDirX;
+		double Ray_DirRightEndY = PlayerDirY + CameraDirY;
 
 
 
 		/*
 		0		Ceiling
 				------------------------------------
-		       /
+			   /
 			  /
 			 /
 			/
@@ -591,7 +612,7 @@ void DrawFloor()
 
 		높이가 Height / 2일때 거리 = 1 (무한)
 		그렇다면 CurrentY일때 거리는 = 1/x (반비례 관계라서)
-		1 : posZ = 1/x : p (반비례 관계니깐) 
+		1 : posZ = 1/x : p (반비례 관계니깐)
 		posZ/x = p;
 		posZ/p = x;
 		----
@@ -604,7 +625,7 @@ void DrawFloor()
 		// 현재 카메라 평면의 Y좌표
 		double CameraY = 0.5 * HEIGHT;
 		// 카메라 평면을 기준으로 현재 Y 좌표가 얼마나 떨어져 있는지
-		int CurrentY = Y - HEIGHT/2;
+		int CurrentY = Y - HEIGHT / 2;
 		// 카메라 평면에서 현재 Y(row) 까지의 거리
 		// Y가 Height/2일 때 무한(1) (가로 길이는 0)
 		// Y가 Height일 때 1(0) (가로 길이는 width)
@@ -616,8 +637,8 @@ void DrawFloor()
 		double FloorStepY = HorDistFromCamToFloorRatio * (Ray_DirRightEndY - Ray_DirLeftEndY) / WIDTH;
 
 		// 시야각의 맨 왼쪽 방향의 방향 벡터쪽의 바닥(현재 시야각에서 가장 왼쪽 바닥)
-		double FloorX = Player.X + HorDistFromCamToFloorRatio * Ray_DirLeftEndX;
-		double FloorY = Player.Y + HorDistFromCamToFloorRatio * Ray_DirLeftEndY;
+		double FloorX = PlayerPosX + HorDistFromCamToFloorRatio * Ray_DirLeftEndX;
+		double FloorY = PlayerPosY + HorDistFromCamToFloorRatio * Ray_DirLeftEndY;
 
 		for (int X = 0; X < WIDTH; X++)
 		{
@@ -643,7 +664,7 @@ void DrawWall()
 {
 	const int WIDTH = GScreen.HorSize;
 	const int HEIGHT = GScreen.VerSize;
-	
+
 	for (int X = 0; X < WIDTH; X++)
 	{
 		int OutSide = 0;
@@ -681,7 +702,7 @@ void Draw3dGrid()
 	DrawWall();
 }
 
-void SortSprite(vector<int>* OrderVec, vector<double> *DistVec, int Amount)
+void SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount)
 {
 	vector<pair<double, int>> Sprites(Amount);
 	for (int i = 0; i < Amount; i++)
@@ -716,21 +737,33 @@ void DrawSprite()
 	// 벡터 거리 저장
 	// 벡터 우선순위 초기화
 
+	double PlayerDirX = Player->GetDirVec().DirX;
+	double PlayerDirY = Player->GetDirVec().DirY;
+
+	double CameraDirX = Player->GetCameraDirVec().DirX;
+	double CameraDirY = Player->GetCameraDirVec().DirY;
+
+	float PlayerPosX = Player->GetPos().X;
+	float PlayerPosY = Player->GetPos().Y;
+
+	const int WIDTH = GScreen.HorSize;
+	const int HEIGHT = GScreen.VerSize;
+
 	for (int i = 0; i < NumOfSprite; i++)
 	{
 		SpriteOrder[i] = i;
-		SpriteDistance[i] = ((Player.X - Sprites[i].X) * (Player.X - Sprites[i].X) + (Player.Y - Sprites[i].Y) * (Player.Y - Sprites[i].Y));
+		SpriteDistance[i] = ((PlayerPosX - Sprites[i].X) * (PlayerPosX - Sprites[i].X) + (PlayerPosY - Sprites[i].Y) * (PlayerPosY - Sprites[i].Y));
 	}
 
 	SortSprite(&SpriteOrder, &SpriteDistance, NumOfSprite);
 
 	for (int i = 0; i < NumOfSprite; i++)
 	{
-		auto *CurrentSprite = &Sprites[SpriteOrder[i]];
+		auto* CurrentSprite = &Sprites[SpriteOrder[i]];
 
 		// 카메라에서 스프라이트 까지의 상대적인 위치
-		double SpriteX = CurrentSprite->X - Player.X;
-		double SpriteY = CurrentSprite->Y - Player.Y;
+		double SpriteX = CurrentSprite->X - PlayerPosX;
+		double SpriteY = CurrentSprite->Y - PlayerPosY;
 
 		// 카메라 행렬(카메라 좌표계)
 		// 카메라의 정면 (스크린 안쪽)은 플레이어의 방향벡터
@@ -764,12 +797,12 @@ void DrawSprite()
 		// [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
 		// [ planeY   dirY ]                                          [ -planeY  planeX ]
 
-		double invDet = 1.0 / (Player.PlaneX * Player.DirY - Player.DirX * Player.PlaneY);
+		double invDet = 1.0 / (CameraDirX * PlayerDirY - PlayerDirX * CameraDirY);
 
 		// 카메라 중심에서 좌우로 얼마나 떨어져 있는가
-		double transformX = invDet * (Player.DirY * SpriteX - Player.DirX * SpriteY); // 화면의 좌우 (양수면 오른쪽)
+		double transformX = invDet * (PlayerDirY * SpriteX - PlayerDirX * SpriteY); // 화면의 좌우 (양수면 오른쪽)
 		// 카메라 중심에서 앞뒤로 얼마나 떨어져 있는가.
-		double transformY = invDet * (-Player.PlaneY * SpriteX + Player.PlaneX * SpriteY); // 화면 안쪽으로 얼마나 들어가 있는지
+		double transformY = invDet * (-CameraDirY * SpriteX + CameraDirX * SpriteY); // 화면 안쪽으로 얼마나 들어가 있는지
 
 		// ????
 		// 원근투영
@@ -832,7 +865,7 @@ void DrawSprite()
 				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
-					int d = (j- vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+					int d = (j - vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
 					int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
 
 					// 경계 안으로 들어 오도록
@@ -843,7 +876,7 @@ void DrawSprite()
 					wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
 
 
-					GScreen.PrintChar(SpriteChar, Stripe, j );
+					GScreen.PrintChar(SpriteChar, Stripe, j);
 
 					//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
 					//if (SpriteChar != L' ')
@@ -869,8 +902,8 @@ void DrawInfo()
 	wstring Wstr = to_wstring(FPS);
 
 	Wss << L"FPS : " << Wstr
-		<< L"| Pos (" << Player.X << L", " << Player.Y << L")"
-		<< L"| Theta : " << Player.PlayerTheta << L"°";
+		<< L"| Pos (" << Player->GetPos().X << L", " << Player->GetPos().Y << L")"
+		<< L"| Theta : " << Player->GetTheta() << L"°";
 
 	GScreen.PrintString(Wss.str(), 0, 0);
 
@@ -909,6 +942,10 @@ int main()
 	delete[] Sprites;
 	Sprites = nullptr;
 
+
+	delete Player;
+	Player = nullptr;
+
 	//TODO
 	/*
 
@@ -927,8 +964,8 @@ int main()
 	4. 게임 방향성 정하기
 		- 슈팅
 		- 맵 탐험 요소가 있는 턴제 JRPG
-	
-	
+
+
 	3. 콘솔 크기 조절시키기 win11은 고정인듯 함.
 */
 

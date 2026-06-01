@@ -1,6 +1,8 @@
 #pragma once
+
 #include <Windows.h>
 #include <stdlib.h>
 #include <iostream>
+
 const int SCREEN_TEXT_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;

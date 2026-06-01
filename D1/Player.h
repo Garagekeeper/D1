@@ -1,30 +1,10 @@
 #pragma once
+#include "Creature.h"
 
-typedef struct FPlayer
+class FPlayer : public Creature
 {
 public:
-	// player pos
-	double X;
-	double Y;
-
-	// player dir vec
-	double DirX;
-	double DirY;
-	double RightX;
-	double RightY;
-
-	// camera plane for wall casting
-	double PlaneX;
-	double PlaneY;
-
-	// camera plane for Florr, Ceiling castting
-	double VPlaneX;
-	double VPlaneY;
-
-	// double theta (rotation degree)
-	double PlayerTheta;
-
-public:
-	void SetDirVec();
-	double GetTheta();
-}FPlayer;
+	//constructor
+	FPlayer(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize);
+		
+};
