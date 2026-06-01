@@ -1,12 +1,10 @@
 #pragma once
 
-#include <Windows.h>
 #include <iostream>
 #include <vector>
+#include "Define.h"
 
 using namespace std;
-
-const int SCREEN_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 
 class Screen
 {
@@ -46,7 +44,7 @@ public:
 	/// </summary>
 	/// <param name="str">출력할 스트링</param>
 	/// <param name="position">출력할 좌표</param>
-	void PrintString(const wstring& str, const int x, const int y);
+	void PrintString(const wstring& str, const int x, const int y, const int Attributes = SCREEN_TEXT_COLOR_WHITE);
 	/// <summary>
 	/// CHAR_INFO 버퍼에 문자를 출력하는 함수
 	/// 스크린버퍼에 바로 뿌리는 것이 아님.
@@ -55,9 +53,9 @@ public:
 	/// <param name="X">출력할 X 위치</param>
 	/// <param name="Y">출력할 Y 위치</param>
 	/// <param name="Attributes">해당 문자의 어트리뷰트 (컬러) 7 = WHITE</param>
-	void PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes = WHITE);
-	void PrintHor(const wchar_t ch, const int x, const int y, int length);
-	void PrintVer(const wchar_t ch, const int x, const int y, int length);
+	void PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes = SCREEN_TEXT_COLOR_WHITE);
+	void PrintHor(const wchar_t ch, const int x, const int y, const int length, const int Attributes);
+	void PrintVer(const wchar_t ch, const int x, const int y, const int length, const int Attributes);
 
 	/// <summary>
 	/// 버퍼를 교환하는 함수

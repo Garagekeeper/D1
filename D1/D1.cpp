@@ -538,10 +538,10 @@ double DDA(int X, const int WIDTH, const int HEIGHT, int& Side)
 	return PerpWallDist;
 }
 
-void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd)
+void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute)
 {
 	int Length = DrawEnd - DrawStart;
-	GScreen.PrintVer(Wchar, X, DrawStart, Length);
+	GScreen.PrintVer(Wchar, X, DrawStart, Length , Attribute);
 }
 
 void DrawCeiling()
@@ -659,9 +659,17 @@ void DrawWall()
 		int DrawEnd = LineHeight / 2 + HEIGHT / 2;
 		if (DrawEnd >= HEIGHT)DrawEnd = HEIGHT - 1;
 
+		int Attribute = SCREEN_TEXT_COLOR_WHITE;
+
+
+		//TODO 거리에 따른 색보정(안개 등 챗 지피티한테 추천받기)
+		if (PerpWallDist < 5)
+			Attribute |= FOREGROUND_INTENSITY;
+		//int Attribute = FOREGROUND_GREEN;
+
 		// 현재 X좌표에서 만난 벽까지의 거리
 		GScreen.Zbuffer[X] = PerpWallDist;
-		DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd);
+		DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd, Attribute);
 	}
 }
 

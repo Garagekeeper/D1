@@ -67,10 +67,10 @@ bool Screen::Init()
 	return true;
 }
 
-void Screen::PrintString(const wstring& str, const int x, const int y)
+void Screen::PrintString(const wstring& str, const int x, const int y, const int Attributes)
 {
 	for (int i = 0; i < str.length(); i++)
-		PrintChar(str[i], x + i, y);
+		PrintChar(str[i], x + i, y, Attributes);
 }
 
 void Screen::PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes)
@@ -86,17 +86,17 @@ void Screen::PrintChar(const wchar_t ch, const int X, const int Y, const int Att
 	}
 }
 
-void Screen::PrintHor(const wchar_t ch, const int x, const int y, int length)
+void Screen::PrintHor(const wchar_t ch, const int x, const int y, const int length, const int Attributes)
 {
 	wstring wstr(length, ch);
-	PrintString(wstr, x, y);
+	PrintString(wstr, x, y, Attributes);
 }
 
-void Screen::PrintVer(const wchar_t ch, const int x, const int y, int length)
+void Screen::PrintVer(const wchar_t ch, const int x, const int y, const int length, const int Attributes)
 {
 	for (int i = 0; i < length; i++)
 	{
-		PrintChar(ch, x, y + i);
+		PrintChar(ch, x, y + i, Attributes);
 	}
 
 }

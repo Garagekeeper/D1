@@ -1,10 +1,10 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include <Windows.h>
 #include <string>
+
+#include "Define.h"
 
 using namespace std;
 
@@ -74,7 +74,7 @@ void DrawPlayer();
 void Draw2dGrid();
 
 double DDA(int X, const int WIDTH, const int HEIGHT, int& Side);
-void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd);
+void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 void DrawCeiling();
 void DrawFloor();
 void DrawWall();
