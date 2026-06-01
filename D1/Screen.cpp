@@ -6,21 +6,8 @@ bool Screen::Init()
 	// 커서를 지움
 	// 그 뒤에 버퍼 정보를 가져옴
 
-	int TargetWidth = 120;
-	int TargetHeight = 30;
-
-	// 터미널 크기 키우는 코드라는데, win11에서는 동작하지 않는 듯.
-	for (int i = 0; i < 2; i++)
-	{
-		SMALL_RECT minRect = { 0, 0, 0, 0 };
-		SetConsoleWindowInfo(ScreenBuffer[i], TRUE, &minRect);
-
-		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
-		SetConsoleScreenBufferSize(ScreenBuffer[i], bSize);
-
-		SMALL_RECT wRect = { 0, 0, static_cast<SHORT>(TargetWidth - 1), static_cast<SHORT>(TargetHeight - 1) };
-		SetConsoleWindowInfo(ScreenBuffer[i], TRUE, &wRect);
-	}
+	int TargetWidth = 240;
+	int TargetHeight = 60;
 
 	// 스크린 버퍼 생성
 	ScreenBuffer[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
@@ -34,6 +21,48 @@ bool Screen::Init()
 
 	if (ScreenBuffer[1] == INVALID_HANDLE_VALUE)
 		return false;
+
+	for (int i = 0; i < 2; i++)
+	{
+		HANDLE ConsoleHandle = ScreenBuffer[i];
+
+
+
+
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
+		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
+
+		HWND hwnd = GetConsoleWindow();
+		Sleep(10);
+		HWND owner = GetWindow(hwnd, GW_OWNER);
+		RECT Rect = { 0, 0, screenWidth, screenHeight };
+
+		//폰트 변경(적용 안됨)
+		//CONSOLE_FONT_INFOEX fontInfo;
+		//fontInfo.cbSize = sizeof(fontInfo);
+		//fontInfo.nFont = 0;
+		//fontInfo.dwFontSize.X = 16; // 가로 크기
+		//fontInfo.dwFontSize.Y = 36; // 세로 크기
+		//fontInfo.FontFamily = FF_DONTCARE;
+		//fontInfo.FontWeight = FW_NORMAL;
+		//std::wstring fontName = L"Consolas";
+		//wcscpy_s(fontInfo.FaceName, fontName.c_str());
+		//SetCurrentConsoleFontEx(owner, FALSE, &fontInfo);
+
+		// 창을 최대화 시키기
+		ShowWindow(owner, SW_SHOWMAXIMIZED);
+
+
+		// 창크기 조절, 위에서 최대화 시키는게 제일 깔끔함
+		//AdjustWindowRect(&Rect, WS_OVERLAPPEDWINDOW, true);
+		//MoveWindow(owner, 0, 0, Rect.right - Rect.left, Rect.bottom- Rect.top, true);
+		//SetWindowPos(owner, nullptr, 0, 0, Rect.right - Rect.left, Rect.bottom - Rect.top, SWP_NOZORDER);
+		//SetWindowLong(owner, GWL_STYLE, WS_VISIBLE | WS_POPUP | WS_MAXIMIZE);
+	}
+
+
 
 	//커서 제거
 	CONSOLE_CURSOR_INFO CursorInfo = { 1,FALSE };
@@ -105,9 +134,9 @@ bool Screen::ChangeScreenBuffer()
 {
 	DWORD dwWritenByte = 0;
 	COORD BufferSize = { static_cast<SHORT>(HorSize), static_cast<SHORT>(VerSize) };
-	COORD BufferCoord = { 0, 0};
+	COORD BufferCoord = { 0, 0 };
 	SMALL_RECT WriteRegion = { 0, 0, static_cast<SHORT>(HorSize - 1), static_cast<SHORT>(VerSize - 1) };
-	
+
 	WriteConsoleOutputW(
 		ScreenBuffer[CurrentScreenBufferIndex],
 		CharInfoBuffer,
