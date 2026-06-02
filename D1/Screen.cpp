@@ -19,6 +19,7 @@ bool Screen::Init()
 	if (ScreenBuffer[1] == INVALID_HANDLE_VALUE)
 		return false;
 
+
 	for (int i = 0; i < 2; i++)
 	{
 		HANDLE ConsoleHandle = ScreenBuffer[i];
@@ -48,7 +49,6 @@ bool Screen::Init()
 		//std::wstring fontName = L"Consolas";
 		//wcscpy_s(fontInfoex.FaceName, fontName.c_str());
 		//SetCurrentConsoleFontEx(ConsoleHandle, FALSE, &fontInfo);
-
 
 
 		// 창크기 조절, 위에서 최대화 시키는게 제일 깔끔함

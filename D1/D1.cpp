@@ -241,7 +241,7 @@ void PlayerRotate()
 {
 
 	// 회전 처리
-	// TODO 상하 처리는 나중에 하거나 안넣거나
+	// 상하 처리는 안넣기
 	//if (KeyState.UpArrow)			*Dy -= MoveSpeed;
 	//if (KeyState.DownArrow)		*Dy += MoveSpeed;
 	//// 아래는 45도 기준으로 
@@ -261,8 +261,6 @@ void PlayerRotate()
 	//PrevKeyInfo.PrevRightArrow = KeyState.RightArrowDown;
 
 	// Theta * deltaTime을 곱하는 방식
-	// TODO 회전을 하면 할 수록 벽의 높이가 작아짐
-	double Theta = 35.0;
 	double FinalTheta = 0.0;
 	if (!KeyState.LeftArrowDown && !KeyState.RightArrowDown) return;
 
@@ -281,10 +279,6 @@ void PlayerRotate()
 
 	// 회전 변환
 	// 플레이어가 바라보는 방향 회전
-	// 이런 실수는 하지 말자, 위에서  x 변경하고 밑에서 바로 사용하면 의미가 왜곡됨
-	// 이런 방식은 오차가 누적됨
-	//Player.DirX = Player.DirX * cos(FinalRad) - Player.DirY * sin(FinalRad);
-	//Player.DirY = Player.DirX * sin(FinalRad) + Player.DirY * cos(FinalRad);
 
 	FVec PlayerPos = Player->GetDirVec();
 	double PlayerX = PlayerPos.DirX;
@@ -717,9 +711,20 @@ void DrawWall()
 		else
 			Attribute = 0; // 거리가 너무 멀면 검은색(안개 속으로 사라짐)
 
+		wchar_t WallChar = L' ';
+		if (PerpWallDist < 2)
+			WallChar = L'█';
+		else if (PerpWallDist < 4)
+			WallChar = L'▓';
+		else if (PerpWallDist < 8)
+			WallChar = L'▒';
+		else
+			WallChar = L'░';
+
 		// 현재 X좌표에서 만난 벽까지의 거리
 		GScreen.Zbuffer[X] = PerpWallDist;
-		DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd, Attribute);
+		//DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd, Attribute);
+		DrawWallVer(WallChar, X, DrawStart, DrawEnd, Attribute);
 	}
 }
 
@@ -1099,7 +1104,6 @@ int main()
 	delete Player;
 	Player = nullptr;
 
-	//TODO
 	/*
 
 	최적화
@@ -1108,33 +1112,21 @@ int main()
 	3. DeltaTime 독립성 및 입력 루프 분리
 
 	//TODO
-	3. color 설정
-		글자 무늬만으로는 원근감을 주는 데 한계가 있습니다. Windows API의 SetConsoleTextAttribute나 VT 시퀀스를 이용해 색상을 도입하는 단계입니다.
-		구현 방법: 거리가 멀어질수록 벽과 바닥의 색상을 회색 ➡️ 어두운 회색 ➡️ 검은색으로 바꾸는 거리 기반 안개 효과(Fog Effect / Shading)를 줍니다.
-		효과: 기호로만 보였던 그래픽에 실시간 음영이 들어가면서 갑자기 고전 패키지 게임 같은 엄청난 비주얼로 업그레이드됩니다.
-
-		CHAR_INFO 알아보고 도입하기
-		WORD WallColor;
-		거리에 따른 음영 넣기
 
 	4. 게임 방향성 정하기
 		- 슈팅
-		- 맵 탐험 요소가 있는 턴제 JRPG
 
 
-	3. 콘솔 크기 조절시키기 win11은 고정인듯 함.
 
-	1단계: 플레이어 HUD 무기 그리기 (가장 쉬움)
-
-	레이캐스팅 신경 쓰지 말고, Render() 마지막 단계에 화면 정중앙 최하단 좌표에 문자 무리(칼이나 총 모양)를 고정으로 출력해 봅니다.
-
-	2단계: 입력과 타이머 연동
-
-	Space바를 누르면 무기 모양 문자가 변경되었다가 0.2초 뒤에 원래대로 돌아오는 간단한 프레임 전환을 DeltaTime을 이용해 구현해 봅니다.
-
-	3단계: 히트스캔 판정 연결
+	스타 형식의 HUD, 왼쪽은 체력, 오른쪽은 탄약
+	적 class 만들기
+	히트스캔 판정 연결
+	적 움직이게
+	맵디자인을 최대한 광장이 없게
 
 	공격 애니메이션이 활성화된 타이밍에 화면 정중앙에 있는 적과의 거리 정보를 확인해 데미지를 입히는 로직을 작성합니다.
+
+	
 
 
 */
