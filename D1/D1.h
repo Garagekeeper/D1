@@ -81,6 +81,7 @@ void DrawWall();
 void Draw3dGrid();
 void SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
 void DrawSprite();
+void DrawPlayerHUD();
 
 void DrawInfo();
 void ClearScreen();

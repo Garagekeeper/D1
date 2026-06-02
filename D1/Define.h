@@ -7,11 +7,13 @@
 const double MoveBaseSpeed	= 5.0;
 const double RotationSpeed	= 100.0;
 
-const int TargetWidth		= 240;
-const int TargetHeight		= 60;
 
-const int TargetScreenWidth = 1920;
-const int TargetScreenHeight = 1080;
+// 이 타겟들은 순수 노가다를 통해서 찾음
+const int TargetWidth		= 138;
+const int TargetHeight		= 37;
+
+const int TargetScreenWidth = 1280;
+const int TargetScreenHeight = 720;
 
 
 const int SCREEN_TEXT_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;

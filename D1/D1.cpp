@@ -203,6 +203,7 @@ void Render()
 	Draw3dGrid();
 	DrawSprite();
 	DrawInfo();
+	DrawPlayerHUD();
 	ClearScreen();
 }
 
@@ -355,7 +356,7 @@ void PlayerMove()
 	if (PlayerPosY < ColliderRadius) PlayerPosY = ColliderRadius;
 	if (PlayerPosY > MapMaxY) PlayerPosY = MapMaxY;
 
-	Player->MoveTo(PlayerPosX, PlayerPosY);
+	Player->MoveTo(static_cast<float>(PlayerPosX), static_cast<float>(PlayerPosY));
 }
 
 void DrawPlayer()
@@ -882,92 +883,111 @@ void DrawSprite()
 	}
 }
 
-//void DrawPlayerHUD()
-//{
-//	// 이거 고쳐서 HUD 그리기
-//	/*
-//	   ( + )
-//	   _|_|_
-//	.-'     '-.
-//   /   ▒▒▒▒▒   \
-//  /   ▒▒▒▒▒▒▒   \
-// |    ░░░░░░░    |
-// |===░░░░░░░░░===|
-//	*/
-//	//--------------------------
-//	//Scailing					|
-//	//--------------------------
-//	// rkfh로 몇배 줄일건지
-//	const float uDiv = 1 / (float)4;
-//	// 세로로 몇배 줄일건지
-//	const float vDiv = 1 / (float)2;
-//	// 위로 몇칸 갈건지 
-//	// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
-//
-//
-//	// 스프라이트의 높이
-//	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
-//	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-//	//TODO 하드코딩 변경
-//	int SpriteHeight = 7;
-//	//세로 비율 조정
-//
-//	int DrawStartY = GScreen.VerSize - SpriteHeight;
-//	if (DrawStartY < 0) DrawStartY = 0;
-//	int DrawEndY = GScreen.VerSize - 1;
-//
-//	// 스프라이트의 너비
-//	//TODO 하드코딩 변경
-//	int SpriteWidth = 17;
-//
-//	int DrawStartX = GScreen.HorSize / 2 - SpriteWidth / 2;
-//	if (DrawStartX < 0) DrawStartX = 0;
-//	int DrawEndX = GScreen.HorSize / SpriteWidth / 22;
-//	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
-//
-//	for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
-//	{
-//		for (int j = DrawStartY; j < DrawEndY; j++)
-//		{
-//			// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
-//			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
-//			int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
-//			//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
-//
-//			// 경계 안으로 들어 오도록
-//			if (texX < 0) texX = 0;
-//			if (texX >= SpriteTextureTest_RowSize) texX = SpriteTextureTest_RowSize - 1;
-//
-//			// 1. transformY이 0이하면 화면의 뒤쪽
-//			// 2. i가 화면에 있는지
-//			// 3. 벽보다 가까이 있는지
-//			if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
-//			{
-//				//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
-//				int d = (j) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
-//				int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
-//
-//				// 경계 안으로 들어 오도록
-//				if (texY < 0) texY = 0;
-//				if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
-//
-//
-//				wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
-//
-//
-//				GScreen.PrintChar(SpriteChar, Stripe, j);
-//
-//				//// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
-//				//if (SpriteChar != L' ')
-//				//{
-//				//	// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
-//				//	// 예시: GScreen.Buffer[j][i] = spriteChar;
-//				//	GScreen.PrintChar(SpriteChar, Stripe, j);
-//				//}
-//			}
-//		}
-//	}
-//}
+void DrawPlayerHUD()
+{
+	// 이거 고쳐서 HUD 그리기
+	/*
+	   ( + )
+	   _|_|_
+	.-'     '-.
+   /   ▒▒▒▒▒   \
+  /   ▒▒▒▒▒▒▒   \
+ |    ░░░░░░░    |
+ |===░░░░░░░░░===|
+	*/
+	//--------------------------
+	//Scailing					|
+	//--------------------------
+	// 가로 몇배 늘릴건지
+	const float uMul = 2;
+	// 세로로 몇배 늘릴건지
+	const float vMul = 1;
+	// 위로 몇칸 갈건지 
+	// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
+
+
+	// 스프라이트의 높이
+	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
+	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
+	//TODO 하드코딩 변경
+	int SpriteHeight = 7;
+	//세로 비율 조정
+
+	int DrawStartY = GScreen.VerSize - SpriteHeight;
+	if (DrawStartY < 0) DrawStartY = 0;
+	int DrawEndY = GScreen.VerSize;
+
+	// 스프라이트의 너비
+	//TODO 하드코딩 변경
+	int SpriteWidth = 18;
+
+	int DrawStartX = GScreen.HorSize / 2 - SpriteWidth / 2;
+	if (DrawStartX < 0) DrawStartX = 0;
+	int DrawEndX = GScreen.HorSize / 2 + SpriteWidth / 2;
+	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
+
+	const wchar_t* temp[] =
+	{
+			L"      ( + )      ",
+			L"      _|_|_      ",
+			L"   .-'     '-.   ",
+			L"  /   ▒▒▒▒▒   \\  ",
+			L" /   ▒▒▒▒▒▒▒   \\ ",
+			L"|    ░░░░░░░    |",
+			L"|===░░░░░░░░░===|",
+
+	};
+
+	for (int Stripe = DrawStartX; Stripe < DrawEndX-1; Stripe++)
+	{
+		for (int j = DrawStartY; j < DrawEndY; j++)
+		{
+			// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
+			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
+			//int texX = int(256 * (Stripe - (-SpriteWidth / 2 + GScreen.HorSize / 2)) / SpriteWidth) / 256;
+			//int texX = int(256 * Stripe + SpriteWidth * 128 - GScreen.HorSize * 128) / SpriteWidth) / 256;
+			int texX = (Stripe + SpriteWidth/2 - GScreen.HorSize/2) ;
+			//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
+
+			// 경계 안으로 들어 오도록
+			if (texX < 0) texX = 0;
+			if (texX >= 18) texX = 18 - 1;
+
+			// 2. i가 화면에 있는지
+			if (Stripe >= 0 && Stripe < GScreen.HorSize)
+			{
+				//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
+				int d = (j + (SpriteHeight - GScreen.VerSize));
+				int texY = d;
+
+				/*int d = (j - vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+				int d = 256 * (j + (SpriteHeight - GScreen.VerSize) / 2);
+				int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;*/
+
+				// 경계 안으로 들어 오도록
+				if (texY < 0) texY = 0;
+				if (texY >= 7) texY = 7 - 1;
+
+
+				wchar_t SpriteChar = temp[texY][texX];
+
+
+				//TODO 스케일 대응하기
+				//TODO 벽이랑 겹칠때 무기를 구성하는 글자의 네모난 모습이 보임 이거 고쳐애함
+
+				//GScreen.PrintChar(SpriteChar, Stripe, j);
+
+				// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
+				if (SpriteChar != L' ')
+				{
+					// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
+					// 예시: GScreen.Buffer[j][i] = spriteChar;
+					GScreen.PrintChar(SpriteChar, Stripe, j);
+				}
+			}
+		}
+	}
+}
 
 void DrawInfo()
 {

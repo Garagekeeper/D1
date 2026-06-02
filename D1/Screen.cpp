@@ -23,35 +23,41 @@ bool Screen::Init()
 	{
 		HANDLE ConsoleHandle = ScreenBuffer[i];
 
-		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
-		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
-
 		HWND hwnd = GetConsoleWindow();
 		Sleep(10);
 		HWND owner = GetWindow(hwnd, GW_OWNER);
 		RECT Rect = { 0, 0, TargetScreenWidth, TargetScreenHeight };
 
-		//폰트 변경(적용 안됨)
-		//CONSOLE_FONT_INFOEX fontInfo;
-		//fontInfo.cbSize = sizeof(fontInfo);
-		//fontInfo.nFont = 0;
-		//fontInfo.dwFontSize.X = 16; // 가로 크기
-		//fontInfo.dwFontSize.Y = 36; // 세로 크기
-		//fontInfo.FontFamily = FF_DONTCARE;
-		//fontInfo.FontWeight = FW_NORMAL;
-		//std::wstring fontName = L"Consolas";
-		//wcscpy_s(fontInfo.FaceName, fontName.c_str());
-		//SetCurrentConsoleFontEx(owner, FALSE, &fontInfo);
-
 		// 창을 최대화 시키기
-		ShowWindow(owner, SW_SHOWMAXIMIZED);
+		//ShowWindow(owner, SW_SHOWMAXIMIZED);
+
+
+		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
+		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
+
+
+		//폰트 변경(적용 안됨)
+		//CONSOLE_FONT_INFO fontInfo = { 0, {0,0} };
+		//CONSOLE_FONT_INFOEX fontInfoex;
+		//fontInfoex.cbSize = sizeof(fontInfoex);
+		//fontInfoex.nFont = 0;
+		//fontInfoex.dwFontSize.X = 4; // 가로 크기
+		//fontInfoex.dwFontSize.Y = 32; // 세로 크기
+		//fontInfoex.FontFamily = FF_DONTCARE;
+		//fontInfoex.FontWeight = FW_NORMAL;
+		//std::wstring fontName = L"Consolas";
+		//wcscpy_s(fontInfoex.FaceName, fontName.c_str());
+		//SetCurrentConsoleFontEx(ConsoleHandle, FALSE, &fontInfo);
+
 
 
 		// 창크기 조절, 위에서 최대화 시키는게 제일 깔끔함
-		//AdjustWindowRect(&Rect, WS_OVERLAPPEDWINDOW, true);
+		AdjustWindowRect(&Rect, WS_OVERLAPPEDWINDOW, true);
 		//MoveWindow(owner, 0, 0, Rect.right - Rect.left, Rect.bottom- Rect.top, true);
-		//SetWindowPos(owner, nullptr, 0, 0, Rect.right - Rect.left, Rect.bottom - Rect.top, SWP_NOZORDER);
+		SetWindowPos(owner, nullptr, 0, 0, Rect.right - Rect.left, Rect.bottom - Rect.top, SWP_NOZORDER);
 		//SetWindowLong(owner, GWL_STYLE, WS_VISIBLE | WS_POPUP | WS_MAXIMIZE);
+		//GetCurrentConsoleFont(ConsoleHandle, false, &fontInfo);
+		//SetCurrentConsoleFontEx(ConsoleHandle, false, &fontInfoex);
 	}
 
 
