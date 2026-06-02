@@ -9,6 +9,7 @@
 
 const double PHI = 3.14159265358979323846;
 double DeltaTime = 0.0;
+double AmountTime = 0.0;
 const int NumOfSprite = 1;
 const int SpriteTextureTest_RowSize = 12;
 
@@ -19,6 +20,7 @@ FPrevKeyInfo	PrevKeyInfo;
 FSprite* Sprites;
 vector<int>		SpriteOrder;
 vector<double>	SpriteDistance;
+
 
 #define mapWidth 24
 #define mapHeight 24
@@ -144,6 +146,7 @@ void Input()
 	int InKey = 0;
 	int XDir = 0;
 	int YDir = 0;
+	bool isSpaceCurrentDown = (GetAsyncKeyState(VK_SPACE) & 0x8000 )!= 0;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
@@ -182,11 +185,23 @@ void Input()
 		KeyState.LeftArrowDown = false;
 	}
 
+	if (isSpaceCurrentDown && !KeyState.KEYSpaceWasDown)
+	{
+		KeyState.KEYSpaceDown = true;
+	}
+	else
+	{
+		KeyState.KEYSpaceDown = false;
+	}
+
+	KeyState.KEYSpaceWasDown = isSpaceCurrentDown;
+
 	if (GetAsyncKeyState('Q') & 0x8000) exit(0);
 	if (GetAsyncKeyState('W') & 0x8001)	KeyState.KEYW = true;
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
 	if (GetAsyncKeyState('A') & 0x8001)	KeyState.KEYA = true;
+	
 }
 
 void Update()
@@ -194,6 +209,7 @@ void Update()
 	HandleInput();
 	PlayerRotate();
 	PlayerMove();
+	UpdatePlayer();
 }
 
 void Render()
@@ -357,6 +373,27 @@ void PlayerMove()
 	if (PlayerPosY > MapMaxY) PlayerPosY = MapMaxY;
 
 	Player->MoveTo(static_cast<float>(PlayerPosX), static_cast<float>(PlayerPosY));
+}
+
+void UpdatePlayer()
+{
+	if (KeyState.KEYSpaceDown && Player->GetState() == ECreatureState::Idle)
+	{
+		Player->SetState(ECreatureState::Attack);
+		AmountTime = 0.0;
+
+		return;
+	}
+	
+	if (Player->GetState() == ECreatureState::Attack)
+	{
+		AmountTime += DeltaTime;
+		if (AmountTime > PlayerAttackCoolTime)
+		{
+			AmountTime = 0.0;
+			Player->SetState(ECreatureState::Idle);
+		}
+	}
 }
 
 void DrawPlayer()
@@ -910,7 +947,7 @@ void DrawPlayerHUD()
 	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
 	//TODO 하드코딩 변경
-	int SpriteHeight = 7;
+	int SpriteHeight = 10;
 	//세로 비율 조정
 
 	int DrawStartY = GScreen.VerSize - SpriteHeight;
@@ -926,19 +963,36 @@ void DrawPlayerHUD()
 	int DrawEndX = GScreen.HorSize / 2 + SpriteWidth / 2;
 	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
 
-	const wchar_t* temp[] =
+	vector<vector<const wchar_t*>> HudSprites =
 	{
-			L"      ( + )      ",
-			L"      _|_|_      ",
-			L"   .-'     '-.   ",
-			L"  /   ▒▒▒▒▒   \\  ",
-			L" /   ▒▒▒▒▒▒▒   \\ ",
-			L"|    ░░░░░░░    |",
-			L"|===░░░░░░░░░===|",
+			{
+				L"                 ",
+				L"                 ",
+				L"                 ",
+				L"      ( + )      ",
+				L"      _|_|_      ",
+				L"   .-'     '-.   ",
+				L"  /   ▒▒▒▒▒   \\  ",
+				L" /   ▒▒▒▒▒▒▒   \\ ",
+				L"|    ░░░░░░░    |",
+				L"|===░░░░░░░░░===|"
+			},
 
+			{
+				L"    \\   |   /    ",
+				L"     \\  |  /     ",
+				L"      \\ | /      ",
+				L"      ( + )      ",
+				L"      _|_|_      ",
+				L"   .-'     '-.   ",
+				L"  /   ▒▒▒▒▒   \\  ",
+				L" /   ▒▒▒▒▒▒▒   \\ ",
+				L"|    ░░░░░░░    |",
+				L"|===░░░░░░░░░===|"
+			}
 	};
 
-	for (int Stripe = DrawStartX; Stripe < DrawEndX-1; Stripe++)
+	for (int Stripe = DrawStartX; Stripe < DrawEndX - 1; Stripe++)
 	{
 		for (int j = DrawStartY; j < DrawEndY; j++)
 		{
@@ -946,12 +1000,12 @@ void DrawPlayerHUD()
 			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
 			//int texX = int(256 * (Stripe - (-SpriteWidth / 2 + GScreen.HorSize / 2)) / SpriteWidth) / 256;
 			//int texX = int(256 * Stripe + SpriteWidth * 128 - GScreen.HorSize * 128) / SpriteWidth) / 256;
-			int texX = (Stripe + SpriteWidth/2 - GScreen.HorSize/2) ;
+			int texX = (Stripe + SpriteWidth / 2 - GScreen.HorSize / 2);
 			//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
 
 			// 경계 안으로 들어 오도록
 			if (texX < 0) texX = 0;
-			if (texX >= 18) texX = 18 - 1;
+			if (texX >= SpriteWidth) texX = SpriteWidth - 1;
 
 			// 2. i가 화면에 있는지
 			if (Stripe >= 0 && Stripe < GScreen.HorSize)
@@ -966,10 +1020,11 @@ void DrawPlayerHUD()
 
 				// 경계 안으로 들어 오도록
 				if (texY < 0) texY = 0;
-				if (texY >= 7) texY = 7 - 1;
+				if (texY >= SpriteHeight) texY = SpriteHeight - 1;
 
 
-				wchar_t SpriteChar = temp[texY][texX];
+				int Index = static_cast<int>(Player->GetState());
+				wchar_t SpriteChar = HudSprites[Index][texY][texX];
 
 
 				//TODO 스케일 대응하기
@@ -1014,7 +1069,6 @@ void ClearScreen()
 
 int main()
 {
-	//system("mode con cols=240 lines=60");
 
 	// delta time을위한  타이머(chrono)
 	LARGE_INTEGER Frequency;
@@ -1029,6 +1083,7 @@ int main()
 	{
 		QueryPerformanceCounter(&CurrentTime);
 		DeltaTime = static_cast<double>(CurrentTime.QuadPart - PrevTime.QuadPart) / Frequency.QuadPart;
+		//DeltaTime = 0.001;
 		PrevTime = CurrentTime;
 
 		Input();

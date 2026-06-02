@@ -1,7 +1,7 @@
 #include "Creature.h"
 
 Creature::Creature(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize)
-	:Stat(_Stat), Pos(_Pos), DirVec(_DirVec), PlaneSize(PlaneSize), Theta(0.0)
+	:Stat(_Stat), State(ECreatureState::Idle), Pos(_Pos), DirVec(_DirVec), PlaneSize(PlaneSize), Theta(0.0)
 {
 	// Right 벡터 
 	RightVec.DirX = -DirVec.DirY;

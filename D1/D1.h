@@ -19,6 +19,9 @@ typedef struct FKeyState
 	bool UpArrowUP = true;
 	bool DownArrowDown = false;
 	bool DownArrowUP = true;
+	bool KEYSpaceWasDown = false;
+	bool KEYSpaceDown = false;
+	bool KEYSpaceUp = false;
 	bool KEYW = false;
 	bool KEYD = false;
 	bool KEYS = false;
@@ -67,6 +70,7 @@ void ClearInput();
 void HandleInput();
 void PlayerRotate();
 void PlayerMove();
+void UpdatePlayer();
 #pragma endregion
 
 #pragma region Render loop

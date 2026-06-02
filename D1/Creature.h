@@ -2,6 +2,8 @@
 
 #include "Define.h"
 
+
+
 struct FPos
 {
 	float X				= 0;
@@ -32,6 +34,7 @@ class Creature
 private:
 	// Stat
 	FCreatureBaseStat	Stat;
+	ECreatureState		State;
 
 	// Pos and Vector
 	FPos				Pos;
@@ -68,6 +71,9 @@ public:
 
 	void				MoveTo(float NextX, float NextY);
 	void				RotateTo(double NextX, double NextY, double _Theta);
+
+	inline ECreatureState GetState() const { return State; }
+	inline void SetState(ECreatureState _State) { State = _State; }
 
 
 };
