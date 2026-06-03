@@ -35,7 +35,8 @@ bool Screen::Init()
 
 		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
 		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
-
+		HorSize = TargetWidth;
+		VerSize = TargetHeight;
 
 		//폰트 변경(적용 안됨)
 		//CONSOLE_FONT_INFO fontInfo = { 0, {0,0} };
@@ -81,8 +82,7 @@ bool Screen::Init()
 	//버퍼의 정보를 info에 담아옴
 	if (GetConsoleScreenBufferInfo(ScreenBuffer[0], &BufferInfo))
 	{
-		HorSize = BufferInfo.dwSize.X;
-		VerSize = BufferInfo.dwSize.Y;
+	
 	}
 
 	CharInfoBuffer = new CHAR_INFO[HorSize * VerSize];

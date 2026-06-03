@@ -146,7 +146,7 @@ void Input()
 	int InKey = 0;
 	int XDir = 0;
 	int YDir = 0;
-	bool isSpaceCurrentDown = (GetAsyncKeyState(VK_SPACE) & 0x8000 )!= 0;
+	bool isSpaceCurrentDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
@@ -201,7 +201,7 @@ void Input()
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
 	if (GetAsyncKeyState('A') & 0x8001)	KeyState.KEYA = true;
-	
+
 }
 
 void Update()
@@ -378,7 +378,7 @@ void UpdatePlayer()
 
 		return;
 	}
-	
+
 	if (Player->GetState() == ECreatureState::Attack)
 	{
 		AmountTime += DeltaTime;
@@ -952,7 +952,7 @@ void DrawPlayerHUD()
 	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
 	//TODO 하드코딩 변경
-	int SpriteHeight = 10;
+	int SpriteHeight = 11;
 	//세로 비율 조정
 
 	int DrawStartY = GScreen.VerSize - SpriteHeight;
@@ -971,30 +971,60 @@ void DrawPlayerHUD()
 	vector<vector<const wchar_t*>> HudSprites =
 	{
 			{
-				L"                 ",
-				L"                 ",
-				L"                 ",
-				L"      ( + )      ",
-				L"      _|_|_      ",
-				L"   .-'     '-.   ",
-				L"  /   ▒▒▒▒▒   \\  ",
-				L" /   ▒▒▒▒▒▒▒   \\ ",
-				L"|    ░░░░░░░    |",
-				L"|===░░░░░░░░░===|"
+				L"        ⠶        ",
+				L"     ⡔⠉⠉⠉⠉⠉⢢     ",
+				L"    ⢰⠁⠄⠄⠄⠄⠠⠈⡆    ",
+				L"    ⡥⠭⢭⠉⠉⠉⡭⠭⢬    ",
+				L"   ⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡   ",
+				L"  ⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇  ",
+				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
+				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
+				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
+				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
+				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
+				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇    ",
 			},
 
 			{
-				L"    \\   |   /    ",
-				L"     \\  |  /     ",
-				L"      \\ | /      ",
-				L"      ( + )      ",
-				L"      _|_|_      ",
-				L"   .-'     '-.   ",
-				L"  /   ▒▒▒▒▒   \\  ",
-				L" /   ▒▒▒▒▒▒▒   \\ ",
-				L"|    ░░░░░░░    |",
-				L"|===░░░░░░░░░===|"
-			}
+				L"        ⠶        ",
+				L" ⠶⠶⠶⠶⡔⠉⠉⠉⠉⠉⢢⠶⠶⠶⠶ ",
+				L" ⠶⠶⠶⢰⠁⠄⠄⠄⠄⠠⠈⡆⠶⠶⠶ ",
+				L" ⠶⠶⠶⡥⠭⢭⠉⠉⠉⡭⠭⢬⠶⠶⠶ ",
+				L"   ⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡   ",
+				L"  ⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇  ",
+				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
+				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
+				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
+				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
+				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
+				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇     ",
+			},
+
+
+		/*
+[0~2개 도트 - 연한 선/파편]
+⠀ ⠁ ⠂ ⠃ ⠄ ⠅ ⠆ ⠇ ⠈ ⠉ ⠊ ⠋ ⠌ ⠍ ⠎ ⠏
+⠐ ⠑ ⠒  ⠔ ⠕ ⠖ ⠗ ⠘ ⠙ ⠚ ⠛ ⠜ ⠝ ⠞ ⠟
+
+[3~5개 도트 - 중간 음영/테두리]
+⠠ ⠡ ⠢ ⠣ ⠤ ⠥ ⠦ ⠧ ⠨ ⠩ ⠪ ⠫ ⠬ ⠭ ⠮ ⠯
+⠰ ⠱ ⠲ ⠳ ⠴ ⠵ ⠶ ⠷ ⠸ ⠹ ⠺ ⠻ ⠼ ⠽ ⠾ ⠿
+
+[6~8개 도트 - 어두운 음영/총기 본체]
+⡀ ⡁ ⡂ ⡃ ⡄ ⡅ ⡆ ⡇ ⡈ ⡉ ⡊ ⡋ ⡌ ⡍ ⡎ ⡏
+
+⡐ ⡑ ⡒ ⡓ ⡔ ⡕ ⡖ ⡗ ⡘ ⡙ ⡚ ⡛ ⡜ ⡝ ⡞ ⡟
+
+⢀ ⢁ ⢂ ⢃ ⢄ ⢅ ⢆ ⢇ ⢈ ⢉ ⢊ ⢋ ⢌ ⢍ ⢎ ⢏
+
+⢐ ⢑ ⢒ ⢓ ⢔ ⢕ ⢖ ⢗ ⢘ ⢙ ⢚ ⢛ ⢜ ⢝ ⢞ ⢟
+
+⡠ ⡡ ⡢ ⡣ ⡤ ⡥ ⡦ ⡧ ⡨ ⡩ ⡪ ⡫ ⡬ ⡭ ⡮ ⡯
+
+⢠ ⢡ ⢢ ⢣ ⢤ ⢥ ⢦ ⢧ ⢨ ⢩ ⢪ ⢫ ⢬ ⢭ ⢮ ⢯
+
+⢰ ⢱ ⢲ ⢳ ⢴ ⢵ ⢶ ⢷ ⢸ ⢹ ⢺ ⢻ ⢼ ⢽ ⢾ ⣿⠀⠀
+		*/
 	};
 
 	for (int Stripe = DrawStartX; Stripe < DrawEndX - 1; Stripe++)
@@ -1035,7 +1065,7 @@ void DrawPlayerHUD()
 				//TODO 스케일 대응하기
 				//TODO 벽이랑 겹칠때 무기를 구성하는 글자의 네모난 모습이 보임 이거 고쳐애함
 
-				//GScreen.PrintChar(SpriteChar, Stripe, j);
+				/*GScreen.PrintChar(SpriteChar, Stripe, j);*/
 
 				// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)
 				if (SpriteChar != L' ')
@@ -1126,7 +1156,7 @@ int main()
 
 	공격 애니메이션이 활성화된 타이밍에 화면 정중앙에 있는 적과의 거리 정보를 확인해 데미지를 입히는 로직을 작성합니다.
 
-	
+
 
 
 */
