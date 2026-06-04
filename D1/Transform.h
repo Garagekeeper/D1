@@ -29,7 +29,7 @@ struct FTransform
 		Theta = 0.0;
 
 		// Right 벡터 
-		RightVec.DirX = DirVec.DirY;
+		RightVec.DirX = -DirVec.DirY;
 		RightVec.DirY = DirVec.DirX;
 
 		// 카메라 벡터

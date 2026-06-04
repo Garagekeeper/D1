@@ -1,5 +1,6 @@
 #include "Utils.h";
 #include "Transform.h"
+#include <cmath>
 
 void FTransform::MoveTo(FPos NextPos)
 {
@@ -9,7 +10,7 @@ void FTransform::MoveTo(FPos NextPos)
 void FTransform::RotateTo(FVec NextVec, double _Theta)
 {
 	//TODO Sqrt 안쓰고 해보기
-	auto Len = GetSqrLen(NextVec);
+	auto Len = sqrt(GetSqrLen(NextVec));
 
 	// 방향벡터 수정
 	DirVec.DirX = NextVec.DirX / Len;
