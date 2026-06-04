@@ -10,3 +10,8 @@ double GetSqrLen(FPos Pos)
 {
     return (Pos.X * Pos.X) + (Pos.Y * Pos.Y);;
 }
+
+double GetSqrDist(FPos P1, FPos P2)
+{
+    return ((P2.X - P1.X) * (P2.X - P1.X)) + ((P2.Y - P1.Y) * (P2.Y - P1.Y));
+}

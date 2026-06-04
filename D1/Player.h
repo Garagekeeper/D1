@@ -18,7 +18,6 @@ struct FWeaponHud
 class FPlayer : public Creature
 {
 public:
-	FWeaponHud WeaponHud;
 
 public:
 	//constructor
@@ -26,7 +25,5 @@ public:
 		: Creature(_Stat, _Transform, _Sprites) {}
 	FPlayer(FTransform _Transform, FSprite _Sprites)
 		: Creature({ 100,100,100 }, _Transform, _Sprites) {}
-
-	inline FWeaponHud* GetWeaponHud() { return &WeaponHud; }
 
 };

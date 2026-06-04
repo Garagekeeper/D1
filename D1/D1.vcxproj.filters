@@ -24,13 +24,7 @@
     <ClCompile Include="Screen.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Sprite.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Creature.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Monster.cpp">
@@ -45,6 +39,15 @@
     <ClCompile Include="Transform.cpp">
       <Filter>PlaceableObject</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>PlaceableObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Creature.cpp">
+      <Filter>PlaceableObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>PlaceableObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D1.h">
@@ -53,16 +56,10 @@
     <ClInclude Include="Screen.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Creature.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Monster.h">
@@ -75,6 +72,15 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
+      <Filter>PlaceableObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>PlaceableObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Creature.h">
+      <Filter>PlaceableObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
       <Filter>PlaceableObject</Filter>
     </ClInclude>
   </ItemGroup>
