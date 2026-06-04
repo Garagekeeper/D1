@@ -13,35 +13,6 @@ using namespace std;
 class Creature;
 struct FPos;
 
-typedef struct FKeyState
-{
-	bool QKey = false;
-	bool LeftArrowDown = false;
-	bool LeftArrowUP = true;
-	bool RightArrowDown = false;
-	bool RightArrowUP = true;
-	bool UpArrowDown = false;
-	bool UpArrowUP = true;
-	bool DownArrowDown = false;
-	bool DownArrowUP = true;
-	bool KEYSpaceWasDown = false;
-	bool KEYSpaceDown = false;
-	bool KEYSpaceUp = false;
-	bool KEYW = false;
-	bool KEYD = false;
-	bool KEYS = false;
-	bool KEYA = false;
-}FKeyState;
-
-typedef struct FPrevKeyInfo
-{
-	bool PrevLeftArrow = false;
-	bool PrevRightArrow = false;
-	bool PrevDownrrow = false;
-	bool PrevUpArrow = false;
-
-}FPrevKeyInfo;
-
 enum EDir
 {
 	LEFT = 75,
@@ -52,13 +23,6 @@ enum EDir
 	EAST = 'd',
 	SOUTH = 's',
 	WEST = 'a',
-};
-
-enum Env
-{
-	EMPTY = 0,
-	WALL = 1,
-	PLAYER = 9,
 };
 
 enum class ERayCastLayer

@@ -180,9 +180,6 @@ void Init()
 
 void Input()
 {
-	int InKey = 0;
-	int XDir = 0;
-	int YDir = 0;
 	bool isSpaceCurrentDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
@@ -384,13 +381,13 @@ void PlayerMove()
 
 	// 다음 좌표의 충돌 체크
 	double ColliderEdgeX = NextX + (Dx > 0 ? ColliderRadius : -ColliderRadius);
-	if (WorldMap[(int)PlayerPosY][(int)ColliderEdgeX] != WALL)
+	if (WorldMap[(int)PlayerPosY][(int)ColliderEdgeX] != static_cast<int>(Env::WALL))
 	{
 		PlayerPosX = NextX;
 	}
 
 	double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
-	if (WorldMap[(int)ColliderEdgeY][(int)PlayerPosX] != WALL)
+	if (WorldMap[(int)ColliderEdgeY][(int)PlayerPosX] != static_cast<int>(Env::WALL))
 	{
 		PlayerPosY = NextY;
 	}
@@ -598,7 +595,7 @@ FRaycasterResult DDA(int X, ERayCastLayer TargetLayer)
 		if (TargetLayer == ERayCastLayer::WALL)
 		{
 			// 해당 격자에 벽, 오브젝트, 적이 있는지 확인
-			if (WorldMap[MapPosY][MapPosX] == WALL) Res.bHit = true;
+			if (WorldMap[MapPosY][MapPosX] == static_cast<int>(Env::WALL)) Res.bHit = true;
 		}
 		else if (TargetLayer == ERayCastLayer::Creature)
 		{

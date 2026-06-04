@@ -126,8 +126,12 @@
     <ClCompile Include="Creature.cpp" />
     <ClCompile Include="D1.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="WorldManager.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PObject.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -138,8 +142,12 @@
     <ClInclude Include="D1.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="WorldManager.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PObject.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Transform.h" />

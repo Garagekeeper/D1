@@ -22,4 +22,38 @@ const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BA
 
 const double PlayerAttackCoolTime = 0.2;
 
+struct FKeyState
+{
+	bool QKey = false;
+	bool LeftArrowDown = false;
+	bool LeftArrowUP = true;
+	bool RightArrowDown = false;
+	bool RightArrowUP = true;
+	bool UpArrowDown = false;
+	bool UpArrowUP = true;
+	bool DownArrowDown = false;
+	bool DownArrowUP = true;
+	bool KEYSpaceWasDown = false;
+	bool KEYSpaceDown = false;
+	bool KEYSpaceUp = false;
+	bool KEYW = false;
+	bool KEYD = false;
+	bool KEYS = false;
+	bool KEYA = false;
+};
 
+struct FPrevKeyInfo
+{
+	bool PrevLeftArrow = false;
+	bool PrevRightArrow = false;
+	bool PrevDownrrow = false;
+	bool PrevUpArrow = false;
+
+};
+
+enum class Env
+{
+	EMPTY = 0,
+	WALL = 1,
+	PLAYER = 9,
+};
