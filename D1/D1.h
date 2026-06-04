@@ -3,10 +3,14 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
-
+#include <list>
+#include<utility>
 #include "Define.h"
 
 using namespace std;
+
+class Creature;
+struct FPos;
 
 typedef struct FKeyState
 {
@@ -76,8 +80,8 @@ void UpdatePlayer();
 #pragma region Render loop
 void DrawPlayer();
 void Draw2dGrid();
-
-double DDA(int X, const int WIDTH, const int HEIGHT, int& Side);
+double DDA(int X, int& Side);
+std::pair<FPos,double> DDAEnemy(int X);
 void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 void DrawCeiling();
 void DrawFloor();

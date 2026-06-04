@@ -26,4 +26,6 @@ public:
 	FPlayer(FTransform _Transform, FSprite _Sprites)
 		: Creature({ 100,100,100 }, _Transform, _Sprites) {}
 
+	Creature* FindTargetOnRay();
+
 };

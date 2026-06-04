@@ -22,10 +22,4 @@ const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BA
 
 const double PlayerAttackCoolTime = 0.2;
 
-// Move?
-enum class ECreatureState
-{
-	Idle = 0,
-	Attack,
-	ECreatureStateLen,
-};
+

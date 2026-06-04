@@ -126,7 +126,6 @@
     <ClCompile Include="Creature.cpp" />
     <ClCompile Include="D1.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PObject.cpp" />
     <ClCompile Include="Screen.cpp" />
@@ -139,7 +138,6 @@
     <ClInclude Include="D1.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Enemy.h" />
-    <ClInclude Include="Monster.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PObject.h" />
     <ClInclude Include="Screen.h" />

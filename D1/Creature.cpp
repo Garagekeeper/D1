@@ -13,7 +13,7 @@ int Creature::GetHp()
 
 int Creature::GetAttackDamage()
 {
-	return 0;
+	return Stat.AttackDamage;
 }
 
 void Creature::SetAttackDamage()
@@ -27,7 +27,7 @@ void Creature::GetHeal(int Amount)
 
 void Creature::GetDamage(int Amount)
 {
-	Stat.Hp -= Amount;
+ 	Stat.Hp -= Amount;
 	if (Stat.Hp <= 0)
 	{
 		Stat.Hp = 0;
@@ -36,9 +36,9 @@ void Creature::GetDamage(int Amount)
 }
 
 //TODO Attack 구현
-void Creature::Attack()
+void Creature::Attack(Creature* Target)
 {
-	
+	Target->OnAttacked(this);
 }
 
 void Creature::OnAttacked(Creature* From)

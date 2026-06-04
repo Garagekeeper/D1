@@ -23,7 +23,7 @@ public:
 	inline FTransform*		GetTransform() { return &Transform; }
 
 
-	void					MoveTo(FPos NextPos);
+	virtual void			MoveTo(FPos NextPos);
 	void					RotateTo(FVec NextVec, double _Theta);
 
 };

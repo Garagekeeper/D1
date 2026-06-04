@@ -12,6 +12,15 @@ struct FCreatureBaseStat
 	int MaxHp			= 100;
 };
 
+// Move?
+enum class ECreatureState
+{
+	Idle = 0,
+	Attack,
+	GetAttacked,
+	ECreatureStateLen,
+};
+
 class Creature : public PObject
 {
 
@@ -33,7 +42,7 @@ public:
 	int						GetAttackDamage();
 	void					SetAttackDamage();
 
-	virtual void			Attack();
+	virtual void			Attack(Creature* Target);
 	virtual void			GetDamage(int Amount);
 	virtual void			GetHeal(int Amount);
 	virtual void			OnAttacked(Creature* From);
