@@ -25,6 +25,7 @@ public:
 	//constructor
 							Creature() = default;
 							Creature(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize);
+							Creature(FPos _Pos, FVec _DirVec, double PlaneSize);
 	virtual					~Creature();
 
 	//stat

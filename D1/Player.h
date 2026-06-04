@@ -59,6 +59,7 @@ public:
 public:
 	//constructor
 	FPlayer(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize);
+	FPlayer(FPos _Pos, FVec _DirVec, double PlaneSize);
 
 	inline FWeaponHud* GetWeaponHud() { return &WeaponHud; }
 

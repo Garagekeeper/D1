@@ -65,3 +65,8 @@ FPlayer::FPlayer(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneS
 {
 
 }
+
+FPlayer::FPlayer(FPos _Pos, FVec _DirVec, double PlaneSize)
+{
+	Creature({100,100,100}, _Pos, _DirVec, PlaneSize);
+}
