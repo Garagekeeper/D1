@@ -6,6 +6,7 @@
 #include <list>
 #include<utility>
 #include "Define.h"
+#include "Transform.h"
 
 using namespace std;
 
@@ -60,6 +61,20 @@ enum Env
 	PLAYER = 9,
 };
 
+enum class ERayCastLayer
+{
+	WALL,
+	Creature,
+};
+
+struct FRaycasterResult
+{
+	bool bHit = false;
+	FPos MapPos = { 0.0f, 0.0f };
+	double PerpDist = 0.0;
+	int Side = 0;
+};
+
 
 void Init();
 
@@ -80,8 +95,7 @@ void UpdatePlayer();
 #pragma region Render loop
 void DrawPlayer();
 void Draw2dGrid();
-double DDA(int X, int& Side);
-std::pair<FPos,double> DDAEnemy(int X);
+FRaycasterResult DDA(int X, ERayCastLayer TargetLayer);
 void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 void DrawCeiling();
 void DrawFloor();
