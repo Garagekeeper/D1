@@ -22,6 +22,9 @@ public:
 	void						Run();
 	void static					StartEngine();
 	inline double				GetDeltaTime() const { return deltaTime; }
+	inline InputManager*		GetInputManager() const { return SInputManager; }
+	inline WorldManager*		GetWorldManager() const { return SWorldManager; }
+	inline Renderer*			GetRenderer() const { return SRenderer; }
 	inline static GameEngine*	GetInstance() { return Instance; }
 
 };

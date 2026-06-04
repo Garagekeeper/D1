@@ -21,6 +21,7 @@ const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BA
 
 
 const double PlayerAttackCoolTime = 0.2;
+const double PHI = 3.14159265358979323846;
 
 struct FKeyState
 {

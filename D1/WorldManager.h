@@ -12,6 +12,8 @@ private:
 	std::vector<std::vector<int>>					WorldMap;
 	std::vector<std::vector<std::list<Creature*>>>	CreatureMap;
 
+	double											AmountTime;
+
 public:
 	const int mapWidth = 24;
 	const int mapHeight = 24;
@@ -19,7 +21,13 @@ public:
 public:
 	void Init();
 	void Update();
+	void PlayerMove();
+	void PlayerRotate();
+	void PlayerStateUpdate();
+	void PlayerUpdate();
+	void EnemiesUpdate();
 	void SpawnEnemy(FTransform EnemyTranform, FSprite EnemySprite);
+	void HandleInput();
 
 	inline FPlayer* GetPlayer() const { return Player; }
 

@@ -33,6 +33,7 @@ public:
 	void DrawFloor(const WorldManager* World);
 	void Draw3DGrid(const WorldManager* World);
 	void DrawWall(const WorldManager* World);
+	void DrawSprite(const WorldManager* World);
 	void DrawObject(const WorldManager* World);
 	void DrawPlayer(const WorldManager* World);
 	void DrawEnemy(const WorldManager* World);
@@ -41,6 +42,8 @@ public:
 	FRaycasterResult DDA(int X, ERayCastLayer TargetLayer, const WorldManager* World);
 	void SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
 	void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
+
+	inline const Screen* GetScreen() const { return &GScreen; }
 
 };
 
