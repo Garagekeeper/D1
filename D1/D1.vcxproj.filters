@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="PlaceableObject">
+      <UniqueIdentifier>{834895b1-6d39-4d09-b0be-fe41bc61dc39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D1.cpp">
@@ -32,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="Monster.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PObject.cpp">
+      <Filter>PlaceableObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="Monster.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PObject.h">
+      <Filter>PlaceableObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

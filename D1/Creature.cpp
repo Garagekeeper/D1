@@ -1,17 +1,9 @@
 #include "Creature.h"
 
 Creature::Creature(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize)
-	:Stat(_Stat), State(ECreatureState::Idle), Pos(_Pos), DirVec(_DirVec), PlaneSize(PlaneSize), Theta(0.0)
+	: PObject(_Pos, _DirVec, PlaneSize, 0.0), Stat(_Stat), State(ECreatureState::Idle)
 {
-	// Right 벡터 
-	RightVec.DirX = -DirVec.DirY;
-	RightVec.DirY = DirVec.DirX;
 
-	// 카메라 벡터
-	CameraDirVec.DirX = RightVec.DirX * PlaneSize;
-	CameraDirVec.DirY = RightVec.DirY * PlaneSize;
-
-	
 }
 
 Creature::~Creature()
@@ -32,32 +24,6 @@ int Creature::GetAttackDamage()
 
 void Creature::SetAttackDamage()
 {}
-
-FPos Creature::GetPos()
-{
-	return Pos;
-}
-
-FVec Creature::GetDirVec()
-{
-	return DirVec;
-}
-
-FVec Creature::GetCameraDirVec()
-{
-	return CameraDirVec;
-}
-
-FVec Creature::GetRightDirVec()
-{
-	return RightVec;
-}
-
-
-double Creature::GetTheta()
-{
-	return Theta;
-}
 
 void Creature::GetHeal(int Amount)
 {
