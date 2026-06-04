@@ -39,7 +39,8 @@ public:
 	void DrawInfo(const WorldManager* World);
 	void DrawPlayerHud(const WorldManager* World);
 	FRaycasterResult DDA(int X, ERayCastLayer TargetLayer, const WorldManager* World);
-	//void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
+	void SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
+	void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 
 };
 

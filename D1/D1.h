@@ -25,20 +25,6 @@ enum EDir
 	WEST = 'a',
 };
 
-enum class ERayCastLayer
-{
-	WALL,
-	Creature,
-};
-
-struct FRaycasterResult
-{
-	bool bHit = false;
-	FPos MapPos = { 0.0f, 0.0f };
-	double PerpDist = 0.0;
-	int Side = 0;
-};
-
 
 void Init();
 
@@ -59,7 +45,7 @@ void UpdatePlayer();
 #pragma region Render loop
 void DrawPlayer();
 void Draw2dGrid();
-FRaycasterResult DDA(int X, ERayCastLayer TargetLayer);
+//FRaycasterResult DDA(int X, ERayCastLayer TargetLayer);
 void DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 void DrawCeiling();
 void DrawFloor();

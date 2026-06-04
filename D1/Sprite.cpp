@@ -6,7 +6,7 @@ FSprite::FSprite(double X, double Y, double VMove, std::vector<std::vector<std::
 	this->Y = Y;
 	this->VMove = VMove;
 	this->SpriteTexture = SpriteTexture;
-	Width = static_cast<int>(SpriteTexture[0][0].length() + 1);
+	Width = static_cast<int>(SpriteTexture[0][0].length());
 	Height = static_cast<int>(SpriteTexture[0].size());
 }
 

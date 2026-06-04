@@ -1,3 +1,8 @@
+#include <list>
+#include <stdio.h>
+#include <conio.h>
+#include <sstream>
+
 #include "D1.h"
 #include "Screen.h"
 #include "Player.h"
@@ -5,17 +10,14 @@
 #include "Sprite.h"
 #include "TransForm.h"
 #include "Utils.h"
+#include "GameEngine.h"
 
-#include <list>
-#include <stdio.h>
-#include <conio.h>
-#include <sstream>
+
 
 const double	PHI = 3.14159265358979323846;
 double			DeltaTime = 0.0;
 double			AmountTime = 0.0;
 const int		NumOfSprite = 1;
-const int		SpriteTextureTest_RowSize = 12;
 
 FPlayer*		Player;
 vector<FEnemy*>	EnemyVec;
@@ -408,7 +410,7 @@ void PlayerMove()
 
 void UpdatePlayer()
 {
-	if (KeyState.KEYSpaceDown && Player->GetState() == ECreatureState::Idle)
+	/*if (KeyState.KEYSpaceDown && Player->GetState() == ECreatureState::Idle)
 	{
 		Player->SetState(ECreatureState::Attack);
 		FRaycasterResult Res = DDA(GScreen.HorSize / 2, ERayCastLayer::Creature);
@@ -444,7 +446,7 @@ void UpdatePlayer()
 			AmountTime = 0.0;
 			Player->SetState(ECreatureState::Idle);
 		}
-	}
+	}*/
 }
 
 void DrawPlayer()
@@ -1086,12 +1088,12 @@ void DrawEnemySprite()
 			{
 				// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
 				// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
-				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * SpriteTextureTest_RowSize / SpriteWidth) / 256;
+				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * (CurrentSprite->Height) / SpriteWidth) / 256;
 				//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
 
 				// 경계 안으로 들어 오도록
 				if (texX < 0) texX = 0;
-				if (texX >= SpriteTextureTest_RowSize) texX = SpriteTextureTest_RowSize - 1;
+				if (texX >= (CurrentSprite->Height)) texX = (CurrentSprite->Height) - 1;
 
 				// 1. transformY이 0이하면 화면의 뒤쪽
 				// 2. i가 화면에 있는지
@@ -1100,11 +1102,11 @@ void DrawEnemySprite()
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
 					int d = (j - vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
-					int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
+					int texY = ((d * (CurrentSprite->Width)) / SpriteHeight) / 256;
 
 					// 경계 안으로 들어 오도록
 					if (texY < 0) texY = 0;
-					if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
+					if (texY >= (CurrentSprite->Width)) texY = (CurrentSprite->Width) - 1;
 
 					//TODO 고치기
 					wchar_t SpriteChar = CurrentSprite->SpriteTexture[static_cast<int>(CurrentState)][texY][texX];
@@ -1212,40 +1214,10 @@ void ClearScreen()
 
 int main()
 {
-
-	// delta time을위한  타이머(chrono)
-	LARGE_INTEGER Frequency;
-	LARGE_INTEGER PrevTime;
-	LARGE_INTEGER CurrentTime;
-
-	QueryPerformanceFrequency(&Frequency);
-	QueryPerformanceCounter(&PrevTime);
-
-	Init();
-	while (true)
-	{
-		QueryPerformanceCounter(&CurrentTime);
-		DeltaTime = static_cast<double>(CurrentTime.QuadPart - PrevTime.QuadPart) / Frequency.QuadPart;
-		//DeltaTime = 0.001;
-		PrevTime = CurrentTime;
-
-		Input();
-		Update();
-		Render();
-		ClearInput();
-	}
-
-	for (int i = 0; i < EnemyVec.size(); i++)
-	{
-		delete EnemyVec[i];
-		EnemyVec[i] = nullptr;
-	}
-
-	EnemyVec.clear();
-
-
-	delete Player;
-	Player = nullptr;
+	GameEngine::StartEngine();
+	GameEngine* Engine = GameEngine::GetInstance();
+	Engine->Init();
+	Engine->Run();
 
 	/*
 

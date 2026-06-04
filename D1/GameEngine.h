@@ -5,11 +5,24 @@
 class GameEngine
 {
 private:
-	InputManager*	SInputManager;
-	WorldManager*	SWorldManager;
-	Renderer*		SRenderer;
+	static GameEngine*			Instance;
+	InputManager*				SInputManager;
+	WorldManager*				SWorldManager;
+	Renderer*					SRenderer;
+
+	double						deltaTime = 0.0;
+
+
+								GameEngine() = default;
+								~GameEngine();
 public:
-	void			Init();
-	void			Run();
+					
+
+	void						Init();
+	void						Run();
+	void static					StartEngine();
+	inline double				GetDeltaTime() const { return deltaTime; }
+	inline static GameEngine*	GetInstance() { return Instance; }
+
 };
 
