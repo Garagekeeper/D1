@@ -11,43 +11,7 @@ struct FWeaponHud
 {
 	// HUD구조체를 sprite랑 합치기
 	// https://en.wikipedia.org/wiki/Braille_Patterns 점자패턴
-	FSprite WeponHudSprite = 
-	{
-		0,
-		0,
-		0,
-		{
-			{
-				L"        ⠶        ",
-				L"     ⡔⠉⠉⠉⠉⠉⢢     ",
-				L"    ⢰⠁⠄⠄⠄⠄⠠⠈⡆    ",
-				L"    ⡥⠭⢭⠉⠉⠉⡭⠭⢬    ",
-				L"   ⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡   ",
-				L"  ⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇  ",
-				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
-				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
-				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇    ",
-			},
-
-			{
-				L"    ⣿⣿⣿⣿⠶⣿⣿⣿⣿    ",
-				L" ⣿⣿⣿⣿⡔⠉⠉⠉⠉⠉⢢⣿⣿⣿⣿ ",
-				L" ⣿⣿⣿⢰⠁⠄⠄⠄⠄⠠⠈⡆⣿⣿⣿ ",
-				L" ⣿⣿⣿⡥⠭⢭⠉⠉⠉⡭⠭⢬⣿⣿⣿ ",
-				L"⣿⣿⣿⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡⣿⣿⣿",
-				L"⣿⣿⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇⣿⣿",
-				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
-				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
-				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇    ",
-			}
-		}
-	};
+	
 };
 
 
@@ -58,8 +22,10 @@ public:
 
 public:
 	//constructor
-	FPlayer(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize);
-	FPlayer(FPos _Pos, FVec _DirVec, double PlaneSize);
+	FPlayer(FCreatureBaseStat _Stat, FTransform _Transform, FSprite _Sprites)
+		: Creature(_Stat, _Transform, _Sprites) {}
+	FPlayer(FTransform _Transform, FSprite _Sprites)
+		: Creature({ 100,100,100 }, _Transform, _Sprites) {}
 
 	inline FWeaponHud* GetWeaponHud() { return &WeaponHud; }
 

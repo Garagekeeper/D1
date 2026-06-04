@@ -5,11 +5,11 @@
 struct FSprite
 {
 public:
-	double X;
-	double Y;
-	double VMove;
-	int Width;
-	int Height;
+	double X = 0.0;
+	double Y = 0.0 ;
+	double VMove = 0.0;
+	int Width = 0;
+	int Height = 0;
 
 	std::vector<std::vector<std::wstring>> SpriteTexture;
 

@@ -59,14 +59,3 @@
 //			break;
 //	}
 //}
-
-FPlayer::FPlayer(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize) 
-	: Creature(_Stat, _Pos, _DirVec, PlaneSize)
-{
-
-}
-
-FPlayer::FPlayer(FPos _Pos, FVec _DirVec, double PlaneSize)
-{
-	Creature({100,100,100}, _Pos, _DirVec, PlaneSize);
-}

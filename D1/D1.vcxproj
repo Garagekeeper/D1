@@ -130,6 +130,8 @@
     <ClCompile Include="PObject.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Creature.h" />
@@ -140,6 +142,8 @@
     <ClInclude Include="PObject.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

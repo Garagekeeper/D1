@@ -24,8 +24,8 @@ protected:
 public:
 	//constructor
 							Creature() = default;
-							Creature(FCreatureBaseStat _Stat, FPos _Pos, FVec _DirVec, double PlaneSize);
-							Creature(FPos _Pos, FVec _DirVec, double PlaneSize);
+							Creature(FCreatureBaseStat _Stat, FTransform _TransForm, FSprite _Sprites)
+								: Stat(_Stat), PObject(_TransForm, _Sprites), State(ECreatureState::Idle){ }
 	virtual					~Creature();
 
 	//stat
@@ -38,9 +38,6 @@ public:
 	virtual void			GetHeal(int Amount);
 	virtual void			OnAttacked(Creature* From);
 	virtual void			OnDead();
-
-	void					MoveTo(float NextX, float NextY);
-	void					RotateTo(double NextX, double NextY, double _Theta);
 
 	inline ECreatureState	GetState() const { return State; }
 	inline void				SetState(ECreatureState _State) { State = _State; }

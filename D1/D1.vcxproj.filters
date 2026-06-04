@@ -39,6 +39,12 @@
     <ClCompile Include="PObject.cpp">
       <Filter>PlaceableObject</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>PlaceableObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D1.h">
@@ -63,6 +69,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="PObject.h">
+      <Filter>PlaceableObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
       <Filter>PlaceableObject</Filter>
     </ClInclude>
   </ItemGroup>
