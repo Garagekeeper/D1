@@ -1,9 +1,7 @@
 #pragma once
 #include <vector>
 #include <list>
-
-class FPlayer;
-class Creature;
+#include "Player.h"
 
 class WorldManager
 {
