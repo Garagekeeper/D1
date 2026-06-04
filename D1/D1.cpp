@@ -66,56 +66,28 @@ void Init()
 	Sprites = new FSprite[NumOfSprite]
 	{
 		{
-			5.5, 2.5, GScreen.VerSize / (float)4, new const wchar_t* [SpriteTextureTest_RowSize]
+			5.5,
+			2.5, 
+			GScreen.VerSize / (float)4, 
 			{
-			L"  ▒▒▒▒▒▒▒▒  ",
-			L" ▒▒▒▒▒▒▒▒▒▒ ",
-			L"▒▒▒▒▓▒▒▓▒▒▒▒",
-			L"▒▒▒▒▓▒▒▓▒▒▒▒",
-			L"▒▒▒▒▓▒▒▓▒▒▒▒",
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
-			L"▒▒▒▒▒▒▒▒▒▒▒▒",
-			L"▒▓▒▒▒▒▒▒▒▒▓▒",
-			L"▒▒▓▒▒▒▒▒▒▓▒▒",
-			L" ▒▒▓▓▓▓▓▓▒▒",
-			L"  ▒▒▒▒▒▒▒▒  ",
-
+				{
+				L"  ▒▒▒▒▒▒▒▒  ",
+				L" ▒▒▒▒▒▒▒▒▒▒ ",
+				L"▒▒▒▒▓▒▒▓▒▒▒▒",
+				L"▒▒▒▒▓▒▒▓▒▒▒▒",
+				L"▒▒▒▒▓▒▒▓▒▒▒▒",
+				L"▒▒▒▒▒▒▒▒▒▒▒▒",
+				L"▒▒▒▒▒▒▒▒▒▒▒▒",
+				L"▒▒▒▒▒▒▒▒▒▒▒▒",
+				L"▒▓▒▒▒▒▒▒▒▒▓▒",
+				L"▒▒▓▒▒▒▒▒▒▓▒▒",
+				L" ▒▒▓▓▓▓▓▓▒▒",
+				L"  ▒▒▒▒▒▒▒▒  ",
+				}
 			}
+			
 		},
-		/*{
-			5.5, 2.5, 0, new const wchar_t* [SpriteTextureTest_RowSize]
-			{
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                ⡖⡆⡴⡒⡄      ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⡆⣇⠱⡷          ",
-				L"⠀⠀⠀⠀⣀⣀⡤⠤⠼⢻⣿⡀⣧⣤⣄⠀⢇          ",
-				L"⢠⣿⣿⣿⣿⡆⠀⠀⠀⠐⠿⠇⠙⠿⠂⠀⠘⡄         ",
-				L"⢸⣿⣿⣿⣿⣟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⡇        ",
-				L"⠘⢿⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⢀⠠⢀⠇⢇         ",
-				L"⠀⠈⠙⠻⢏⣀⣀⡀⠀⠀⠠⢤⢖⠊⠁⠀⢸          ",
-				L"⠀⠀⠀⠀⠀⠀⠀⣸⠤⣀⣈⣉⣉⢤⣴⡾⠛⠢⡀        ",
-				L"⠀⠀⠀⠀⠀⠀⢰⢱⠀⠀⠉⠉⠉⠉⠀⢰⠇⠀⢁        ",
-				L"⠀⠀⠀⠀⠀⠀⠰⢦⠀⠀⠀⠀⠀⠀⠀⠀⡆⡄⠀⡆       ",
-				L"⠀⠀⠀⠀⠀⠀⠐⢬⠦⣤⣤⢄⣠⣠⣤⢼⡀⠀⡰        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠈⡆⠈⠻⠿⡭⠁⠀⠀⠩⠉⡇        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠀⠱⠠⡀⠀⣃⠀⡀⠀⠀⢰⡇        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠀⠘⠤⠀⠀⠸⠄⣈⣀⣀⣽⠃        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠀⣤⣶⣤⣤⣤⠂⠀⡄⣤⣤⡆        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⢊⠀⠀⠙⠿⣭⠟⠛⠿⣯⣷⡅        ",
-				L"⠀⠀⠀⠀⠀⠀⠀⠈⠑⠒⠒⠉⠙⢂⣀⣀⡊⠟         ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-				L"                           ",
-			}
-		},*/
+		/*
 
 		/*{
 			22.5, 11.5, 0,new const wchar_t* [SpriteTextureTest_RowSize]
@@ -838,7 +810,7 @@ void DrawSprite()
 		// 카메라 중심에서 앞뒤로 얼마나 떨어져 있는가.
 		double transformY = invDet * (-CameraDirY * SpriteX + CameraDirX * SpriteY); // 화면 안쪽으로 얼마나 들어가 있는지
 
-		// ????
+		// ?????
 		// 원근투영
 		// 어떤 물체가 왼쪽으로 2미터 떨어진 위치에 있다.
 		// 화면에 가까울때는 화면을 많이 돌려야하고, 크게 보인다.
@@ -906,8 +878,8 @@ void DrawSprite()
 					if (texY < 0) texY = 0;
 					if (texY >= SpriteTextureTest_RowSize) texY = SpriteTextureTest_RowSize - 1;
 
-
-					wchar_t SpriteChar = CurrentSprite->SpriteTexture[texY][texX];
+					//TODO 고치기
+					wchar_t SpriteChar = CurrentSprite->SpriteTexture[0][texY][texX];
 
 
 					//GScreen.PrintChar(SpriteChar, Stripe, j);
@@ -927,96 +899,24 @@ void DrawSprite()
 
 void DrawPlayerHUD()
 {
-	//--------------------------
-	//Scailing					|
-	//--------------------------
+
 	// 가로 몇배 늘릴건지
 	const float uMul = 2;
 	// 세로로 몇배 늘릴건지
 	const float vMul = 1;
-	// 위로 몇칸 갈건지 
-	// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
-
-
-	// 스프라이트의 높이
-	// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
-	// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-	//TODO 하드코딩 변경
-	int SpriteHeight = 11;
-	//세로 비율 조정
+	
+	FSprite WeponHudSprite = Player->GetWeaponHud()->WeponHudSprite;
+	int SpriteHeight = WeponHudSprite.Height;
+	int SpriteWidth = WeponHudSprite.Width;
 
 	int DrawStartY = GScreen.VerSize - SpriteHeight;
 	if (DrawStartY < 0) DrawStartY = 0;
 	int DrawEndY = GScreen.VerSize;
 
-	// 스프라이트의 너비
-	//TODO 하드코딩 변경
-	int SpriteWidth = 18;
-
 	int DrawStartX = GScreen.HorSize / 2 - SpriteWidth / 2;
 	if (DrawStartX < 0) DrawStartX = 0;
 	int DrawEndX = GScreen.HorSize / 2 + SpriteWidth / 2;
 	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
-
-	vector<vector<const wchar_t*>> HudSprites =
-	{
-			{
-				L"        ⠶        ",
-				L"     ⡔⠉⠉⠉⠉⠉⢢     ",
-				L"    ⢰⠁⠄⠄⠄⠄⠠⠈⡆    ",
-				L"    ⡥⠭⢭⠉⠉⠉⡭⠭⢬    ",
-				L"   ⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡   ",
-				L"  ⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇  ",
-				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
-				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
-				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇    ",
-			},
-
-			//TODO 더 수정하기
-			{
-				L"    ⣿⣿⣿⣿⠶⣿⣿⣿⣿    ",
-				L" ⣿⣿⣿⣿⡔⠉⠉⠉⠉⠉⢢⣿⣿⣿⣿ ",
-				L" ⣿⣿⣿⢰⠁⠄⠄⠄⠄⠠⠈⡆⣿⣿⣿ ",
-				L" ⣿⣿⣿⡥⠭⢭⠉⠉⠉⡭⠭⢬⣿⣿⣿ ",
-				L"⣿⣿⣿⣌⣀⣛⣸⣤⣤⣤⣇⣛⣀⣡⣿⣿⣿",
-				L"⣿⣿⣸⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣉⣇⣿⣿",
-				L"  ⡇⣿⣿⡞⠉⠉⠉⠉⠉⢳⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⣿⣿⡇⠄⠄⠄⠄⠄⢸⣿⣿⢸  ",
-				L"  ⡇⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⢸  ",
-				L"   ⠙⢿⣿⣿⣿⣿⣿⣿⣿⡿⠋   ",
-				L"    ⢸⣿⣿⣿⣿⣿⣿⣿⡇     ",
-			},
-
-
-		/*
-[0~2개 도트 - 연한 선/파편]
-⠀ ⠁ ⠂ ⠃ ⠄ ⠅ ⠆ ⠇ ⠈ ⠉ ⠊ ⠋ ⠌ ⠍ ⠎ ⠏
-⠐ ⠑ ⠒  ⠔ ⠕ ⠖ ⠗ ⠘ ⠙ ⠚ ⠛ ⠜ ⠝ ⠞ ⠟
-
-[3~5개 도트 - 중간 음영/테두리]
-⠠ ⠡ ⠢ ⠣ ⠤ ⠥ ⠦ ⠧ ⠨ ⠩ ⠪ ⠫ ⠬ ⠭ ⠮ ⠯
-⠰ ⠱ ⠲ ⠳ ⠴ ⠵ ⠶ ⠷ ⠸ ⠹ ⠺ ⠻ ⠼ ⠽ ⠾ ⠿
-
-[6~8개 도트 - 어두운 음영/총기 본체]
-⡀ ⡁ ⡂ ⡃ ⡄ ⡅ ⡆ ⡇ ⡈ ⡉ ⡊ ⡋ ⡌ ⡍ ⡎ ⡏
-
-⡐ ⡑ ⡒ ⡓ ⡔ ⡕ ⡖ ⡗ ⡘ ⡙ ⡚ ⡛ ⡜ ⡝ ⡞ ⡟
-
-⢀ ⢁ ⢂ ⢃ ⢄ ⢅ ⢆ ⢇ ⢈ ⢉ ⢊ ⢋ ⢌ ⢍ ⢎ ⢏
-
-⢐ ⢑ ⢒ ⢓ ⢔ ⢕ ⢖ ⢗ ⢘ ⢙ ⢚ ⢛ ⢜ ⢝ ⢞ ⢟
-
-⡠ ⡡ ⡢ ⡣ ⡤ ⡥ ⡦ ⡧ ⡨ ⡩ ⡪ ⡫ ⡬ ⡭ ⡮ ⡯
-
-⢠ ⢡ ⢢ ⢣ ⢤ ⢥ ⢦ ⢧ ⢨ ⢩ ⢪ ⢫ ⢬ ⢭ ⢮ ⢯
-
-⢰ ⢱ ⢲ ⢳ ⢴ ⢵ ⢶ ⢷ ⢸ ⢹ ⢺ ⢻ ⢼ ⢽ ⢾ ⣿⠀⠀
-		*/
-	};
 
 	for (int Stripe = DrawStartX; Stripe < DrawEndX - 1; Stripe++)
 	{
@@ -1027,7 +927,6 @@ void DrawPlayerHUD()
 			//int texX = int(256 * (Stripe - (-SpriteWidth / 2 + GScreen.HorSize / 2)) / SpriteWidth) / 256;
 			//int texX = int(256 * Stripe + SpriteWidth * 128 - GScreen.HorSize * 128) / SpriteWidth) / 256;
 			int texX = (Stripe + SpriteWidth / 2 - GScreen.HorSize / 2);
-			//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
 
 			// 경계 안으로 들어 오도록
 			if (texX < 0) texX = 0;
@@ -1040,9 +939,8 @@ void DrawPlayerHUD()
 				int d = (j + (SpriteHeight - GScreen.VerSize));
 				int texY = d;
 
-				/*int d = (j - vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
-				int d = 256 * (j + (SpriteHeight - GScreen.VerSize) / 2);
-				int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;*/
+				//int d = 256 * (j + (SpriteHeight - GScreen.VerSize) / 2);
+				//int texY = ((d * SpriteTextureTest_RowSize) / SpriteHeight) / 256;
 
 				// 경계 안으로 들어 오도록
 				if (texY < 0) texY = 0;
@@ -1050,12 +948,12 @@ void DrawPlayerHUD()
 
 
 				int Index = static_cast<int>(Player->GetState());
-				wchar_t SpriteChar = HudSprites[Index][texY][texX];
+				//TODO 고치기
+				//wchar_t SpriteChar = HudSprites[Index][texY][texX];
+				wchar_t SpriteChar = WeponHudSprite.SpriteTexture[Index][texY][texX];
 
 
 				//TODO 스케일 대응하기
-				//TODO 벽이랑 겹칠때 무기를 구성하는 글자의 네모난 모습이 보임 이거 고쳐애함
-
 				/*GScreen.PrintChar(SpriteChar, Stripe, j);*/
 
 				// 공백 처리 (텍스처 배열에서 ' ' 즉, 빈 공간은 투명화 처리하여 그리지 않음)

@@ -1,16 +1,21 @@
 #pragma once
-class FSprite
+#include <vector>
+#include <string>
+
+struct FSprite
 {
 public:
 	double X;
 	double Y;
 	double VMove;
+	int Width;
+	int Height;
 
-	const wchar_t** SpriteTexture;
+	std::vector<std::vector<std::wstring>> SpriteTexture;
 
 public:
-	FSprite() :X(0.0), Y(0.0),VMove(0.0), SpriteTexture(nullptr) {}
-	FSprite(double X, double Y, double VMove, const wchar_t** SpriteTexture);
+	FSprite() = default;
+	FSprite(double X, double Y, double VMove, std::vector<std::vector<std::wstring>> SpriteTexture);
 
 	virtual ~FSprite();
 

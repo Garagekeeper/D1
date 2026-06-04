@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Define.h"
+#include "Sprite.h"
 
 
 
