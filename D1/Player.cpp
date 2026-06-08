@@ -67,13 +67,14 @@
 
 void FPlayer::Update(const WorldManager* World)
 {
-	Roate(World);
-	Move(World);
 	UpdateState();
+	Roate();
+	Move(World);
+	Move(World);
 	UpdateStateBehavior(World);
 }
 
-void FPlayer::Roate(const WorldManager* World)
+void FPlayer::Roate()
 {
 	// 회전 처리
 	//if (KeyState.UpArrow)			*Dy -= MoveSpeed;
@@ -158,23 +159,23 @@ void FPlayer::Move(const WorldManager* World)
 	if (!KeyState.KEYW && !KeyState.KEYD && !KeyState.KEYS && !KeyState.KEYA) return;
 	if (KeyState.KEYW)
 	{
-		Dx = (PlayerDirX / DirSize) * MoveBaseSpeed * DeltaTime;
-		Dy = (PlayerDirY / DirSize) * MoveBaseSpeed * DeltaTime;
+		Dx = (PlayerDirX / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
+		Dy = (PlayerDirY / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
 	}
 	if (KeyState.KEYD)
 	{
-		Dx = (PlayerRightX / RightSize) * MoveBaseSpeed * DeltaTime;
-		Dy = (PlayerRightY / RightSize) * MoveBaseSpeed * DeltaTime;
+		Dx = (PlayerRightX / RightSize) * PlayerMoveBaseSpeed * DeltaTime;
+		Dy = (PlayerRightY / RightSize) * PlayerMoveBaseSpeed * DeltaTime;
 	}
 	if (KeyState.KEYS)
 	{
-		Dx = (PlayerDirX / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
-		Dy = (PlayerDirY / DirSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dx = (PlayerDirX / DirSize) * PlayerMoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (PlayerDirY / DirSize) * PlayerMoveBaseSpeed * DeltaTime * -1.0;
 	}
 	if (KeyState.KEYA)
 	{
-		Dx = (PlayerRightX / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
-		Dy = (PlayerRightY / RightSize) * MoveBaseSpeed * DeltaTime * -1.0;
+		Dx = (PlayerRightX / RightSize) * PlayerMoveBaseSpeed * DeltaTime * -1.0;
+		Dy = (PlayerRightY / RightSize) * PlayerMoveBaseSpeed * DeltaTime * -1.0;
 	}
 
 	double ColliderRadius = 0.3;
@@ -198,9 +199,9 @@ void FPlayer::Move(const WorldManager* World)
 
 	// 콘솔 바운더리를 넘어가지는 못한다.
 	double MapMin = ColliderRadius;
-	//TODO Gscreen으로 바꾸기
-	double MapMaxX = TargetWidth - 0.3;
-	double MapMaxY = TargetHeight - 0.3;
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	double MapMaxX = GScreen->HorSize - 0.3;
+	double MapMaxY = GScreen->VerSize - 0.3;
 
 	if (PlayerPosX < ColliderRadius) PlayerPosX = ColliderRadius;
 	if (PlayerPosX > MapMaxX) PlayerPosX = MapMaxX;
@@ -227,7 +228,7 @@ void FPlayer::UpdateState()
 	if (GetState() == ECreatureState::Attack)
 	{
 		AmountTime += DeltaTime;
-		if (AmountTime > PlayerAttackCoolTime)
+		if (AmountTime > AnimDelay)
 		{
 			AmountTime = 0.0;
 			SetState(ECreatureState::Idle);
@@ -243,11 +244,15 @@ void FPlayer::UpdateStateBehavior(const WorldManager* World)
 		// RayCast
 		FRaycasterResult Res = DDA(TargetWidth / 2, ERayCastLayer::Creature, World);
 
-		std::list<Creature*> CreatureList = World->GetCreatureMap()[static_cast<int>(Res.MapPos.Y)][static_cast<int>(Res.MapPos.X)];
+		if (Res.bHit == true)
+		{
+			std::list<Creature*> CreatureList = World->GetCreatureMap()[static_cast<int>(Res.MapPos.Y)][static_cast<int>(Res.MapPos.X)];
 
-		Creature* Target = FindClosetTargetFromList(Res,Transform.Pos, CreatureList);
+			Creature* Target = FindClosetTargetFromList(Res, Transform.Pos, CreatureList);
 
-		if (Target != nullptr)
-			Attack(Target);
+			if (Target != nullptr)
+				Attack(Target);
+		}
+
 	}
 }

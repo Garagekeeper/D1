@@ -7,9 +7,9 @@
 
 struct FCreatureBaseStat
 {
-	int AttackDamage	= 10;
-	int Hp				= 100;
-	int MaxHp			= 100;
+	int						AttackDamage	= 10;
+	int						Hp				= 100;
+	int						MaxHp			= 100;
 };
 
 // Move?
@@ -17,9 +17,11 @@ enum class ECreatureState
 {
 	Idle = 0,
 	Attack,
-	GetAttacked,
-	ECreatureStateLen,
 	Dead,
+	OnAttacked,
+	OnDead,
+	Patrol,
+	ECreatureStateLen,
 };
 
 class Creature : public PObject
@@ -27,9 +29,9 @@ class Creature : public PObject
 
 protected:
 	// Stat
-	FCreatureBaseStat	Stat;
-	ECreatureState		State;
-
+	FCreatureBaseStat		Stat;
+	ECreatureState			State;
+	ECreatureState			PrevState = ECreatureState::Idle;
 
 public:
 	//constructor

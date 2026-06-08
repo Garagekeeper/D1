@@ -42,7 +42,7 @@ void GameEngine::Init()
 	if(SInputManager)
 		SWorldManager->Init();
 
-	if (SWorldManager);
+	if (SWorldManager)
 		SRenderer->Init();
 
 	if(GScreen)

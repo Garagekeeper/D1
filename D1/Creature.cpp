@@ -27,7 +27,7 @@ void Creature::GetHeal(int Amount)
 
 void Creature::GetDamage(int Amount)
 {
- 	Stat.Hp -= Amount;
+  	Stat.Hp -= Amount;
 	if (Stat.Hp <= 0)
 	{
 		Stat.Hp = 0;

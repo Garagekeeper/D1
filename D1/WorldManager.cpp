@@ -155,14 +155,14 @@ void WorldManager::Init()
 		}
 	};
 
-	SpawnEnemy(EnemyTranform, EnemySprite);
+	SpawnEnemy(EnemyStat, EnemyTranform, EnemySprite);
 }
 
 void WorldManager::Update()
 {
 
 	PlayerUpdate(this);
-	EnemiesUpdate();
+	EnemiesUpdate(this);
 }
 
 void WorldManager::PlayerUpdate(const WorldManager* World)
@@ -170,7 +170,7 @@ void WorldManager::PlayerUpdate(const WorldManager* World)
 	Player->Update(World);
 }
 
-void WorldManager::EnemiesUpdate()
+void WorldManager::EnemiesUpdate(WorldManager* World)
 {
 	// 죽은 Enemy WolrdManger에서 일괄 삭제
 	// Ondead에서는 죽었다고 표시만
@@ -198,16 +198,16 @@ void WorldManager::EnemiesUpdate()
 		}
 		else
 		{
-			EnemyVec[i]->Update();
+			EnemyVec[i]->Update(World);
 		}
 	}
 }
 
-void WorldManager::SpawnEnemy(FTransform EnemyTranform, FSprite EnemySprite)
+void WorldManager::SpawnEnemy(FCreatureBaseStat Stat, FTransform EnemyTranform, FSprite EnemySprite)
 {
 	//TODO null check
-	auto NewEnemy = new FEnemy(EnemyTranform, EnemySprite);
-	NewEnemy->MoveToWithArray(EnemyTranform.Pos, &CreatureMap);
+	auto NewEnemy = new FEnemy(Stat, EnemyTranform, EnemySprite);
+	CreatureMap[static_cast<int>(EnemyTranform.Pos.Y)][static_cast<int>(EnemyTranform.Pos.X)].push_back(NewEnemy);
 	EnemyVec.push_back(NewEnemy);
 }
 
@@ -217,6 +217,22 @@ void WorldManager::HandleInput()
 	// TODO GameEngine Run을 종료하도록 변경
 	if (KeyState.QKey)
 		exit(0);
+}
+
+
+void WorldManager::UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target)
+{
+	if (static_cast<int>(Before.X) == static_cast<int>(After.X) && static_cast<int>(Before.Y) == static_cast<int>(After.Y))
+		return;
+
+	std::list<Creature*>& CurrList = CreatureMap[static_cast<int>(Before.Y)][static_cast<int>(Before.X)];
+	auto itr = std::find(CurrList.begin(), CurrList.end(), Target);
+	if (itr != CurrList.end())
+	{
+		CreatureMap[static_cast<int>(Before.Y)][static_cast<int>(Before.X)].erase(itr);
+	}
+
+	CreatureMap[static_cast<int>(After.Y)][static_cast<int>(After.X)].push_back(Target);
 }
 
 

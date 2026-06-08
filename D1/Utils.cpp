@@ -19,6 +19,21 @@ double GetSqrDist(FPos P1, FPos P2)
     return ((P2.X - P1.X) * (P2.X - P1.X)) + ((P2.Y - P1.Y) * (P2.Y - P1.Y));
 }
 
+int GetRandInt(int Min, int Max)
+{
+	return rand() % (Max - Min + 1) + Min;
+}
+
+int GetRandInt(int Max)
+{
+	return GetRandInt(0, Max);
+}
+
+float GetRandRange()
+{
+	return rand() / (float)RAND_MAX;
+}
+
 Creature* FindClosetTargetFromList(FRaycasterResult Res, FPos From, std::list<Creature*>& CreatureList)
 {
 	Creature* ClosestTarget = nullptr;

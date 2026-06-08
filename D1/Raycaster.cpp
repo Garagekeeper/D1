@@ -123,6 +123,9 @@ FRaycasterResult DDA(const int X, ERayCastLayer TargetLayer, const WorldManager*
 			Res.Side = 1;
 		}
 
+		if (MapPosX <= 0 || MapPosX >= World->mapWidth) break;
+		if (MapPosY <= 0 || MapPosY >= World->mapHeight) break;
+
 		if (TargetLayer == ERayCastLayer::WALL)
 		{
 			// 해당 격자에 벽, 오브젝트, 적이 있는지 확인

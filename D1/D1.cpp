@@ -1,9 +1,13 @@
+#include <time.h>
+
 #include "D1.h"
 #include "GameEngine.h"
 
 
 int main()
 {
+	srand(time(0));
+
 	GameEngine::StartEngine();
 	GameEngine* Engine = GameEngine::GetInstance();
 	Engine->Init();
@@ -25,9 +29,10 @@ int main()
 	스타 형식의 HUD, 왼쪽은 체력, 오른쪽은 탄약
 	적 class 만들기(완)
 	히트스캔 판정 연결(완)
+	// 스프라이트 변경은 죽을때만, 나머지 경우는 깜빡이는 것만
 	적 피격 스프라이트 (현재 피격시 내부에서 체력까지는 깎이는 상태)
 	적이 죽었을때 격자, 벡터에서 삭제 (완)
-	적 움직이게
+	적 움직이게 (현재 패트롤 완,)
 	맵디자인을 최대한 광장이 없게
 
 */

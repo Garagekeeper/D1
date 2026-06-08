@@ -504,7 +504,20 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					if (texY < 0) texY = 0;
 					if (texY >= (CurrentSprite->Width)) texY = (CurrentSprite->Width) - 1;
 
-					//TODO 고치기
+					//TODO 고치기(CurrentState)
+
+					switch (CurrentState)
+					{
+						case ECreatureState::Idle:
+						case ECreatureState::Patrol:
+							CurrentState = ECreatureState::Idle;
+							break;
+						case ECreatureState::OnAttacked:
+						case ECreatureState::OnDead:
+							CurrentState = ECreatureState::OnAttacked;
+							break;
+					}
+
 					wchar_t SpriteChar = CurrentSprite->SpriteTexture[static_cast<int>(CurrentState)][texY][texX];
 
 

@@ -1,4 +1,14 @@
 #pragma once
+
+enum class EDir
+{
+	Up,
+	Down,
+	Left,
+	Right,
+	EDirLen,
+};
+
 struct FPos
 {
 	float X = 0;

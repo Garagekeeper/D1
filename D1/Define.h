@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <iostream>
 
-const double MoveBaseSpeed = 5.0;
+const double PlayerMoveBaseSpeed = 5.0;
+const double EnemyMoveBaseSpeed = 3.0;
 const double RotationSpeed = 100.0;
 
 
@@ -20,7 +21,7 @@ const int SCREEN_TEXT_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROU
 const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
 
 
-const double PlayerAttackCoolTime = 0.2;
+const double AnimDelay = 0.2;
 const double PHI = 3.14159265358979323846;
 
 struct FKeyState
