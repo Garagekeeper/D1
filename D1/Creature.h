@@ -19,6 +19,7 @@ enum class ECreatureState
 	Attack,
 	GetAttacked,
 	ECreatureStateLen,
+	Dead,
 };
 
 class Creature : public PObject

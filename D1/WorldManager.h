@@ -3,6 +3,7 @@
 #include <list>
 #include "Player.h"
 #include "Enemy.h"
+struct FRaycasterResult;
 
 class WorldManager
 {
@@ -11,8 +12,6 @@ private:
 	std::vector<FEnemy*>							EnemyVec;
 	std::vector<std::vector<int>>					WorldMap;
 	std::vector<std::vector<std::list<Creature*>>>	CreatureMap;
-
-	double											AmountTime = 0.0;
 
 public:
 	const int mapWidth = 24;
@@ -23,11 +22,7 @@ public:
 
 	void Init();
 	void Update();
-	void PlayerMove();
-	void PlayerRotate();
-	void PlayerStateUpdate();
-	void PlayerUpdate();
-	//void RayCastFromPlayer();
+	void PlayerUpdate(const WorldManager* World);
 	void EnemiesUpdate();
 	void SpawnEnemy(FTransform EnemyTranform, FSprite EnemySprite);
 	void HandleInput();

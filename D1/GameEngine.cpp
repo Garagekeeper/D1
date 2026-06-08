@@ -7,28 +7,46 @@ GameEngine* GameEngine::Instance = nullptr;
 GameEngine::~GameEngine()
 {
 
-	delete SInputManager;
-	SInputManager = nullptr;
+	if (SInputManager)
+	{
+		delete SInputManager;
+		SInputManager = nullptr;
+	}
 
-	delete SWorldManager;
-	SWorldManager = nullptr;
+	if (SWorldManager)
+	{
+		delete SWorldManager;
+		SWorldManager = nullptr;
+	}
 
-	delete SRenderer;
-	SRenderer = nullptr;
+	if (SRenderer)
+	{
+		delete SRenderer;
+		SRenderer = nullptr;
+	}
 
-	delete GScreen;
-	GScreen = nullptr;
+	if (GScreen)
+	{
+		delete GScreen;
+		GScreen = nullptr;
+	}
 }
 
 void GameEngine::Init()
 {
-	SInputManager	= new InputManager();
-	SWorldManager	= new WorldManager();
-	SRenderer		= new Renderer();
-	GScreen			= new Screen();
-	SWorldManager->Init();
-	SRenderer->Init();
-	GScreen->Init();
+	SInputManager = new InputManager();
+	SWorldManager = new WorldManager();
+	SRenderer = new Renderer();
+	GScreen = new Screen();
+
+	if(SInputManager)
+		SWorldManager->Init();
+
+	if (SWorldManager);
+		SRenderer->Init();
+
+	if(GScreen)
+		GScreen->Init();
 }
 
 void GameEngine::Run()
@@ -39,6 +57,7 @@ void GameEngine::Run()
 
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&PrevTime);
+	//TODO 조건을 정해서 while을 탈출할 수 있도록
 	while (true)
 	{
 		QueryPerformanceCounter(&CurrentTime);
@@ -51,7 +70,18 @@ void GameEngine::Run()
 		SWorldManager->Update();
 		SRenderer->Render(SWorldManager);
 	}
-	
+
+}
+
+// 이래 하는게 맞는지..?
+void GameEngine::ClearEngine()
+{
+	if (Instance != nullptr)
+	{
+		delete Instance;
+	}
+
+	Instance = nullptr;
 }
 
 void GameEngine::StartEngine()

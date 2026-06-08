@@ -50,7 +50,7 @@ void Creature::OnAttacked(Creature* From)
 //TODO Ondead 구현
 void Creature::OnDead()
 {
-	
+	State = ECreatureState::Dead;
 }
 
 

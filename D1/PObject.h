@@ -11,6 +11,8 @@ protected:
 	FTransform				Transform;
 	FSprite					Sprites;
 
+	double					AmountTime = 0.0;
+
 
 public:
 							PObject() = default;

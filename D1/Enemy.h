@@ -16,5 +16,6 @@ public:
 
 
 	void MoveToWithArray(FPos NextPos, std::vector<std::vector<std::list<Creature*>>>* CreatureMap);
+	void Update();
 };
 

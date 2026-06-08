@@ -16,3 +16,9 @@ void FEnemy::MoveToWithArray(FPos NextPos, std::vector<std::vector<std::list<Cre
 	MoveTo(NextPos);
 }
 
+void FEnemy::Update()
+{
+
+}
+
+

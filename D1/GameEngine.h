@@ -6,6 +6,7 @@ class GameEngine
 {
 private:
 	static GameEngine*			Instance;
+
 	InputManager*				SInputManager = nullptr;
 	WorldManager*				SWorldManager = nullptr;
 	Renderer*					SRenderer = nullptr;
@@ -21,6 +22,7 @@ public:
 
 	void						Init();
 	void						Run();
+	void static					ClearEngine();
 	void static					StartEngine();
 	inline double				GetDeltaTime() const { return deltaTime; }
 	inline InputManager*		GetInputManager() const { return SInputManager; }

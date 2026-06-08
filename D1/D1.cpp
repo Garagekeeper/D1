@@ -8,6 +8,7 @@ int main()
 	GameEngine* Engine = GameEngine::GetInstance();
 	Engine->Init();
 	Engine->Run();
+	Engine->ClearEngine();
 
 	/*
 
@@ -25,10 +26,10 @@ int main()
 	적 class 만들기(완)
 	히트스캔 판정 연결(완)
 	적 피격 스프라이트 (현재 피격시 내부에서 체력까지는 깎이는 상태)
+	적이 죽었을때 격자, 벡터에서 삭제 (완)
 	적 움직이게
 	맵디자인을 최대한 광장이 없게
 
 */
-
 
 }

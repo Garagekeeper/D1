@@ -52,9 +52,6 @@ void InputManager::GetInput()
 	}
 
 	KeyState.KEYSpaceWasDown = isSpaceCurrentDown;
-
-	// GameEngine Run을 종료하도록 변경
-	if (GetAsyncKeyState('Q') & 0x8000) exit(0);
 	if (GetAsyncKeyState('W') & 0x8001)	KeyState.KEYW = true;
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
