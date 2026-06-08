@@ -46,7 +46,7 @@ void FEnemy::Move(WorldManager* World)
 		Dx = (DirVec.DirX / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
 		Dy = (DirVec.DirY / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
 
-		double ColliderRadius = 0.3;
+		double ColliderRadius = 1;
 
 		// 다음 좌표
 		double NextX = Pos.X + Dx;
@@ -97,10 +97,13 @@ void FEnemy::Move(WorldManager* World)
 
 void FEnemy::UpdateState()
 {
-	PrevState = State;
+	
 	if (State == ECreatureState::Dead) return;
 	if (State == ECreatureState::OnAttacked)
 	{
+		if (PrevState == ECreatureState::Idle)
+			AmountTime = 0.0;
+
 		if (AmountTime >= AnimDelay)
 		{
 			AmountTime = 0.0;
@@ -111,8 +114,7 @@ void FEnemy::UpdateState()
 			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
-
-	if (State == ECreatureState::Idle)
+	else if (State == ECreatureState::Idle)
 	{
 		// TODO 하드 코딩 고치기
 		if (AmountTime >= 1)
@@ -168,6 +170,7 @@ void FEnemy::UpdateState()
 	{
 
 	}
+	PrevState = State;
 }
 
 

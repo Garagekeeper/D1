@@ -10,7 +10,7 @@
 
 void Renderer::Init()
 {
-	
+
 }
 
 void Renderer::Render(const WorldManager* World)
@@ -45,8 +45,7 @@ void Renderer::Draw2DGrid(const WorldManager* World)
 }
 
 void Renderer::DrawCeiling(const WorldManager* World)
-{
-}
+{}
 
 void Renderer::DrawFloor(const WorldManager* World)
 {
@@ -371,8 +370,7 @@ void Renderer::DrawSprite(const WorldManager* World)
 }
 
 void Renderer::DrawObject(const WorldManager* World)
-{
-}
+{}
 
 void Renderer::Draw3DGrid(const WorldManager* World)
 {
@@ -423,7 +421,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		FEnemy* CurrentEnemy = (*EnemyVec)[EnemyOrder[i]];
 		FSprite* CurrentSprite = CurrentEnemy->GetSprite();
 		FTransform* CurrentTransform = CurrentEnemy->GetTransform();
-		ECreatureState CurrentState = CurrentEnemy->GetState();
+		int CreatureState = static_cast<int>(CurrentEnemy->GetState());
 
 		// 카메라에서 적 까지의 상대적인 위치
 		double SpriteX = CurrentTransform->Pos.X - PlayerPosX;
@@ -506,19 +504,19 @@ void Renderer::DrawEnemy(const WorldManager* World)
 
 					//TODO 고치기(CurrentState)
 
-					switch (CurrentState)
+					switch (static_cast<ECreatureState>(CreatureState))
 					{
 						case ECreatureState::Idle:
 						case ECreatureState::Patrol:
-							CurrentState = ECreatureState::Idle;
+							CreatureState = static_cast<int>(ECreatureState::Idle);
 							break;
 						case ECreatureState::OnAttacked:
 						case ECreatureState::OnDead:
-							CurrentState = ECreatureState::OnAttacked;
+							CreatureState = static_cast<int>(ECreatureState::OnAttacked);
 							break;
 					}
 
-					wchar_t SpriteChar = CurrentSprite->SpriteTexture[static_cast<int>(CurrentState)][texY][texX];
+					wchar_t SpriteChar = CurrentSprite->SpriteTexture[CreatureState][texY][texX];
 
 
 					//GScreen.PrintChar(SpriteChar, Stripe, j);

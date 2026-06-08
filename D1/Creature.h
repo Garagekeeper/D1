@@ -17,8 +17,8 @@ enum class ECreatureState
 {
 	Idle = 0,
 	Attack,
-	Dead,
 	OnAttacked,
+	Dead,
 	OnDead,
 	Patrol,
 	ECreatureStateLen,
