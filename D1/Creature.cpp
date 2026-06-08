@@ -25,7 +25,7 @@ void Creature::GetHeal(int Amount)
 	if (Stat.Hp >= Stat.MaxHp) Stat.Hp = Stat.MaxHp;
 }
 
-void Creature::GetDamage(int Amount)
+void Creature::GetDamage(int Amount, Creature* From)
 {
   	Stat.Hp -= Amount;
 	if (Stat.Hp <= 0)
@@ -45,7 +45,7 @@ void Creature::OnAttacked(Creature* From)
 	// TODO 무적등 상태 적용
 	// TODO 데미지 계산을 여기서 할지 게임 시스템에서 할지 결정
 	State = ECreatureState::OnAttacked;
-	GetDamage(From->GetAttackDamage());
+	GetDamage(From->GetAttackDamage(), From);
 }
 
 //TODO Ondead 구현

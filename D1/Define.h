@@ -42,6 +42,7 @@ struct FKeyState
 	bool KEYD = false;
 	bool KEYS = false;
 	bool KEYA = false;
+	bool KEYR = false;
 };
 
 struct FPrevKeyInfo

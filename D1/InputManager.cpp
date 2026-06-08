@@ -56,6 +56,7 @@ void InputManager::GetInput()
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;
 	if (GetAsyncKeyState('A') & 0x8001)	KeyState.KEYA = true;
+	if (GetAsyncKeyState('R') & 0x8001)	KeyState.KEYR = true;
 }
 
 void InputManager::ClearInput()
@@ -64,4 +65,5 @@ void InputManager::ClearInput()
 	KeyState.KEYD = false;
 	KeyState.KEYS = false;
 	KeyState.KEYA = false;
+	KeyState.KEYR = false;
 }

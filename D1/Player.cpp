@@ -217,11 +217,11 @@ void FPlayer::UpdateState()
 	PrevState = State;
 	double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
 	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
-	if (KeyState.KEYSpaceDown && GetState() == ECreatureState::Idle)
+	if (KeyState.KEYSpaceDown && GetState() == ECreatureState::Idle && CurrentBullet > 0)
 	{
 		SetState(ECreatureState::Attack);
 		AmountTime = 0.0;
-
+		CurrentBullet--;
 		return;
 	}
 
@@ -233,6 +233,11 @@ void FPlayer::UpdateState()
 			AmountTime = 0.0;
 			SetState(ECreatureState::Idle);
 		}
+	}
+
+	if (KeyState.KEYR)
+	{
+		CurrentBullet = BulletMax;
 	}
 
 }
@@ -255,4 +260,13 @@ void FPlayer::UpdateStateBehavior(const WorldManager* World)
 		}
 
 	}
+}
+
+void FPlayer::Attack(Creature* Target)
+{
+	if (CurrentBullet != 0)
+	{
+		Creature::Attack(Target);
+	}
+	
 }

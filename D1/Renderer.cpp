@@ -1,5 +1,6 @@
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 
 #include "GameEngine.h"
 #include "Renderer.h"
@@ -539,18 +540,28 @@ void Renderer::DrawInfo(const WorldManager* World)
 	wstringstream Wss;
 	// 소수점 아래 자리 고정
 	Wss.fixed;
-	Wss.precision(3);
+	Wss.precision(2);
 
 	int FPS = static_cast<int>(1 / GameEngine::GetInstance()->GetDeltaTime());
 	wstring Wstr = to_wstring(FPS);
 	FTransform* PlayerTransform = World->GetPlayer()->GetTransform();
+	FPlayer* Player = World->GetPlayer();
 
-	Wss << L"FPS : " << Wstr
-		<< L"| Pos (" << PlayerTransform->GetPos().X << L", " << PlayerTransform->GetPos().Y << L")"
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"FPS : " << Wstr
+		<< L"| Pos (" << std::setw(2) << PlayerTransform->GetPos().X << L", " << std::setw(2) << PlayerTransform->GetPos().Y << L")"
 		<< L"| Theta : " << World->GetPlayer()->GetTheta() << L"°";
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 0);
 
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 0);
+	Wss.clear();
+	Wss.str(L"");
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"Hp   : " << Player->GetHp()
+		<< L"| Bullet: " << Player->GetBullet() << L" / " << Player->GetMaxBullet()
+		<< L"| Score : " << Player->GetScore();
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 1);
 }
 
 void Renderer::DrawPlayerHud(const WorldManager* World)

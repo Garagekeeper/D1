@@ -5,8 +5,9 @@ class WorldManager;
 
 class FPlayer : public Creature
 {
-public:
-
+private:
+	const int		BulletMax = 6;
+	int				CurrentBullet = BulletMax;
 public:
 								//constructor
 					FPlayer(FCreatureBaseStat _Stat, FTransform _Transform, FSprite _Sprites)
@@ -19,5 +20,8 @@ public:
 	void			Move(const WorldManager* World);
 	void			UpdateState();
 	void			UpdateStateBehavior(const WorldManager* World);
+	virtual void	Attack(Creature* Target) override;
+	inline int		GetBullet() { return CurrentBullet; }
+	inline int		GetMaxBullet() { return BulletMax; }
 
 };

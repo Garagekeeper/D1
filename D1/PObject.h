@@ -12,6 +12,7 @@ protected:
 	FSprite					Sprites;
 
 	double					AmountTime = 0.0;
+	int						Score = 0;
 
 
 public:
@@ -27,6 +28,9 @@ public:
 
 	virtual void			MoveTo(FPos NextPos);
 	void					RotateTo(FVec NextVec, double _Theta);
+
+	inline int		GetScore() { return Score; }
+	inline void		AddScore(int Amount) { Score += Amount; }
 
 };
 

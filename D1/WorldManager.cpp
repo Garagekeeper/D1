@@ -236,7 +236,6 @@ void WorldManager::HandleInput()
 		exit(0);
 }
 
-
 void WorldManager::UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target)
 {
 	if (static_cast<int>(Before.X) == static_cast<int>(After.X) && static_cast<int>(Before.Y) == static_cast<int>(After.Y))

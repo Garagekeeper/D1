@@ -46,13 +46,12 @@ public:
 	void					SetAttackDamage();
 
 	virtual void			Attack(Creature* Target);
-	virtual void			GetDamage(int Amount);
+	virtual void			GetDamage(int Amount, Creature* From);
 	virtual void			GetHeal(int Amount);
 	virtual void			OnAttacked(Creature* From);
 	virtual void			OnDead();
 
 	inline ECreatureState	GetState() const { return State; }
 	inline void				SetState(ECreatureState _State) { State = _State; }
-
 
 };

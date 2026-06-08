@@ -35,8 +35,8 @@ void FEnemy::Move(WorldManager* World)
 	{
  		FPos NextPos;
 
-		float Dx = 0.0f;
-		float Dy = 0.0;
+		double Dx = 0.0f;
+		double Dy = 0.0;
 
 		FVec DirVec = Transform.GetDirVec();
 		FPos Pos = Transform.GetPos();
@@ -56,7 +56,7 @@ void FEnemy::Move(WorldManager* World)
 		double ColliderEdgeX = NextX + (Dx > 0 ? ColliderRadius : -ColliderRadius);
 		if (World->GetWorldMap()[(int)Pos.Y][(int)ColliderEdgeX] != static_cast<int>(Env::WALL))
 		{
-			Pos.X = NextX;
+			Pos.X = static_cast<float>(NextX);
 		}
 		else 
 		{
@@ -66,7 +66,7 @@ void FEnemy::Move(WorldManager* World)
 		double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
 		if (World->GetWorldMap()[(int)ColliderEdgeY][(int)Pos.X] != static_cast<int>(Env::WALL))
 		{
-			Pos.Y = NextY;
+			Pos.Y = static_cast<float>(NextY);
 		}
 		else
 		{
@@ -82,10 +82,10 @@ void FEnemy::Move(WorldManager* World)
 		if (Pos.X < ColliderRadius || Pos.X > MapMaxX || Pos.Y < ColliderRadius || Pos.Y > MapMaxY)
 		{
 			State = ECreatureState::Idle;
-			if (Pos.X < ColliderRadius) Pos.X = ColliderRadius;
-			if (Pos.X > MapMaxX) Pos.X = MapMaxX;
-			if (Pos.Y < ColliderRadius) Pos.Y = ColliderRadius;
-			if (Pos.Y > MapMaxY) Pos.Y = MapMaxY;
+			if (Pos.X < ColliderRadius) Pos.X = static_cast<float>(ColliderRadius);
+			if (Pos.X > MapMaxX) Pos.X = static_cast<float>(MapMaxX);
+			if (Pos.Y < ColliderRadius) Pos.Y = static_cast<float>(ColliderRadius);
+			if (Pos.Y > MapMaxY) Pos.Y = static_cast<float>(MapMaxY);
 		}
 		
 
@@ -128,7 +128,7 @@ void FEnemy::UpdateState()
 				int RandIndex = GetRandInt(static_cast<int>(EDir::EDirLen) - 1);
 				auto NextDirX = 0.0;
 				auto NextDirY = -1.0;
-				auto FinalTheta = 0;
+				auto FinalTheta = 0.0;
 
 				switch (RandIndex)
 				{
@@ -172,5 +172,15 @@ void FEnemy::UpdateState()
 	}
 	PrevState = State;
 }
+
+void FEnemy::GetDamage(int Amount, Creature* From)
+{
+	Creature::GetDamage(Amount, From);
+	if (Stat.Hp <= 0)
+		From->AddScore(Amount);
+}
+
+
+
 
 

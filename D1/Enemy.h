@@ -10,6 +10,7 @@ class FEnemy : public Creature
 private:
 	const float		EnemyPatrolPerCentage = 0.0f;
 	float			PatrolPercentage = EnemyPatrolPerCentage;
+	int				RewardScore = 10;
 
 public:
 
@@ -26,6 +27,6 @@ public:
 	void			Rotate();
 	void			Move(WorldManager* World);
 	void			UpdateState();
-
+	virtual void	GetDamage(int Amount, Creature* From) override;
 };
 
