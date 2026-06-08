@@ -35,7 +35,6 @@ void Creature::GetDamage(int Amount)
 	}
 }
 
-//TODO Attack 구현
 void Creature::Attack(Creature* Target)
 {
 	Target->OnAttacked(this);

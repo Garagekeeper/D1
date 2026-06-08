@@ -7,24 +7,27 @@
 class WorldManager
 {
 private:
-	FPlayer*										Player;
+	FPlayer*										Player = nullptr;
 	std::vector<FEnemy*>							EnemyVec;
 	std::vector<std::vector<int>>					WorldMap;
 	std::vector<std::vector<std::list<Creature*>>>	CreatureMap;
 
-	double											AmountTime;
+	double											AmountTime = 0.0;
 
 public:
 	const int mapWidth = 24;
 	const int mapHeight = 24;
 
 public:
+	~WorldManager();
+
 	void Init();
 	void Update();
 	void PlayerMove();
 	void PlayerRotate();
 	void PlayerStateUpdate();
 	void PlayerUpdate();
+	//void RayCastFromPlayer();
 	void EnemiesUpdate();
 	void SpawnEnemy(FTransform EnemyTranform, FSprite EnemySprite);
 	void HandleInput();

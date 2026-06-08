@@ -6,6 +6,7 @@ GameEngine* GameEngine::Instance = nullptr;
 
 GameEngine::~GameEngine()
 {
+
 	delete SInputManager;
 	SInputManager = nullptr;
 
@@ -14,6 +15,9 @@ GameEngine::~GameEngine()
 
 	delete SRenderer;
 	SRenderer = nullptr;
+
+	delete GScreen;
+	GScreen = nullptr;
 }
 
 void GameEngine::Init()
@@ -21,8 +25,10 @@ void GameEngine::Init()
 	SInputManager	= new InputManager();
 	SWorldManager	= new WorldManager();
 	SRenderer		= new Renderer();
+	GScreen			= new Screen();
 	SWorldManager->Init();
 	SRenderer->Init();
+	GScreen->Init();
 }
 
 void GameEngine::Run()

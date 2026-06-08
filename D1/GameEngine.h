@@ -6,9 +6,10 @@ class GameEngine
 {
 private:
 	static GameEngine*			Instance;
-	InputManager*				SInputManager;
-	WorldManager*				SWorldManager;
-	Renderer*					SRenderer;
+	InputManager*				SInputManager = nullptr;
+	WorldManager*				SWorldManager = nullptr;
+	Renderer*					SRenderer = nullptr;
+	Screen*						GScreen = nullptr;
 
 	double						deltaTime = 0.0;
 
@@ -26,6 +27,7 @@ public:
 	inline WorldManager*		GetWorldManager() const { return SWorldManager; }
 	inline Renderer*			GetRenderer() const { return SRenderer; }
 	inline static GameEngine*	GetInstance() { return Instance; }
+	inline Screen*				GetScreen() { return GScreen; }
 
 };
 

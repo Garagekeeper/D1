@@ -127,6 +127,7 @@
     <ClCompile Include="D1.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="WorldManager.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="Raycaster.h" />
     <ClInclude Include="WorldManager.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Player.h" />

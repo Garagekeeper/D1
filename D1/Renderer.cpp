@@ -5,11 +5,12 @@
 #include "Renderer.h"
 #include "Define.h"
 #include "WorldManager.h"
+#include "Raycaster.h"
 #include "Utils.h"
 
 void Renderer::Init()
 {
-	GScreen.Init();
+	
 }
 
 void Renderer::Render(const WorldManager* World)
@@ -23,7 +24,7 @@ void Renderer::Render(const WorldManager* World)
 
 void Renderer::ClearScreen()
 {
-	GScreen.ChangeScreenBuffer();
+	GameEngine::GetInstance()->GetScreen()->ChangeScreenBuffer();
 }
 
 void Renderer::Draw2DGrid(const WorldManager* World)
@@ -39,8 +40,12 @@ void Renderer::Draw2DGrid(const WorldManager* World)
 			else
 				str.append(1, ' ');
 		}
-		GScreen.PrintString(str, 0, i);
+		GameEngine::GetInstance()->GetScreen()->PrintString(str, 0, i);
 	}
+}
+
+void Renderer::DrawCeiling(const WorldManager* World)
+{
 }
 
 void Renderer::DrawFloor(const WorldManager* World)
@@ -54,6 +59,7 @@ void Renderer::DrawFloor(const WorldManager* World)
 	// 해당 거리를 통해서 실제 그 거리를 가진 맵 위의 점을 찾고 
 
 	FTransform* PlayerTransform = World->GetPlayer()->GetTransform();
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
 	double PlayerDirX = PlayerTransform->GetDirVec().DirX;
 	double PlayerDirY = PlayerTransform->GetDirVec().DirY;
 
@@ -63,8 +69,8 @@ void Renderer::DrawFloor(const WorldManager* World)
 	float PlayerPosX = PlayerTransform->GetPos().X;
 	float PlayerPosY = PlayerTransform->GetPos().Y;
 
-	const int WIDTH = GScreen.HorSize;
-	const int HEIGHT = GScreen.VerSize;
+	const int WIDTH = GScreen->HorSize;
+	const int HEIGHT = GScreen->VerSize;
 
 	for (int Y = HEIGHT / 2 + 1; Y < HEIGHT; Y++)
 	{
@@ -135,7 +141,7 @@ void Renderer::DrawFloor(const WorldManager* World)
 			// 실제 출력할 좌표
 			int checkerBoard = (std::abs(CellX) + std::abs(CellY)) % 2;
 			wchar_t tileChar = (checkerBoard == 0) ? L'·' : L' ';
-			GScreen.PrintChar(tileChar, X, Y);
+			GScreen->PrintChar(tileChar, X, Y);
 
 			FloorX += FloorStepX;
 			FloorY += FloorStepY;
@@ -145,8 +151,9 @@ void Renderer::DrawFloor(const WorldManager* World)
 
 void Renderer::DrawWall(const WorldManager* World)
 {
-	const int WIDTH = GScreen.HorSize;
-	const int HEIGHT = GScreen.VerSize;
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	const int WIDTH = GScreen->HorSize;
+	const int HEIGHT = GScreen->VerSize;
 
 	for (int X = 0; X < WIDTH; X++)
 	{
@@ -186,7 +193,7 @@ void Renderer::DrawWall(const WorldManager* World)
 			WallChar = L'░';
 
 		// 현재 X좌표에서 만난 벽까지의 거리
-		GScreen.Zbuffer[X] = PerpWallDist;
+		GScreen->Zbuffer[X] = PerpWallDist;
 		//DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd, Attribute);
 		DrawWallVer(WallChar, X, DrawStart, DrawEnd, Attribute);
 	}
@@ -363,6 +370,10 @@ void Renderer::DrawSprite(const WorldManager* World)
 	//}
 }
 
+void Renderer::DrawObject(const WorldManager* World)
+{
+}
+
 void Renderer::Draw3DGrid(const WorldManager* World)
 {
 	//DrawCeiling();
@@ -381,6 +392,8 @@ void Renderer::DrawEnemy(const WorldManager* World)
 // 벡터 거리 저장
 // 벡터 우선순위 초기화
 	FTransform* PlayerTransform = World->GetPlayer()->GetTransform();
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+
 	double PlayerDirX = PlayerTransform->GetDirVec().DirX;
 	double PlayerDirY = PlayerTransform->GetDirVec().DirY;
 
@@ -390,8 +403,8 @@ void Renderer::DrawEnemy(const WorldManager* World)
 	float PlayerPosX = PlayerTransform->GetPos().X;
 	float PlayerPosY = PlayerTransform->GetPos().Y;
 
-	const int WIDTH = GScreen.HorSize;
-	const int HEIGHT = GScreen.VerSize;
+	const int WIDTH = GScreen->HorSize;
+	const int HEIGHT = GScreen->VerSize;
 	const vector<FEnemy*>* EnemyVec = World->GetEnemyVec();
 
 	vector<int>		EnemyOrder(EnemyVec->size());
@@ -432,7 +445,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		// 이 값은 -1 < X < 1인데 화면에는 음수 좌표계가 없으니까 +1
 		// 0 < x < 2 범위의 X를 0~130까지의 정수로 변환
 		// 스프라이트가 찍힐 X 좌표
-		int SpriteScrrenX = int((GScreen.HorSize / 2) * (1 + transformX / transformY));
+		int SpriteScrrenX = int((GScreen->HorSize / 2) * (1 + transformX / transformY));
 
 		//--------------------------
 		//Scailing					|
@@ -449,21 +462,21 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		// 스프라이트의 높이
 		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-		int SpriteHeight = (int)(abs(int(GScreen.VerSize / transformY)) / vDiv);
+		int SpriteHeight = (int)(abs(int(GScreen->VerSize / transformY)) / vDiv);
 		//세로 비율 조정
 
-		int DrawStartY = -SpriteHeight / 2 + GScreen.VerSize / 2 + vMoveScrren;
+		int DrawStartY = -SpriteHeight / 2 + GScreen->VerSize / 2 + vMoveScrren;
 		if (DrawStartY < 0) DrawStartY = 0;
-		int DrawEndY = SpriteHeight / 2 + GScreen.VerSize / 2 + vMoveScrren;
-		if (DrawEndY >= GScreen.VerSize) DrawEndY = GScreen.VerSize - 1;
+		int DrawEndY = SpriteHeight / 2 + GScreen->VerSize / 2 + vMoveScrren;
+		if (DrawEndY >= GScreen->VerSize) DrawEndY = GScreen->VerSize - 1;
 
 		// 스프라이트의 너비
-		int SpriteWidth = (int)(abs(int(GScreen.VerSize / transformY)) / uDiv);
+		int SpriteWidth = (int)(abs(int(GScreen->VerSize / transformY)) / uDiv);
 
 		int DrawStartX = -SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawStartX < 0) DrawStartX = 0;
 		int DrawEndX = SpriteWidth / 2 + SpriteScrrenX;
-		if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
+		if (DrawEndX >= GScreen->HorSize) DrawEndX = GScreen->HorSize;
 
 		for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
 		{
@@ -481,10 +494,10 @@ void Renderer::DrawEnemy(const WorldManager* World)
 				// 1. transformY이 0이하면 화면의 뒤쪽
 				// 2. i가 화면에 있는지
 				// 3. 벽보다 가까이 있는지
-				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen.HorSize && transformY < GScreen.Zbuffer[Stripe])
+				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen->HorSize && transformY < GScreen->Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
-					int d = (j - vMoveScrren) * 256 - GScreen.VerSize * 128 + SpriteHeight * 128;
+					int d = (j - vMoveScrren) * 256 - GScreen->VerSize * 128 + SpriteHeight * 128;
 					int texY = ((d * (CurrentSprite->Width)) / SpriteHeight) / 256;
 
 					// 경계 안으로 들어 오도록
@@ -502,7 +515,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					{
 						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
 						// 예시: GScreen.Buffer[j][i] = spriteChar;
-						GScreen.PrintChar(SpriteChar, Stripe, j);
+						GScreen->PrintChar(SpriteChar, Stripe, j);
 					}
 				}
 			}
@@ -525,7 +538,7 @@ void Renderer::DrawInfo(const WorldManager* World)
 		<< L"| Pos (" << PlayerTransform->GetPos().X << L", " << PlayerTransform->GetPos().Y << L")"
 		<< L"| Theta : " << World->GetPlayer()->GetTheta() << L"°";
 
-	GScreen.PrintString(Wss.str(), 0, 0);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 0);
 
 }
 
@@ -538,18 +551,20 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 	const float vMul = 1;
 
 	FSprite* WeponHudSprite = World->GetPlayer()->GetSprite();
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+
 	int SpriteHeight = WeponHudSprite->Height;
 	int SpriteWidth = WeponHudSprite->Width;
 	int PlayerState = static_cast<int>(World->GetPlayer()->GetState());
 
-	int DrawStartY = GScreen.VerSize - SpriteHeight;
+	int DrawStartY = GScreen->VerSize - SpriteHeight;
 	if (DrawStartY < 0) DrawStartY = 0;
-	int DrawEndY = GScreen.VerSize;
+	int DrawEndY = GScreen->VerSize;
 
-	int DrawStartX = GScreen.HorSize / 2 - SpriteWidth / 2;
+	int DrawStartX = GScreen->HorSize / 2 - SpriteWidth / 2;
 	if (DrawStartX < 0) DrawStartX = 0;
-	int DrawEndX = GScreen.HorSize / 2 + SpriteWidth / 2;
-	if (DrawEndX >= GScreen.HorSize) DrawEndX = GScreen.HorSize;
+	int DrawEndX = GScreen->HorSize / 2 + SpriteWidth / 2;
+	if (DrawEndX >= GScreen->HorSize) DrawEndX = GScreen->HorSize;
 
 	for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
 	{
@@ -557,16 +572,16 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 		{
 			// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
 			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
-			int texX = (Stripe + SpriteWidth / 2 - GScreen.HorSize / 2);
+			int texX = (Stripe + SpriteWidth / 2 - GScreen->HorSize / 2);
 
 			// 경계 안으로 들어 오도록
 			if (texX < 0) texX = 0;
 			if (texX >= SpriteWidth) texX = SpriteWidth;
 
 			// 2. i가 화면에 있는지
-			if (Stripe >= 0 && Stripe < GScreen.HorSize)
+			if (Stripe >= 0 && Stripe < GScreen->HorSize)
 			{
-				int d = (j + (SpriteHeight - GScreen.VerSize));
+				int d = (j + (SpriteHeight - GScreen->VerSize));
 				int texY = d;
 
 				// 경계 안으로 들어 오도록
@@ -583,180 +598,11 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 				{
 					// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
 					// 예시: GScreen.Buffer[j][i] = spriteChar;
-					GScreen.PrintChar(SpriteChar, Stripe, j);
+					GScreen->PrintChar(SpriteChar, Stripe, j);
 				}
 			}
 		}
 	}
-}
-
-FRaycasterResult Renderer::DDA(const int X, ERayCastLayer TargetLayer, const WorldManager* World)
-{
-	FRaycasterResult Res;
-
-	const int WIDTH = GScreen.HorSize;
-	const int HEIGHT = GScreen.VerSize;
-	/*
-	y
-		\	     /
-		 \ ____ /
-		  \    /
-		   \  /
-							x
-	여기서 카메라 플레인 (가로선)의 x범위를 -1 ~ 1로 만들어준다.
-	dir + Plane에 이 감소된 범위를 곱해서 방향을 결정해준다
-	음수는 카메라의 왼쪽, 양수는 카메라의 오른쪽, 0은 정 중앙
-	*/
-
-	FTransform* PlayerTransform = World->GetPlayer()->GetTransform();
-	double PlayerDirX = PlayerTransform->GetDirVec().DirX;
-	double PlayerDirY = PlayerTransform->GetDirVec().DirY;
-
-	double CameraDirX = PlayerTransform->GetCameraDirVec().DirX;
-	double CameraDirY = PlayerTransform->GetCameraDirVec().DirY;
-
-	float PlayerPosX = PlayerTransform->GetPos().X;
-	float PlayerPosY = PlayerTransform->GetPos().Y;
-
-	double CameraX = 2 * X / double(WIDTH) - 1;
-	double RayDirX = PlayerDirX + CameraDirX * CameraX;
-	double RayDirY = PlayerDirY + CameraDirY * CameraX;
-
-	// 현재 우리가 서 있는 위치
-	int MapPosX = (int)PlayerTransform->GetPos().X;
-	int MapPosY = (int)PlayerTransform->GetPos().Y;
-
-	// ray가 출발해서 처음으로 x에 수직인 선을 만난 위치까지의 거리
-	// ray가 출발해서 처음으로 y에 수직은 선을 만난 위치까지의 거리
-	double SideDistX;
-	double SideDistY;
-
-	// ray가 그 다음으로 x축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
-	// ray가 그 다음으로 y축에 수직인 선을 만났을 때 처음 만났던점에서 지금까지의 거리
-
-	// 그림으로 보면 직각 삼각형 형태로 피타고라스로 계산할 수있다.
-	// deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
-	// deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
-
-	// 이를 단순화하면 (계산하고 정리하면 이렇게 됨)
-	// deltaDistX = abs(|rayDir|(길이) / rayDirX)
-	// deltaDistY = abs(|rayDir|(길이) / rayDirY)
-
-	// 여기서 한 술 더 떠서 |rayDir|을 1로 게산해 버리는데 DDA알고리즘에서
-	// 길이가 중요한게 아니라 비율이 중요한거라 둘다 길이로 나눠버린다고 한다.
-	// 0으로 나눌 수는 없으니까 큰 값을 넣어서 사실상 0으로 만든다.
-	double DeltaDistX = (RayDirX == 0) ? 1e30 : std::abs(1 / RayDirX);
-	double DeltaDistY = (RayDirY == 0) ? 1e30 : std::abs(1 / RayDirY);
-	// 나중에 Ray의 거리를 구하는데 사용
-	double PerpWallDist;
-
-	//DDA는 반복할 때마다 맵을 정확히 한칸씩 이동하는데 (대각선 안됨)
-	//한칸 넘었을 떄 X에 닿았는지 Y에 닿았는지 둘 중 하나만 먼저 발생
-	//이동 방향은 ray의 방향에따라서 결정되고, 그방향을 여기에 저장한다.
-	int StepX;
-	int StepY;
-
-	// X에 수직선에 감지? Y수직선에 감지?
-	// X쪽이면 0, Y쪽이면 1
-
-	//초기 sideDist 계산
-	//현재 위치에서 가장 가까운 다음 격자선까지 raY가 얼마나 가야하는가
-	if (RayDirX < 0)
-	{
-		StepX = -1;
-		// 왼쪽 방향으로 가면
-		// 처음 x를 만날때 까지의 실제 거리 * deltaDistX 인데
-		// deltaDistX는 다음과 같다 x가 +- 1증가할 때 ray의 전체 길이는 얼마나 증가했나?
-		// 원래는 그런데 길이를 나눠나서 모호하게 보일 수 있음
-		SideDistX = (PlayerPosX - MapPosX) * DeltaDistX;
-	}
-	else
-	{
-		StepX = 1;
-		SideDistX = (MapPosX + 1.0 - PlayerPosX) * DeltaDistX;
-	}
-
-	if (RayDirY < 0)
-	{
-		StepY = -1;
-		SideDistY = (PlayerPosY - MapPosY) * DeltaDistY;
-	}
-	else
-	{
-		StepY = 1;
-		SideDistY = (MapPosY + 1.0 - PlayerPosY) * DeltaDistY;
-	}
-
-	// 진짜 DDA시작
-	// 매 루프마다 격자 1칸을 이동(충돌할 때 까지)
-	while (Res.bHit == false)
-	{
-		if (MapPosX <= 0 || MapPosX >= World->mapWidth) break;
-		if (MapPosY <= 0 || MapPosY >= World->mapHeight) break;
-		//다음 격자로 이동, x나 y 방향으로
-		if (SideDistX < SideDistY)
-		{
-			// 직전에 x를 먼저 만났으면 x 쪽으로 이동
-			// 직전에 Y를 먼저 만났으면 Y 쪽으로 이동
-
-			// ray 이동
-			SideDistX += DeltaDistX;
-			// 격자 이동
-			MapPosX += StepX;
-			// 직전에 x를 먼저 만나서 0으로 표시
-			Res.Side = 0;
-		}
-		else
-		{
-			SideDistY += DeltaDistY;
-			MapPosY += StepY;
-			Res.Side = 1;
-		}
-
-		if (TargetLayer == ERayCastLayer::WALL)
-		{
-			// 해당 격자에 벽, 오브젝트, 적이 있는지 확인
-			if (World->GetWorldMap()[MapPosY][MapPosX] == static_cast<int>(Env::WALL)) Res.bHit = true;
-		}
-		else if (TargetLayer == ERayCastLayer::Creature)
-		{
-			if (!World->GetCreatureMap()[MapPosY][MapPosX].empty()) Res.bHit = true;
-		}
-	}
-	// DDA가 끝나면 실제 Ray의 거리를 계산
-	// 유클리드 효과거리를 사용하면 어안효과고 있다고 하는데.. 잘 몰루
-	//		플레이어의 위치를 기준으로 유클리드 하면
-	//		ㅁㅁㅁ
-	//        p
-	//		이 상황에서 p에서 각 벽까지의 거리가 다 달라서 중간게 제일 커보이고
-	//		나머지는 작아보임 이러면 어안처럼 둥글게 보인다
-	// 카메라 평면을 사용하면 
-	//      ㅁㅁㅁ
-	//      
-	//      ------- 
-	// 평면에서 벽까지의 수직거리를 측정해서 어느 점에서나 같은 값이 나온다.
-	// 그래서 어안효과 사라짐.
-	// perpWallDist이 값이 벽에 수직인 거리를 말하는 것
-
-	// 벽을 발견했다? -> 벽에 들어와있다(한칸 더 갔다)
-	// 한칸 뒤로가자 (ray도 온 만큼 뒤돌아가자)
-	// 근데 왜 한칸 뒤로 가는게 실제 수직 거리이죠?
-	//		아까 double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
-	//		여기서 길이를 1로 바꿔버려서 대각선 성분이 없어지고 수직 성분만 남았다고!
-	//		(솔직히 좀 놀라움)
-
-	Res.MapPos.X = static_cast<float>(MapPosX);
-	Res.MapPos.Y = static_cast<float>(MapPosY);
-
-	if (Res.Side == 0)
-		Res.PerpDist = (SideDistX - DeltaDistX);
-	else
-		Res.PerpDist = (SideDistY - DeltaDistY);
-
-	if (Res.PerpDist < 0.001)
-		Res.PerpDist = 0.001;
-
-	return Res;
 }
 
 void Renderer::SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount)
@@ -779,5 +625,5 @@ void Renderer::SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Am
 void Renderer::DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute)
 {
 	int Length = DrawEnd - DrawStart;
-	GScreen.PrintVer(Wchar, X, DrawStart, Length, Attribute);
+	GameEngine::GetInstance()->GetScreen()->PrintVer(Wchar, X, DrawStart, Length, Attribute);
 }

@@ -1,6 +1,19 @@
 #include "WorldManager.h"
 #include "Utils.h"
 #include "GameEngine.h"
+#include "Raycaster.h"
+
+WorldManager::~WorldManager()
+{
+	delete Player;
+	Player = nullptr;
+
+	for (int i = 0; i < EnemyVec.size(); i++)
+	{
+		delete EnemyVec[i];
+		EnemyVec[i] = nullptr;
+	}
+}
 
 void WorldManager::Init()
 {
@@ -296,18 +309,18 @@ void WorldManager::PlayerStateUpdate()
 	{
 		Player->SetState(ECreatureState::Attack);
 		//TODO Gscreen으로 바꾸기
-		FRaycasterResult Res = GameEngine::GetInstance()->GetRenderer()->DDA(TargetWidth / 2, ERayCastLayer::Creature, this);
+		FRaycasterResult Res = DDA(TargetWidth / 2, ERayCastLayer::Creature, this);
 		//TODO Gscreen으로 바꾸기
 		if (Res.bHit
-			&& GameEngine::GetInstance()->GetRenderer()->GetScreen()->Zbuffer[TargetWidth / 2] > Res.PerpDist)
+			&& GameEngine::GetInstance()->GetScreen()->Zbuffer[TargetWidth / 2] > Res.PerpDist)
 		{
-			std::list<Creature*> CreatureList = CreatureMap[Res.MapPos.Y][Res.MapPos.X];
+			std::list<Creature*> CreatureList = CreatureMap[static_cast<int>(Res.MapPos.Y)][static_cast<int>(Res.MapPos.X)];
 			Creature* MinCreature = nullptr;
 
-			int Min = INT32_MAX;
+			double Min = INT32_MAX;
 			for (auto e : CreatureList)
 			{
-				int Dist = GetSqrDist(e->GetTransform()->Pos, Player->GetTransform()->Pos);
+				double Dist = GetSqrDist(e->GetTransform()->Pos, Player->GetTransform()->Pos);
 				if (Dist < Min)
 				{
 					Min = Dist;
@@ -342,7 +355,9 @@ void WorldManager::PlayerUpdate()
 }
 
 void WorldManager::EnemiesUpdate()
-{}
+{
+
+}
 
 void WorldManager::SpawnEnemy(FTransform EnemyTranform, FSprite EnemySprite)
 {
@@ -358,3 +373,5 @@ void WorldManager::HandleInput()
 	if (KeyState.QKey)
 		exit(0);
 }
+
+
