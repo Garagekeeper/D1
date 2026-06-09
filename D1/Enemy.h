@@ -8,7 +8,8 @@ class FEnemy : public Creature
 {
 
 private:
-	const float		EnemyPatrolPerCentage = 0.0f;
+	const float		EnemyPatrolPerCentage = 0.3f;
+	const float		EnemyIdlePerCentage = 0.5f;
 	float			PatrolPercentage = EnemyPatrolPerCentage;
 	int				RewardScore = 10;
 

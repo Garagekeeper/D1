@@ -168,7 +168,18 @@ void FEnemy::UpdateState()
 	}
 	else if (State == ECreatureState::Patrol)
 	{
-
+		if (AmountTime > 1)
+		{
+			AmountTime = 0.0;
+			if (GetRandRange() < EnemyIdlePerCentage)
+			{
+				State = ECreatureState::Idle;
+			}
+		}
+		else
+		{
+			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
+		}
 	}
 	PrevState = State;
 }

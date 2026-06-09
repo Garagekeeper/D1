@@ -67,34 +67,38 @@ void GameEngine::GameRun()
 
 		SInputManager->ClearInput();
 		SInputManager->GetInput();
+		LoopByState();
 
+	}
+}
 
-		if (GameState == EGameState::BeforeGame)
+void GameEngine::LoopByState()
+{
+	if (GameState == EGameState::BeforeGame)
+	{
+		SWorldManager->UpdateBeforeGameLoop();
+		SRenderer->RenderBeforeGame(SWorldManager);
+	}
+	else if (GameState == EGameState::InGame)
+	{
+		SWorldManager->UpdateGameLoop();
+		SRenderer->RenderGamePlay(SWorldManager);
+
+		if (SInputManager->GetKeyState().KEYEscapeDown)
 		{
-			SWorldManager->UpdateBeforeGameLoop();
-			SRenderer->RenderBeforeGame(SWorldManager);
+			IsPause = !IsPause;
+			GameState = EGameState::Pause;
 		}
-		else if (GameState == EGameState::InGame)
-		{
-			SWorldManager->UpdateGameLoop();
-			SRenderer->RenderGamePlay(SWorldManager);
+	}
+	else if (GameState == EGameState::Pause)
+	{
+		SWorldManager->UpdatePauseLoop();
+		SRenderer->RenderGamePause(SWorldManager);
 
-			if (SInputManager->GetKeyState().KEYEscapeDown)
-			{
-				IsPause = !IsPause;
-				GameState = EGameState::Pause;
-			}
-		}
-		else if (GameState == EGameState::Pause)
+		if (SInputManager->GetKeyState().KEYEscapeDown)
 		{
-			SWorldManager->UpdatePauseLoop();
-			SRenderer->RenderGamePause(SWorldManager);
-
-			if (SInputManager->GetKeyState().KEYEscapeDown)
-			{
-				IsPause = !IsPause;
-				GameState = EGameState::InGame;
-			}
+			IsPause = !IsPause;
+			GameState = EGameState::InGame;
 		}
 	}
 }

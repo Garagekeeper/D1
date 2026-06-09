@@ -28,6 +28,7 @@ public:
 
 	void						Init();
 	void						GameRun();
+	void						LoopByState();
 	void static					ClearEngine();
 	void static					StartEngine();
 	inline double				GetDeltaTime() const { return deltaTime; }
