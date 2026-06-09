@@ -1,11 +1,26 @@
 #pragma once
 #include <vector>
 #include <list>
+#include <map>
+
 #include "Player.h"
 #include "Enemy.h"
 #include "Define.h"
 
 struct FRaycasterResult;
+
+struct PQNode
+{
+	FPos Pos = { 0, 0 };
+	int Huristic = 0;
+	int Depth = 0;
+
+	bool operator<(const PQNode others) const
+	{
+		return this->Huristic > others.Huristic;
+	}
+};
+
 
 class WorldManager
 {
@@ -38,6 +53,9 @@ public:
 	void															UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target);
 	void															HandlePuaeMenu();
 	void															HandleMainMenu();
+	std::vector<FPos>												FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
+	std::vector<FPos>												CalcPath(std::map<FPos, FPos>& Parent, FPos DestPos);
+	bool															CanGo(FPos NextPos);
 
 	inline FPlayer*													GetPlayer() const { return Player; }
 

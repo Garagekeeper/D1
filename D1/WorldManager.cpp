@@ -1,3 +1,6 @@
+#include <queue>
+#include <map>
+
 #include "WorldManager.h"
 #include "Utils.h"
 #include "GameEngine.h"
@@ -371,6 +374,120 @@ void WorldManager::HandleMainMenu()
 	}
 
 	MainMenuIndex = EMainMenu::StartGame;
+}
+
+std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
+{
+	const int DirLen = 4;
+	int Dx[DirLen] = { 0, 1, 0, -1 };
+	int Dy[DirLen] = { 1, 0, -1, 0 };
+	std::priority_queue<PQNode> Pq;
+	std::map<FPos, int> Best;
+	std::map<FPos, FPos> Parent;
+
+	FPos CurrentPos = InStartPos;
+	FPos DestPos = InStartPos;
+	FPos ClosestCellPos = InStartPos;
+
+	// 현재 좌표에서 계산한 휴리스틱
+	int ClosetHuristic = GetSqrDist(DestPos, CurrentPos);
+	int Huristic = ClosetHuristic;
+	// 시작 죄표를 우선순위 큐에 넣음
+	Pq.push({ CurrentPos, Huristic, 1 });
+
+	// 시작 좌표의 부모는 자기 자신
+	Parent[CurrentPos] = CurrentPos;
+	// 현재 좌표까지의 최적값
+	Best[CurrentPos] = Huristic;
+
+	while (!Pq.empty())
+	{
+		PQNode Node = Pq.top();
+		Pq.pop();
+
+		// 현재 노드 갱신
+		CurrentPos = Node.Pos;
+
+		//목적지 도달 시 종료
+		if (CurrentPos.X == DestPos.X && CurrentPos.Y == DestPos.Y) break;
+		// 탐색 깊이를 초과했으면 조기 종료
+		if (Node.Depth > InMaxDepth) break;
+		for (int i = 0; i < DirLen; i++)
+		{
+			FPos NextPos = { CurrentPos.X + Dx[i], CurrentPos.Y + Dy[i] };
+			if (!CanGo(NextPos)) break;
+
+			// 휴리스틱 갱신
+			Huristic = GetSqrDist(DestPos, CurrentPos);
+
+			// 한번도 안온 경우 
+			if (Best[NextPos] == 0)
+				Best[NextPos] = INT32_MAX;
+
+			// 이미 이것보다 좋은 경로를 찾은 경우
+			if (Best[NextPos] < Huristic) continue;
+
+			// 다음 좌표까지 최적값 기록
+			Best[NextPos] = Huristic;
+			
+			// 여기까지 왔다는건, NextPos 까지 가는데 최단 Huristic으로 온것
+			Pq.push({ NextPos, Huristic, Node.Depth + 1 });
+			Parent[NextPos] = CurrentPos;
+	
+			// 경로가 갱신되면
+			// 해당 좌표로 이동
+			if (ClosetHuristic > Huristic)
+			{
+				ClosetHuristic = Huristic;
+				ClosestCellPos = NextPos;
+			}
+		}
+	}
+
+	// Dest의 부모가 기록되지 않았으면
+		// Depth 내에 Dest로 가는 경로를 찾지 못했으면
+	if (find(Parent.begin(), Parent.end(), DestPos) == Parent.end())
+	{
+		// 현재 경로들중 가장 huristic이 적인 곳을 목적지로 입력
+		DestPos = ClosestCellPos;
+	}
+
+	return CalcPath(Parent, DestPos);
+}
+
+std::vector<FPos> WorldManager::CalcPath(std::map<FPos, FPos>& Parent, FPos DestPos)
+{
+	std::vector<FPos> Res;
+	std::vector<FPos> ReverseRes;
+
+	FPos Current = DestPos;
+	int Cnt = 0;
+	// 부모가 자기자신일 떄까지(시작 좌표까지)
+	while (Parent[Current].X != Current.X && Parent[Current].Y != Current.Y)
+	{
+		// 너무 긴 경로는 도중에 반환
+		if (Cnt++ > 500) break;
+		Res.push_back(Current);
+		Current = Parent[Current];
+	}
+
+	Res.push_back(Current);
+	ReverseRes = std::vector<FPos>(Res.rbegin(), Res.rend());
+
+
+	return ReverseRes;
+}
+
+bool WorldManager::CanGo(FPos NextPos)
+{
+	int X = NextPos.X;
+	int Y = NextPos.Y;
+
+	if (X < 0 || X > mapHeight) return false;
+	if (Y < 0 || Y > mapHeight) return false;
+	if (WorldMap[Y][X] == static_cast<int>(Env::WALL)) return false;
+
+	return false;
 }
 
 
