@@ -14,13 +14,19 @@ void Renderer::Init()
 
 }
 
-void Renderer::Render(const WorldManager* World)
+void Renderer::RenderGamePlay(const WorldManager* World)
 {
 	ClearScreen();
 	Draw3DGrid(World);
 	DrawEnemy(World);
 	DrawInfo(World);
 	DrawPlayerHud(World);
+}
+
+void Renderer::RenderGamePause(const WorldManager* World)
+{
+	ClearScreen();
+	DrawPauseMenu(World);
 }
 
 void Renderer::ClearScreen()
@@ -651,4 +657,70 @@ void Renderer::DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, con
 {
 	int Length = DrawEnd - DrawStart;
 	GameEngine::GetInstance()->GetScreen()->PrintVer(Wchar, X, DrawStart, Length, Attribute);
+}
+
+void Renderer::DrawPauseMenu(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int DrawStartX = GScreen->HorSize / 6;
+	int DrawEndX = DrawStartX * 5;
+	int DrawStartY = GScreen->VerSize /5;
+	int DrawEndY = DrawStartY * 5;
+
+	int ResumeY = GScreen->VerSize/2;
+	int ResumeX = GScreen->HorSize/2;
+	int ExitY = ResumeY + 2;
+	int ExitX = ResumeX;
+
+	const int ArrowSpace = 5;
+
+	// Draw OutLine
+	for (int i = DrawStartY; i <= DrawEndY; i++)
+	{
+		if (i == DrawStartY)
+		{
+			GScreen->PrintChar(L'┏', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┓', DrawEndX, i);
+		}
+		else if (i == DrawEndY)
+		{
+			GScreen->PrintChar(L'┗', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┛', DrawEndX, i);
+		}
+		else if (i == ResumeY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintString(L"Resume", ResumeX, ResumeY);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else if (i == ExitY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintString(L"Exit", ExitX, ExitY);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+	}
+
+	// Draw Select Arrow
+	switch (World->GetSelectIndex())
+	{
+		case EPauseMenu::EPauseMenuLen:
+		case EPauseMenu::None:
+			break;
+		case EPauseMenu::Resume:
+			GScreen->PrintChar(L'▶', ResumeX - ArrowSpace, ResumeY);
+			break;
+		case EPauseMenu::Exit:
+			GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
+			break;
+	}
 }

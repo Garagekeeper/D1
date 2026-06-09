@@ -1,7 +1,9 @@
 #pragma once
+
 #include "InputManager.h"
 #include "WorldManager.h"
 #include "Renderer.h"
+
 class GameEngine
 {
 private:
@@ -13,6 +15,8 @@ private:
 	Screen*						GScreen = nullptr;
 
 	double						deltaTime = 0.0;
+	bool						IsPause = false;
+	bool						IsExit = false;
 
 
 								GameEngine() = default;
@@ -21,7 +25,7 @@ public:
 					
 
 	void						Init();
-	void						Run();
+	void						GameRun();
 	void static					ClearEngine();
 	void static					StartEngine();
 	inline double				GetDeltaTime() const { return deltaTime; }
@@ -30,6 +34,10 @@ public:
 	inline Renderer*			GetRenderer() const { return SRenderer; }
 	inline static GameEngine*	GetInstance() { return Instance; }
 	inline Screen*				GetScreen() { return GScreen; }
+	inline bool					GetIsPuase() { return IsPause; }
+	inline void					SetIsPuase(bool InValue) {IsPause = InValue; }
+	inline bool					GetIsExit() { return IsExit; }
+	inline void					SetIsExit(bool InValue) { IsExit = InValue; }
 
 };
 

@@ -4,6 +4,9 @@
 void InputManager::GetInput()
 {
 	bool isSpaceCurrentDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
+	bool isEscapeCuurentDown = (GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0;
+	bool isUpArrowCurrentDown = (GetAsyncKeyState(VK_UP) & 0x8000) != 0;
+	bool isDownArrowCurrentDown = (GetAsyncKeyState(VK_DOWN) & 0x8000) != 0;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
@@ -51,7 +54,37 @@ void InputManager::GetInput()
 		KeyState.KEYSpaceDown = false;
 	}
 
+	if (isEscapeCuurentDown && !KeyState.KEYEscapeWasDown)
+	{
+		KeyState.KEYEscapeDown = true;
+	}
+	else
+	{
+		KeyState.KEYEscapeDown = false;
+	}
+
+	if (isUpArrowCurrentDown && !KeyState.UpArrowWasDown)
+	{
+		KeyState.UpArrowDown = true;
+	}
+	else
+	{
+		KeyState.UpArrowDown = false;
+	}
+
+	if (isDownArrowCurrentDown && !KeyState.DownArrowWasDown)
+	{
+		KeyState.DownArrowDown = true;
+	}
+	else
+	{
+		KeyState.DownArrowDown = false;
+	}
+
 	KeyState.KEYSpaceWasDown = isSpaceCurrentDown;
+	KeyState.KEYEscapeWasDown = isEscapeCuurentDown;
+	KeyState.UpArrowWasDown = isUpArrowCurrentDown;
+	KeyState.DownArrowWasDown = isDownArrowCurrentDown;
 	if (GetAsyncKeyState('W') & 0x8001)	KeyState.KEYW = true;
 	if (GetAsyncKeyState('D') & 0x8001)	KeyState.KEYD = true;
 	if (GetAsyncKeyState('S') & 0x8001)	KeyState.KEYS = true;

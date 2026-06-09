@@ -27,17 +27,28 @@ const double PHI = 3.14159265358979323846;
 struct FKeyState
 {
 	bool QKey = false;
+
 	bool LeftArrowDown = false;
 	bool LeftArrowUP = true;
+
 	bool RightArrowDown = false;
 	bool RightArrowUP = true;
+	
+	bool UpArrowWasDown = false;
 	bool UpArrowDown = false;
 	bool UpArrowUP = true;
+	
+	bool DownArrowWasDown = false;
 	bool DownArrowDown = false;
 	bool DownArrowUP = true;
+	
 	bool KEYSpaceWasDown = false;
 	bool KEYSpaceDown = false;
 	bool KEYSpaceUp = false;
+	
+	bool KEYEscapeWasDown = false;
+	bool KEYEscapeDown = false;
+	
 	bool KEYW = false;
 	bool KEYD = false;
 	bool KEYS = false;
@@ -45,13 +56,12 @@ struct FKeyState
 	bool KEYR = false;
 };
 
-struct FPrevKeyInfo
+enum class EPauseMenu
 {
-	bool PrevLeftArrow = false;
-	bool PrevRightArrow = false;
-	bool PrevDownrrow = false;
-	bool PrevUpArrow = false;
-
+	None = 0,
+	Resume,
+	Exit,
+	EPauseMenuLen
 };
 
 enum class Env

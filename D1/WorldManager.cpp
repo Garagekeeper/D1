@@ -20,6 +20,7 @@ WorldManager::~WorldManager()
 
 void WorldManager::Init()
 {
+	// Game Loop
 	WorldMap =
 	{
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -173,13 +174,52 @@ void WorldManager::Init()
 	};
 
 	SpawnEnemy(EnemyStat, EnemyTranform, EnemySprite);
+
+
+	// Pause Loop
+	SelectIndex = EPauseMenu::Resume;
+
 }
 
-void WorldManager::Update()
+void WorldManager::UpdateGameLoop()
 {
-
 	PlayerUpdate(this);
 	EnemiesUpdate(this);
+}
+
+void WorldManager::UpdatePauseLoop()
+{
+	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
+	if (KeyState.KEYSpaceDown)
+	{
+		HandlePuaeMenu();
+	}
+	else if (KeyState.DownArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(SelectIndex);
+		int UpperBound = static_cast<int>(EPauseMenu::EPauseMenuLen);
+		if (CurrentIndex + 1 >= UpperBound)
+		{
+			SelectIndex = EPauseMenu::Resume;
+		}
+		else
+		{
+			SelectIndex = static_cast<EPauseMenu>(CurrentIndex + 1);
+		}
+	}
+	else if (KeyState.UpArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(SelectIndex);
+		int LowerBound = static_cast<int>(EPauseMenu::None);
+		if (CurrentIndex - 1 <= LowerBound)
+		{
+			SelectIndex = EPauseMenu::Exit;
+		}
+		else
+		{
+			SelectIndex = static_cast<EPauseMenu>(CurrentIndex - 1);
+		}
+	}
 }
 
 void WorldManager::PlayerUpdate(const WorldManager* World)
@@ -192,7 +232,7 @@ void WorldManager::EnemiesUpdate(WorldManager* World)
 	// 죽은 Enemy WolrdManger에서 일괄 삭제
 	// Ondead에서는 죽었다고 표시만
 	// 여기서 순회해서 표시된 아이들을 지움
-	for (int i=0; i<EnemyVec.size(); i++)
+	for (int i = 0; i < EnemyVec.size(); i++)
 	{
 		// 죽은 상태이면
 		if (EnemyVec[i]->GetState() == ECreatureState::Dead)
@@ -253,6 +293,27 @@ void WorldManager::UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target)
 	}
 
 	CreatureMap[static_cast<int>(After.Y)][static_cast<int>(After.X)].push_back(Target);
+}
+
+void WorldManager::HandlePuaeMenu()
+{
+	if (SelectIndex == EPauseMenu::None || SelectIndex == EPauseMenu::EPauseMenuLen)
+		return;
+
+	switch (SelectIndex)
+	{
+		case EPauseMenu::None:
+		case EPauseMenu::EPauseMenuLen:
+			break;
+		case EPauseMenu::Resume:
+			GameEngine::GetInstance()->SetIsPuase(false);
+			break;
+		case EPauseMenu::Exit:
+			GameEngine::GetInstance()->SetIsExit(true);
+			break;
+	}
+
+	SelectIndex = EPauseMenu::Resume;
 }
 
 

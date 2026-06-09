@@ -49,7 +49,7 @@ void GameEngine::Init()
 		GScreen->Init();
 }
 
-void GameEngine::Run()
+void GameEngine::GameRun()
 {
 	LARGE_INTEGER Frequency;
 	LARGE_INTEGER PrevTime;
@@ -58,7 +58,7 @@ void GameEngine::Run()
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&PrevTime);
 	//TODO 조건을 정해서 while을 탈출할 수 있도록
-	while (true)
+	while (!IsExit)
 	{
 		QueryPerformanceCounter(&CurrentTime);
 		deltaTime = static_cast<double>(CurrentTime.QuadPart - PrevTime.QuadPart) / Frequency.QuadPart;
@@ -67,10 +67,21 @@ void GameEngine::Run()
 
 		SInputManager->ClearInput();
 		SInputManager->GetInput();
-		SWorldManager->Update();
-		SRenderer->Render(SWorldManager);
-	}
 
+		if (SInputManager->GetKeyState().KEYEscapeDown)
+			IsPause = !IsPause;
+
+		if (IsPause)
+		{
+			SWorldManager->UpdatePauseLoop();
+			SRenderer->RenderGamePause(SWorldManager);
+		}
+		else
+		{
+			SWorldManager->UpdateGameLoop();
+			SRenderer->RenderGamePlay(SWorldManager);
+		}
+	}
 }
 
 // 이래 하는게 맞는지..?

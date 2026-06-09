@@ -11,7 +11,7 @@ int main()
 	GameEngine::StartEngine();
 	GameEngine* Engine = GameEngine::GetInstance();
 	Engine->Init();
-	Engine->Run();
+	Engine->GameRun();
 	Engine->ClearEngine();
 
 	/*
