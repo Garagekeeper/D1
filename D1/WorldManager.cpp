@@ -215,7 +215,11 @@ void WorldManager::EnemiesUpdate(WorldManager* World)
 		}
 		else
 		{
-			EnemyVec[i]->Update(World);
+			//시야각 안에있는 적들만 Update();
+			if (EnemyVec[i]->GetIsInSight())
+				EnemyVec[i]->Update(World);
+
+			EnemyVec[i]->SetIsInSight(false);
 		}
 	}
 }

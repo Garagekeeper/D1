@@ -32,6 +32,7 @@ protected:
 	FCreatureBaseStat		Stat;
 	ECreatureState			State;
 	ECreatureState			PrevState = ECreatureState::Idle;
+	bool					IsInSight = false;
 
 public:
 	//constructor
@@ -53,5 +54,8 @@ public:
 
 	inline ECreatureState	GetState() const { return State; }
 	inline void				SetState(ECreatureState _State) { State = _State; }
+
+	inline bool				GetIsInSight() const { return IsInSight; }
+	inline void				SetIsInSight(bool InValue) { IsInSight = InValue; }
 
 };

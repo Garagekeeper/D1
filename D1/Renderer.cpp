@@ -518,6 +518,9 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					}
 
 					wchar_t SpriteChar = CurrentSprite->SpriteTexture[CreatureState][texY][texX];
+					// 스프라이트를 출력하는 적들은 시야각안에 있음
+					// TODO 그냥 벡터 계산해서 하는거랑 이거랑 비교해보기
+					CurrentEnemy->SetIsInSight(true);
 
 
 					//GScreen.PrintChar(SpriteChar, Stripe, j);
