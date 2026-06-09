@@ -29,6 +29,12 @@ void Renderer::RenderGamePause(const WorldManager* World)
 	DrawPauseMenu(World);
 }
 
+void Renderer::RenderBeforeGame(const WorldManager* World)
+{
+	ClearScreen();
+	DrawMainMenu(World);
+}
+
 void Renderer::ClearScreen()
 {
 	GameEngine::GetInstance()->GetScreen()->ChangeScreenBuffer();
@@ -711,7 +717,7 @@ void Renderer::DrawPauseMenu(const WorldManager* World)
 	}
 
 	// Draw Select Arrow
-	switch (World->GetSelectIndex())
+	switch (World->GetPauseIndex())
 	{
 		case EPauseMenu::EPauseMenuLen:
 		case EPauseMenu::None:
@@ -720,6 +726,72 @@ void Renderer::DrawPauseMenu(const WorldManager* World)
 			GScreen->PrintChar(L'▶', ResumeX - ArrowSpace, ResumeY);
 			break;
 		case EPauseMenu::Exit:
+			GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
+			break;
+	}
+}
+
+void Renderer::DrawMainMenu(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int DrawStartX = GScreen->HorSize / 6;
+	int DrawEndX = DrawStartX * 5;
+	int DrawStartY = GScreen->VerSize / 5;
+	int DrawEndY = DrawStartY * 5;
+
+	int ResumeY = GScreen->VerSize / 2;
+	int ResumeX = GScreen->HorSize / 2;
+	int ExitY = ResumeY + 2;
+	int ExitX = ResumeX;
+
+	const int ArrowSpace = 5;
+
+	// Draw OutLine
+	for (int i = DrawStartY; i <= DrawEndY; i++)
+	{
+		if (i == DrawStartY)
+		{
+			GScreen->PrintChar(L'┏', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┓', DrawEndX, i);
+		}
+		else if (i == DrawEndY)
+		{
+			GScreen->PrintChar(L'┗', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┛', DrawEndX, i);
+		}
+		else if (i == ResumeY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintString(L"StartGame", ResumeX, ResumeY);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else if (i == ExitY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintString(L"ExitGame", ExitX, ExitY);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+	}
+
+	// Draw Select Arrow
+	switch (World->GetMainIndex())
+	{
+		case EMainMenu::EMainMenuLen:
+		case EMainMenu::None:
+			break;
+		case EMainMenu::StartGame:
+			GScreen->PrintChar(L'▶', ResumeX - ArrowSpace, ResumeY);
+			break;
+		case EMainMenu::ExitGame:
 			GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
 			break;
 	}

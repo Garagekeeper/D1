@@ -17,7 +17,8 @@ private:
 	std::vector<std::vector<std::list<Creature*>>>					CreatureMap;
 
 	// PauseLoop
-	EPauseMenu 														SelectIndex = EPauseMenu::None;
+	EPauseMenu 														PauseMenuIndex = EPauseMenu::None;
+	EMainMenu 														MainMenuIndex = EMainMenu::None;
 
 public:
 	const int														mapWidth = 24;
@@ -27,6 +28,7 @@ public:
 																	~WorldManager();
 
 	void															Init();
+	void															UpdateBeforeGameLoop();
 	void															UpdateGameLoop();
 	void															UpdatePauseLoop();
 	void															PlayerUpdate(const WorldManager* World);
@@ -35,6 +37,7 @@ public:
 	void															HandleInput();
 	void															UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target);
 	void															HandlePuaeMenu();
+	void															HandleMainMenu();
 
 	inline FPlayer*													GetPlayer() const { return Player; }
 
@@ -44,7 +47,9 @@ public:
 	inline const std::vector<std::vector<std::list<Creature*>>>&	GetCreatureMap() const { return CreatureMap; }
 	inline const std::vector<FEnemy*>*								GetEnemyVec() const { return &EnemyVec; }
 
-	inline const EPauseMenu											GetSelectIndex() const { return SelectIndex; }
-	inline void														SetSelectIndex(EPauseMenu InVal) { SelectIndex = InVal; }
+	inline const EPauseMenu											GetPauseIndex() const { return PauseMenuIndex; }
+	inline void														SetPauseIndex(EPauseMenu InVal) { PauseMenuIndex = InVal; }
+	inline const EMainMenu											GetMainIndex() const { return MainMenuIndex; }
+	inline void														SetMainIndex(EPauseMenu InVal) { PauseMenuIndex = InVal; }
 };
 

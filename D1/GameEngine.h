@@ -4,6 +4,7 @@
 #include "WorldManager.h"
 #include "Renderer.h"
 
+
 class GameEngine
 {
 private:
@@ -13,6 +14,7 @@ private:
 	WorldManager*				SWorldManager = nullptr;
 	Renderer*					SRenderer = nullptr;
 	Screen*						GScreen = nullptr;
+	EGameState					GameState = EGameState::BeforeGame;
 
 	double						deltaTime = 0.0;
 	bool						IsPause = false;
@@ -38,6 +40,7 @@ public:
 	inline void					SetIsPuase(bool InValue) {IsPause = InValue; }
 	inline bool					GetIsExit() { return IsExit; }
 	inline void					SetIsExit(bool InValue) { IsExit = InValue; }
+	inline void					SetGameState(EGameState InValue) { GameState = InValue; }
 
 };
 

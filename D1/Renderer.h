@@ -12,6 +12,7 @@ public:
 	void				Init();
 	void				RenderGamePlay(const WorldManager* World);
 	void				RenderGamePause(const WorldManager* World);
+	void				RenderBeforeGame(const WorldManager* World);
 
 	void				ClearScreen();
 	void				Draw2DGrid(const WorldManager* World);
@@ -28,5 +29,6 @@ public:
 	void				SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
 	void				DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 	void				DrawPauseMenu(const WorldManager* World);
+	void				DrawMainMenu(const WorldManager* World);
 };
 

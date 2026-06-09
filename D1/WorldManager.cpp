@@ -177,8 +177,44 @@ void WorldManager::Init()
 
 
 	// Pause Loop
-	SelectIndex = EPauseMenu::Resume;
+	PauseMenuIndex = EPauseMenu::Resume;
+	MainMenuIndex = EMainMenu::StartGame;
 
+}
+
+void WorldManager::UpdateBeforeGameLoop()
+{
+	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
+	if (KeyState.KEYSpaceDown)
+	{
+		HandleMainMenu();
+	}
+	else if (KeyState.DownArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(MainMenuIndex);
+		int UpperBound = static_cast<int>(EMainMenu::EMainMenuLen);
+		if (CurrentIndex + 1 >= UpperBound)
+		{
+			MainMenuIndex = EMainMenu::StartGame;
+		}
+		else
+		{
+			MainMenuIndex = static_cast<EMainMenu>(CurrentIndex + 1);
+		}
+	}
+	else if (KeyState.UpArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(MainMenuIndex);
+		int LowerBound = static_cast<int>(EMainMenu::None);
+		if (CurrentIndex - 1 <= LowerBound)
+		{
+			MainMenuIndex = EMainMenu::ExitGame;
+		}
+		else
+		{
+			MainMenuIndex = static_cast<EMainMenu>(CurrentIndex - 1);
+		}
+	}
 }
 
 void WorldManager::UpdateGameLoop()
@@ -196,28 +232,28 @@ void WorldManager::UpdatePauseLoop()
 	}
 	else if (KeyState.DownArrowDown)
 	{
-		int CurrentIndex = static_cast<int>(SelectIndex);
+		int CurrentIndex = static_cast<int>(PauseMenuIndex);
 		int UpperBound = static_cast<int>(EPauseMenu::EPauseMenuLen);
 		if (CurrentIndex + 1 >= UpperBound)
 		{
-			SelectIndex = EPauseMenu::Resume;
+			PauseMenuIndex = EPauseMenu::Resume;
 		}
 		else
 		{
-			SelectIndex = static_cast<EPauseMenu>(CurrentIndex + 1);
+			PauseMenuIndex = static_cast<EPauseMenu>(CurrentIndex + 1);
 		}
 	}
 	else if (KeyState.UpArrowDown)
 	{
-		int CurrentIndex = static_cast<int>(SelectIndex);
+		int CurrentIndex = static_cast<int>(PauseMenuIndex);
 		int LowerBound = static_cast<int>(EPauseMenu::None);
 		if (CurrentIndex - 1 <= LowerBound)
 		{
-			SelectIndex = EPauseMenu::Exit;
+			PauseMenuIndex = EPauseMenu::Exit;
 		}
 		else
 		{
-			SelectIndex = static_cast<EPauseMenu>(CurrentIndex - 1);
+			PauseMenuIndex = static_cast<EPauseMenu>(CurrentIndex - 1);
 		}
 	}
 }
@@ -297,10 +333,10 @@ void WorldManager::UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target)
 
 void WorldManager::HandlePuaeMenu()
 {
-	if (SelectIndex == EPauseMenu::None || SelectIndex == EPauseMenu::EPauseMenuLen)
+	if (PauseMenuIndex == EPauseMenu::None || PauseMenuIndex == EPauseMenu::EPauseMenuLen)
 		return;
 
-	switch (SelectIndex)
+	switch (PauseMenuIndex)
 	{
 		case EPauseMenu::None:
 		case EPauseMenu::EPauseMenuLen:
@@ -313,7 +349,28 @@ void WorldManager::HandlePuaeMenu()
 			break;
 	}
 
-	SelectIndex = EPauseMenu::Resume;
+	PauseMenuIndex = EPauseMenu::Resume;
+}
+
+void WorldManager::HandleMainMenu()
+{
+	if (MainMenuIndex == EMainMenu::None || MainMenuIndex == EMainMenu::EMainMenuLen)
+		return;
+
+	switch (MainMenuIndex)
+	{
+		case EMainMenu::None:
+		case EMainMenu::EMainMenuLen:
+			break;
+		case EMainMenu::StartGame:
+			GameEngine::GetInstance()->SetGameState(EGameState::InGame);
+			break;
+		case EMainMenu::ExitGame:
+			GameEngine::GetInstance()->SetIsExit(true);
+			break;
+	}
+
+	MainMenuIndex = EMainMenu::StartGame;
 }
 
 

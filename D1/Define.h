@@ -64,6 +64,20 @@ enum class EPauseMenu
 	EPauseMenuLen
 };
 
+enum class EMainMenu
+{
+	None = 0,
+	StartGame,
+	ExitGame,
+	EMainMenuLen
+};
+
+enum class EGameState
+{
+	BeforeGame,
+	InGame,
+	Pause
+};
 enum class Env
 {
 	EMPTY = 0,

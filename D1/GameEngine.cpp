@@ -68,18 +68,33 @@ void GameEngine::GameRun()
 		SInputManager->ClearInput();
 		SInputManager->GetInput();
 
-		if (SInputManager->GetKeyState().KEYEscapeDown)
-			IsPause = !IsPause;
 
-		if (IsPause)
+		if (GameState == EGameState::BeforeGame)
 		{
-			SWorldManager->UpdatePauseLoop();
-			SRenderer->RenderGamePause(SWorldManager);
+			SWorldManager->UpdateBeforeGameLoop();
+			SRenderer->RenderBeforeGame(SWorldManager);
 		}
-		else
+		else if (GameState == EGameState::InGame)
 		{
 			SWorldManager->UpdateGameLoop();
 			SRenderer->RenderGamePlay(SWorldManager);
+
+			if (SInputManager->GetKeyState().KEYEscapeDown)
+			{
+				IsPause = !IsPause;
+				GameState = EGameState::Pause;
+			}
+		}
+		else if (GameState == EGameState::Pause)
+		{
+			SWorldManager->UpdatePauseLoop();
+			SRenderer->RenderGamePause(SWorldManager);
+
+			if (SInputManager->GetKeyState().KEYEscapeDown)
+			{
+				IsPause = !IsPause;
+				GameState = EGameState::InGame;
+			}
 		}
 	}
 }
