@@ -461,13 +461,16 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		//--------------------------
 		//Scailing					|
 		//--------------------------
-		// rkfh로 몇배 줄일건지
-		const float uDiv = 1 / (float)4;
+		
+		//TODO FSprite의 값으로 고치기
+		// 가로 몇배 줄일건지
+		const float uDiv = 1;
 		// 세로로 몇배 줄일건지
-		const float vDiv = 1 / (float)2;
+		const float vDiv = 2;
 		// 위로 몇칸 갈건지 
 		// 이 값들은 스프라이트마다 가지고 있으면 좋을 듯 함;
-		int vMoveScrren = int(-CurrentSprite->VMove / transformY);
+		//int vMoveScrren = int(-CurrentSprite->VMove / transformY);
+		int vMoveScrren = 0;
 
 
 		// 스프라이트의 높이
@@ -515,26 +518,25 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					if (texY < 0) texY = 0;
 					if (texY >= (CurrentSprite->Width)) texY = (CurrentSprite->Width) - 1;
 
-					//TODO 고치기(CurrentState)
-					
-					int SpriteIndex = CreatureState;
-					switch (static_cast<ECreatureState>(CreatureState))
+					//TODO 고치기(SpriteIndex)
+					ECreatureSpriteIndex SpriteIndex = CurrentEnemy->GetSpriteIndex();
+					switch (SpriteIndex)
 					{
 						
-						case ECreatureState::OnAttacked:
-							SpriteIndex = static_cast<int>(ECreatureState::Idle);
+						case ECreatureSpriteIndex::OnAttacked:
+							SpriteIndex = ECreatureSpriteIndex::Idle;
 							break;
-						case ECreatureState::OnDead:
-							SpriteIndex = static_cast<int>(ECreatureState::OnAttacked);
+						case ECreatureSpriteIndex::AttackStart:
+						case ECreatureSpriteIndex::AttackEnd:
 							break;
 						default:
-							SpriteIndex = static_cast<int>(ECreatureState::Idle);
+							SpriteIndex = ECreatureSpriteIndex::Idle;
 							break;
 					}
 
-					wchar_t SpriteChar = CurrentSprite->SpriteTexture[SpriteIndex][texY][texX];
+					wchar_t SpriteChar = CurrentSprite->SpriteTexture[static_cast<int>(SpriteIndex)][texY][texX];
 
-					if (CreatureState == static_cast<int>(ECreatureState::OnAttacked))
+					if (CurrentEnemy->GetbBlink())
 					{
 						// 피격시 깜빡임
 						double TotalTime = GameEngine::GetInstance()->GetAmountTime();

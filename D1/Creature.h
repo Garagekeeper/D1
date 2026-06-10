@@ -25,6 +25,15 @@ enum class ECreatureState
 	ECreatureStateLen,
 };
 
+enum class ECreatureSpriteIndex
+{
+	Idle = 0,
+	AttackStart = 1,
+	AttackEnd,
+	OnAttacked,
+	Dead,
+};
+
 class Creature : public PObject
 {
 

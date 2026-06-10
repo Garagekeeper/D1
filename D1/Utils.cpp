@@ -2,7 +2,7 @@
 #include "Transform.h"
 #include "Raycaster.h"
 #include "Creature.h"
-#include "GameEngine.h";
+#include "GameEngine.h"
 
 double GetSqrLen(FVec Vec)
 {
