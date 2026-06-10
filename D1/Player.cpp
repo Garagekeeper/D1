@@ -225,7 +225,7 @@ void FPlayer::UpdateState()
 		return;
 	}
 
-	if (GetState() == ECreatureState::Attack)
+	else if (GetState() == ECreatureState::Attack)
 	{
 		AmountTime += DeltaTime;
 		if (AmountTime > AnimDelay)
@@ -233,6 +233,11 @@ void FPlayer::UpdateState()
 			AmountTime = 0.0;
 			SetState(ECreatureState::Idle);
 		}
+	}
+
+	else if (State == ECreatureState::OnAttacked)
+	{
+		State = ECreatureState::Idle;
 	}
 
 	if (KeyState.KEYR)
