@@ -516,20 +516,33 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					if (texY >= (CurrentSprite->Width)) texY = (CurrentSprite->Width) - 1;
 
 					//TODO 고치기(CurrentState)
-
+					
+					int SpriteIndex = CreatureState;
 					switch (static_cast<ECreatureState>(CreatureState))
 					{
 						
 						case ECreatureState::OnAttacked:
+							SpriteIndex = static_cast<int>(ECreatureState::Idle);
+							break;
 						case ECreatureState::OnDead:
-							CreatureState = static_cast<int>(ECreatureState::OnAttacked);
+							SpriteIndex = static_cast<int>(ECreatureState::OnAttacked);
 							break;
 						default:
-							CreatureState = static_cast<int>(ECreatureState::Idle);
+							SpriteIndex = static_cast<int>(ECreatureState::Idle);
 							break;
 					}
 
-					wchar_t SpriteChar = CurrentSprite->SpriteTexture[CreatureState][texY][texX];
+					wchar_t SpriteChar = CurrentSprite->SpriteTexture[SpriteIndex][texY][texX];
+
+					if (CreatureState == static_cast<int>(ECreatureState::OnAttacked))
+					{
+						// 피격시 깜빡임
+						double TotalTime = GameEngine::GetInstance()->GetAmountTime();
+						if (static_cast<int>(TotalTime * AnimBlinkSpeed) % BlinkFrequency == 0)
+						{
+							SpriteChar = L' ';
+						}
+					}
 					// 스프라이트를 출력하는 적들은 시야각안에 있음
 					// TODO 그냥 벡터 계산해서 하는거랑 이거랑 비교해보기
 					CurrentEnemy->SetIsInSight(true);

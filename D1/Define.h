@@ -24,6 +24,9 @@ const int SCREEN_BACKGROUND_COLOR_WHITE = BACKGROUND_RED | BACKGROUND_GREEN | BA
 const double AnimDelay = 0.2;
 const double PHI = 3.14159265358979323846;
 
+const double AnimBlinkSpeed = 20.0;
+const int BlinkFrequency = 2;
+
 struct FKeyState
 {
 	bool QKey = false;
