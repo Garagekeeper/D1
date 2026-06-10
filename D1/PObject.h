@@ -21,9 +21,9 @@ public:
 	virtual					~PObject();
 
 	// Pos and Vector
-	inline double			GetTheta() const { return Transform.Theta; }
-	inline FSprite*			GetSprite() { return &Sprites; }
-	inline FTransform*		GetTransform() { return &Transform; }
+	inline double				GetTheta() const { return Transform.Theta; }
+	inline FSprite*				GetSprite() { return &Sprites; }
+	inline FTransform* GetTransform() { return &Transform; }
 
 
 	virtual void			MoveTo(FPos NextPos);

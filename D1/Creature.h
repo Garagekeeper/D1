@@ -21,6 +21,7 @@ enum class ECreatureState
 	Dead,
 	OnDead,
 	Patrol,
+	MoveToTarget,
 	ECreatureStateLen,
 };
 

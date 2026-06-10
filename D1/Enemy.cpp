@@ -14,7 +14,7 @@ void FEnemy::MoveToWithArray(FPos NextPos, WorldManager* World)
 
 void FEnemy::Update(WorldManager* World)
 {
-	UpdateState();
+	UpdateState(World);
 	Rotate();
 	Move(World);
 }
@@ -43,8 +43,8 @@ void FEnemy::Move(WorldManager* World)
 		double DirSize = GetSqrLen(DirVec);
 		double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
 
-		Dx = (DirVec.DirX / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
-		Dy = (DirVec.DirY / DirSize) * PlayerMoveBaseSpeed * DeltaTime;
+		Dx = (DirVec.DirX / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
+		Dy = (DirVec.DirY / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
 
 		double ColliderRadius = 1;
 
@@ -93,15 +93,80 @@ void FEnemy::Move(WorldManager* World)
 
 		MoveToWithArray(NextPos, World);
 	}
+	else if (State == ECreatureState::MoveToTarget)
+	{
+
+		FPos PlayerPos = World->GetPlayerPos();
+		FIntPos NextCell = World->FindPath(Transform.Pos, World->GetPlayerTransform()->Pos, FindDepth)[1];
+		FPos NextPos;
+
+		double Dx = 0.0f;
+		double Dy = 0.0;
+
+		FVec DirVec = {(NextCell.X - static_cast<int>(Transform.Pos.X)),(NextCell.Y - static_cast<int>(Transform.Pos.Y)) };
+		FPos Pos = Transform.Pos;
+		double DirSize = GetSqrLen(DirVec);
+		double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
+
+		Dx = (DirVec.DirX / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
+		Dy = (DirVec.DirY / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
+
+		double ColliderRadius = 1;
+
+		// 다음 좌표
+		double NextX = Pos.X + Dx;
+		double NextY = Pos.Y + Dy;
+
+		// 다음 좌표의 충돌 체크
+		double ColliderEdgeX = NextX + (Dx > 0 ? ColliderRadius : -ColliderRadius);
+		if (World->GetWorldMap()[(int)Pos.Y][(int)ColliderEdgeX] != static_cast<int>(Env::WALL))
+		{
+			Pos.X = static_cast<float>(NextX);
+		}
+		else
+		{
+			State = ECreatureState::Idle;
+		}
+
+		double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
+		if (World->GetWorldMap()[(int)ColliderEdgeY][(int)Pos.X] != static_cast<int>(Env::WALL))
+		{
+			Pos.Y = static_cast<float>(NextY);
+		}
+		else
+		{
+			State = ECreatureState::Idle;
+		}
+
+		// 콘솔 바운더리를 넘어가지는 못한다.
+		double MapMin = ColliderRadius;
+		Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+		double MapMaxX = GScreen->HorSize - ColliderRadius;
+		double MapMaxY = GScreen->VerSize - ColliderRadius;
+
+		if (Pos.X < ColliderRadius || Pos.X > MapMaxX || Pos.Y < ColliderRadius || Pos.Y > MapMaxY)
+		{
+			State = ECreatureState::Idle;
+			if (Pos.X < ColliderRadius) Pos.X = static_cast<float>(ColliderRadius);
+			if (Pos.X > MapMaxX) Pos.X = static_cast<float>(MapMaxX);
+			if (Pos.Y < ColliderRadius) Pos.Y = static_cast<float>(ColliderRadius);
+			if (Pos.Y > MapMaxY) Pos.Y = static_cast<float>(MapMaxY);
+		}
+
+
+		NextPos = { static_cast<float>(Pos.X), static_cast<float>(Pos.Y) };
+
+		MoveToWithArray(NextPos, World);
+	}
 }
 
-void FEnemy::UpdateState()
+void FEnemy::UpdateState(WorldManager* World)
 {
 	
 	if (State == ECreatureState::Dead) return;
 	if (State == ECreatureState::OnAttacked)
 	{
-		if (PrevState == ECreatureState::Idle)
+		if (PrevState != ECreatureState::OnAttacked)
 			AmountTime = 0.0;
 
 		if (AmountTime >= AnimDelay)
@@ -116,6 +181,18 @@ void FEnemy::UpdateState()
 	}
 	else if (State == ECreatureState::Idle)
 	{
+		if (CheckPlayerInAttackRange(World))
+		{
+			State = ECreatureState::Attack;
+			return;
+		}
+
+		if (CheckPlayerInDetectRange(World))
+		{
+			State = ECreatureState::MoveToTarget;
+			return;
+		}
+
 		// TODO 하드 코딩 고치기
 		if (AmountTime >= 1)
 		{
@@ -168,6 +245,18 @@ void FEnemy::UpdateState()
 	}
 	else if (State == ECreatureState::Patrol)
 	{
+		if (CheckPlayerInAttackRange(World))
+		{
+			State = ECreatureState::Attack;
+			return;
+		}
+
+		if (CheckPlayerInDetectRange(World))
+		{
+			State = ECreatureState::MoveToTarget;
+			return;
+		}
+
 		if (AmountTime > 1)
 		{
 			AmountTime = 0.0;
@@ -181,6 +270,14 @@ void FEnemy::UpdateState()
 			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
+	else if (State == ECreatureState::MoveToTarget)
+	{
+		if (CheckPlayerInAttackRange(World))
+		{
+			State = ECreatureState::Attack;
+			return;
+		}
+	}
 	PrevState = State;
 }
 
@@ -189,6 +286,19 @@ void FEnemy::GetDamage(int Amount, Creature* From)
 	Creature::GetDamage(Amount, From);
 	if (Stat.Hp <= 0)
 		From->AddScore(Amount);
+}
+
+bool FEnemy::CheckPlayerInDetectRange(WorldManager* World)
+{
+	FPos PlayerPos = World->GetPlayerPos();
+		
+	return GetSqrDist(Transform.Pos, PlayerPos) < DetectRadius * DetectRadius;
+}
+
+bool FEnemy::CheckPlayerInAttackRange(WorldManager* World)
+{
+	FPos PlayerPos = World->GetPlayerPos();
+	return GetSqrDist(Transform.Pos, PlayerPos) < AttackRange * AttackRange;
 }
 
 

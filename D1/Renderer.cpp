@@ -519,13 +519,13 @@ void Renderer::DrawEnemy(const WorldManager* World)
 
 					switch (static_cast<ECreatureState>(CreatureState))
 					{
-						case ECreatureState::Idle:
-						case ECreatureState::Patrol:
-							CreatureState = static_cast<int>(ECreatureState::Idle);
-							break;
+						
 						case ECreatureState::OnAttacked:
 						case ECreatureState::OnDead:
 							CreatureState = static_cast<int>(ECreatureState::OnAttacked);
+							break;
+						default:
+							CreatureState = static_cast<int>(ECreatureState::Idle);
 							break;
 					}
 

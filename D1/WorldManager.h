@@ -60,6 +60,8 @@ public:
 	bool															CanGo(FIntPos NextPos);
 
 	inline FPlayer*													GetPlayer() const { return Player; }
+	inline FTransform*												GetPlayerTransform() const { return Player->GetTransform(); }
+	inline const FPos												GetPlayerPos() const {return Player->GetTransform()->GetPos(); }
 
 	//TODO const 여부
 	inline const std::vector<std::vector<int>>&						GetWorldMap() const { return WorldMap; }

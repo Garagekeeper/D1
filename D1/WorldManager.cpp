@@ -378,9 +378,9 @@ void WorldManager::HandleMainMenu()
 
 std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
 {
-	const int DirLen = 4;
-	int Dx[DirLen] = { 0, 1, 0, -1 };
-	int Dy[DirLen] = { 1, 0, -1, 0 };
+	const int DirLen = 8;
+	int Dx[DirLen] = { 0, 1, 0, -1,1,1,-1,-1 };
+	int Dy[DirLen] = { 1, 0, -1, 0,1,-1,1,-1 };
 	std::priority_queue<PQNode> Pq;
 	std::unordered_map<FIntPos, int> Best;
 	std::unordered_map<FIntPos, FIntPos> Parent;
@@ -415,17 +415,17 @@ std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int
 		for (int i = 0; i < DirLen; i++)
 		{
 			FIntPos NextPos = { CurrentPos.X + Dx[i], CurrentPos.Y + Dy[i] };
-			if (!CanGo(NextPos)) break;
+			if (!CanGo(NextPos)) continue;
 
 			// 휴리스틱 갱신
-			Huristic = GetSqrDist(DestPos, CurrentPos);
+			Huristic = GetSqrDist(DestPos, NextPos);
 
 			// 한번도 안온 경우 
 			if (Best[NextPos] == 0)
 				Best[NextPos] = INT32_MAX;
 
 			// 이미 이것보다 좋은 경로를 찾은 경우
-			if (Best[NextPos] < Huristic) continue;
+			if (Best[NextPos] <= Huristic) continue;
 
 			// 다음 좌표까지 최적값 기록
 			Best[NextPos] = Huristic;
@@ -487,7 +487,7 @@ bool WorldManager::CanGo(FIntPos NextPos)
 	if (Y < 0 || Y > mapHeight) return false;
 	if (WorldMap[Y][X] == static_cast<int>(Env::WALL)) return false;
 
-	return false;
+	return true;
 }
 
 

@@ -12,6 +12,9 @@ private:
 	const float		EnemyIdlePerCentage = 0.5f;
 	float			PatrolPercentage = EnemyPatrolPerCentage;
 	int				RewardScore = 10;
+	double			DetectRadius = 5.0;
+	double			AttackRange = 1.1;
+	int				FindDepth = 10;
 
 public:
 
@@ -27,7 +30,9 @@ public:
 	void			Update(WorldManager* World);
 	void			Rotate();
 	void			Move(WorldManager* World);
-	void			UpdateState();
+	void			UpdateState(WorldManager* World);
 	virtual void	GetDamage(int Amount, Creature* From) override;
+	bool			CheckPlayerInDetectRange(WorldManager* World);
+	bool			CheckPlayerInAttackRange(WorldManager* World);
 };
 
