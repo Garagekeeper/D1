@@ -5,7 +5,7 @@
 #include <iostream>
 
 const double PlayerMoveBaseSpeed = 5.0;
-const double EnemyMoveBaseSpeed = 3.0;
+const double EnemyMoveBaseSpeed = 1.0;
 const double RotationSpeed = 100.0;
 
 

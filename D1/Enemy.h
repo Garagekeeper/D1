@@ -15,7 +15,7 @@ private:
 	int								RewardScore = 10;
 	int								FindDepth = 10;
 	float							PatrolPercentage = EnemyPatrolPerCentage;
-	double							DetectRadius = 5.0;
+	double							DetectRadius = 3.0;
 	double							AttackRange = 1.1;
 	double							CurrentAttackDelay = AttackDelayMax;
 	bool							bCanAttack = true;

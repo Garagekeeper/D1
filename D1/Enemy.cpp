@@ -95,6 +95,19 @@ void FEnemy::Move(WorldManager* World)
 	}
 	else if (State == ECreatureState::MoveToTarget)
 	{
+		if (!CheckPlayerInDetectRange(World))
+		{
+			State = ECreatureState::Idle;
+			AmountTime = 0.0;
+			return;
+		}
+
+		if (CheckPlayerInAttackRange(World))
+		{
+			State = ECreatureState::Attack;
+			AmountTime = 0.0;
+			return;
+		}
 
 		FPos PlayerPos = World->GetPlayerPos();
 		//TODO 같은 셀일때 처리
