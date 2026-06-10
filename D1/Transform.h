@@ -1,5 +1,5 @@
 #pragma once
-
+#include <functional>
 enum class EDir
 {
 	Up,
@@ -15,10 +15,51 @@ struct FPos
 	float Y = 0;
 };
 
+struct FIntPos
+{
+	int X = 0;
+	int Y = 0;
+
+	bool operator==(const FIntPos& Others) const
+	{
+		return (X == Others.X) && (Y == Others.Y);
+	}
+
+	bool operator!=(const FIntPos& Others) const 
+	{
+		return !(*this == Others);
+	}
+
+	bool operator<(const FIntPos& others) const 
+	{
+		if (X == others.X)
+			return (Y < others.Y);
+
+		return (X < others.X);
+	}
+};
+
+namespace std
+{
+	template <>
+	struct hash<FIntPos>
+	{
+		size_t operator()(const FIntPos& pos) const noexcept
+		{
+			// X와 Y의 해시값을 섞어서 고유한 값을 만듭니다 (비트 연산 활용)
+			size_t h1 = hash<int>{}(pos.X);
+			size_t h2 = hash<int>{}(pos.Y);
+			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+		}
+	};
+}
+
+
 struct FVec
 {
 	double DirX = 0;
 	double DirY = -1;
+
 };
 
 struct FTransform

@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <unordered_map>
 
 #include "Player.h"
 #include "Enemy.h"
@@ -11,7 +12,7 @@ struct FRaycasterResult;
 
 struct PQNode
 {
-	FPos Pos = { 0, 0 };
+	FIntPos Pos = { 0, 0 };
 	int Huristic = 0;
 	int Depth = 0;
 
@@ -19,6 +20,7 @@ struct PQNode
 	{
 		return this->Huristic > others.Huristic;
 	}
+
 };
 
 
@@ -53,9 +55,9 @@ public:
 	void															UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target);
 	void															HandlePuaeMenu();
 	void															HandleMainMenu();
-	std::vector<FPos>												FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
-	std::vector<FPos>												CalcPath(std::map<FPos, FPos>& Parent, FPos DestPos);
-	bool															CanGo(FPos NextPos);
+	std::vector<FIntPos>											FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
+	std::vector<FIntPos>											CalcPath(std::unordered_map<FIntPos,FIntPos>& Parent, FIntPos DestPos);
+	bool															CanGo(FIntPos NextPos);
 
 	inline FPlayer*													GetPlayer() const { return Player; }
 

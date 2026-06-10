@@ -1,5 +1,5 @@
 #include <queue>
-#include <map>
+#include <unordered_map>
 
 #include "WorldManager.h"
 #include "Utils.h"
@@ -376,18 +376,18 @@ void WorldManager::HandleMainMenu()
 	MainMenuIndex = EMainMenu::StartGame;
 }
 
-std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
+std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
 {
 	const int DirLen = 4;
 	int Dx[DirLen] = { 0, 1, 0, -1 };
 	int Dy[DirLen] = { 1, 0, -1, 0 };
 	std::priority_queue<PQNode> Pq;
-	std::map<FPos, int> Best;
-	std::map<FPos, FPos> Parent;
+	std::unordered_map<FIntPos, int> Best;
+	std::unordered_map<FIntPos, FIntPos> Parent;
 
-	FPos CurrentPos = InStartPos;
-	FPos DestPos = InStartPos;
-	FPos ClosestCellPos = InStartPos;
+	FIntPos CurrentPos = { static_cast<int>(InStartPos.X), static_cast<int>(InStartPos.Y) };
+	FIntPos DestPos = { static_cast<int>(InDestPos.X), static_cast<int>(InDestPos.Y) };
+	FIntPos ClosestCellPos = { static_cast<int>(InStartPos.X), static_cast<int>(InStartPos.Y) };
 
 	// 현재 좌표에서 계산한 휴리스틱
 	int ClosetHuristic = GetSqrDist(DestPos, CurrentPos);
@@ -414,7 +414,7 @@ std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int In
 		if (Node.Depth > InMaxDepth) break;
 		for (int i = 0; i < DirLen; i++)
 		{
-			FPos NextPos = { CurrentPos.X + Dx[i], CurrentPos.Y + Dy[i] };
+			FIntPos NextPos = { CurrentPos.X + Dx[i], CurrentPos.Y + Dy[i] };
 			if (!CanGo(NextPos)) break;
 
 			// 휴리스틱 갱신
@@ -445,8 +445,8 @@ std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int In
 	}
 
 	// Dest의 부모가 기록되지 않았으면
-		// Depth 내에 Dest로 가는 경로를 찾지 못했으면
-	if (find(Parent.begin(), Parent.end(), DestPos) == Parent.end())
+	// Depth 내에 Dest로 가는 경로를 찾지 못했으면
+	if (Parent.find(DestPos) == Parent.end())
 	{
 		// 현재 경로들중 가장 huristic이 적인 곳을 목적지로 입력
 		DestPos = ClosestCellPos;
@@ -455,15 +455,15 @@ std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int In
 	return CalcPath(Parent, DestPos);
 }
 
-std::vector<FPos> WorldManager::CalcPath(std::map<FPos, FPos>& Parent, FPos DestPos)
+std::vector<FIntPos> WorldManager::CalcPath(std::unordered_map<FIntPos, FIntPos>& Parent, FIntPos DestPos)
 {
-	std::vector<FPos> Res;
-	std::vector<FPos> ReverseRes;
+	std::vector<FIntPos> Res;
+	std::vector<FIntPos> ReverseRes;
 
-	FPos Current = DestPos;
+	FIntPos Current = DestPos;
 	int Cnt = 0;
 	// 부모가 자기자신일 떄까지(시작 좌표까지)
-	while (Parent[Current].X != Current.X && Parent[Current].Y != Current.Y)
+	while (Parent[Current] != Current)
 	{
 		// 너무 긴 경로는 도중에 반환
 		if (Cnt++ > 500) break;
@@ -472,13 +472,13 @@ std::vector<FPos> WorldManager::CalcPath(std::map<FPos, FPos>& Parent, FPos Dest
 	}
 
 	Res.push_back(Current);
-	ReverseRes = std::vector<FPos>(Res.rbegin(), Res.rend());
+	ReverseRes = std::vector<FIntPos>(Res.rbegin(), Res.rend());
 
 
 	return ReverseRes;
 }
 
-bool WorldManager::CanGo(FPos NextPos)
+bool WorldManager::CanGo(FIntPos NextPos)
 {
 	int X = NextPos.X;
 	int Y = NextPos.Y;

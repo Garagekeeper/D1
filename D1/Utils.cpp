@@ -19,6 +19,11 @@ double GetSqrDist(FPos P1, FPos P2)
     return ((P2.X - P1.X) * (P2.X - P1.X)) + ((P2.Y - P1.Y) * (P2.Y - P1.Y));
 }
 
+int GetSqrDist(FIntPos P1, FIntPos P2)
+{
+    return ((P2.X - P1.X) * (P2.X - P1.X)) + ((P2.Y - P1.Y) * (P2.Y - P1.Y));
+}
+
 int GetRandInt(int Min, int Max)
 {
 	return rand() % (Max - Min + 1) + Min;
