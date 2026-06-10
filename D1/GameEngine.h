@@ -15,6 +15,7 @@ private:
 	Renderer*					SRenderer = nullptr;
 	Screen*						GScreen = nullptr;
 	EGameState					GameState = EGameState::BeforeGame;
+	double						AmountTime = 0.0;
 
 	double						deltaTime = 0.0;
 	bool						IsPause = false;
@@ -32,6 +33,7 @@ public:
 	void static					ClearEngine();
 	void static					StartEngine();
 	inline double				GetDeltaTime() const { return deltaTime; }
+	inline double				GetAmountTime() const { return AmountTime; }
 	inline InputManager*		GetInputManager() const { return SInputManager; }
 	inline WorldManager*		GetWorldManager() const { return SWorldManager; }
 	inline Renderer*			GetRenderer() const { return SRenderer; }

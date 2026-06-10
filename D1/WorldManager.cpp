@@ -121,7 +121,7 @@ void WorldManager::Init()
 	{
 		0,
 		0,
-		TargetHeight / (float)4,
+		TargetHeight / (float)2,
 		{
 			{
 				{

@@ -68,7 +68,7 @@ void GameEngine::GameRun()
 		SInputManager->ClearInput();
 		SInputManager->GetInput();
 		LoopByState();
-
+		AmountTime += deltaTime;
 	}
 }
 

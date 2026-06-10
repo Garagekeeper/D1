@@ -577,6 +577,12 @@ void Renderer::DrawInfo(const WorldManager* World)
 		<< L"| Score : " << Player->GetScore();
 
 	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 1);
+
+	Wss.clear();
+	Wss.str(L"");
+	Wss << GameEngine::GetInstance()->GetAmountTime();
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 2);
 }
 
 void Renderer::DrawPlayerHud(const WorldManager* World)
@@ -592,7 +598,7 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 
 	int SpriteHeight = WeponHudSprite->Height;
 	int SpriteWidth = WeponHudSprite->Width;
-	int PlayerState = static_cast<int>(World->GetPlayer()->GetState());
+	ECreatureState PlayerState = World->GetPlayer()->GetState();
 
 	int DrawStartY = GScreen->VerSize - SpriteHeight;
 	if (DrawStartY < 0) DrawStartY = 0;
@@ -625,7 +631,11 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 				if (texY < 0) texY = 0;
 				if (texY >= SpriteHeight) texY = SpriteHeight - 1;
 
-				wchar_t SpriteChar = WeponHudSprite->SpriteTexture[PlayerState][texY][texX];
+				int HudStateIndex = static_cast<int>(PlayerState);
+				if (PlayerState != ECreatureState::Attack)
+					HudStateIndex = static_cast<int>(ECreatureState::Idle);
+
+				wchar_t SpriteChar = WeponHudSprite->SpriteTexture[HudStateIndex][texY][texX];
 
 				//TODO 스케일 대응하기
 				/*GScreen.PrintChar(SpriteChar, Stripe, j);*/

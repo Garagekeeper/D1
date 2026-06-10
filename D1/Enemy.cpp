@@ -162,6 +162,9 @@ void FEnemy::Move(WorldManager* World)
 
 void FEnemy::UpdateState(WorldManager* World)
 {
+	if (!bCanAttack) CurrentAttackDelay -= GameEngine::GetInstance()->GetDeltaTime();
+	if (CurrentAttackDelay <= 0) bCanAttack = true;
+	PrevState = State;
 	
 	if (State == ECreatureState::Dead) return;
 	if (State == ECreatureState::OnAttacked)
@@ -278,7 +281,31 @@ void FEnemy::UpdateState(WorldManager* World)
 			return;
 		}
 	}
-	PrevState = State;
+	else if (State == ECreatureState::Attack)
+	{
+		if (!bCanAttack)
+		{
+			State = ECreatureState::Idle;
+			return;
+		}
+
+		if (PrevState != ECreatureState::Attack)
+			AmountTime = 0.0;
+
+		if (AmountTime >= AnimDelay)
+		{
+			AmountTime = 0.0;
+			bCanAttack = false;
+			CurrentAttackDelay = AttackDelayMax;
+			Attack(World->GetPlayer());
+			State = ECreatureState::Idle;
+		}
+		else
+		{
+			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
+		}
+	}
+
 }
 
 void FEnemy::GetDamage(int Amount, Creature* From)
