@@ -22,7 +22,7 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	DrawEnemy(World);
 	DrawInfo(World);
 	DrawPlayerHud(World);
-	DrawSceneBorder(World);
+	DrawBorder(World);
 	DrawMiniMap(World);
 }
 
@@ -577,10 +577,22 @@ void Renderer::DrawEnemy(const WorldManager* World)
 
 void Renderer::DrawInfo(const WorldManager* World)
 {
+
+	DrawGameStatus(World);
+	DrawPlayerStatus(World);
+}
+
+void Renderer::DrawGameStatus(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
 	wstringstream Wss;
 	// 소수점 아래 자리 고정
 	Wss.fixed;
 	Wss.precision(2);
+	int LeftTopX = 0;
+	int LeftTopY = 0;
+	int SceneRightBottomX = GScreen->SceneHorSize + 2;
+	int SceneRightBottomY = World->mapHeight + 2;
 
 	int FPS = static_cast<int>(1 / GameEngine::GetInstance()->GetDeltaTime());
 	wstring Wstr = to_wstring(FPS);
@@ -588,26 +600,67 @@ void Renderer::DrawInfo(const WorldManager* World)
 	FPlayer* Player = World->GetPlayer();
 
 	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
-		<< L"FPS : " << Wstr
-		<< L"| Pos (" << std::setw(2) << PlayerTransform->GetPos().X << L", " << std::setw(2) << PlayerTransform->GetPos().Y << L")"
-		<< L"| Theta : " << World->GetPlayer()->GetTheta() << L"°";
+		<< L"FPS : " << Wstr;
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 3);
 
-
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 1);
 	Wss.clear();
 	Wss.str(L"");
 	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
-		<< L"Hp   : " << Player->GetHp()
-		<< L"| Bullet: " << Player->GetBullet() << L" / " << Player->GetMaxBullet()
-		<< L"| Score : " << Player->GetScore();
+		<< L"Pos (" << std::setw(2) << PlayerTransform->GetPos().X << L", " << std::setw(2) << PlayerTransform->GetPos().Y << L")";
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 4);
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 2);
 
 	Wss.clear();
 	Wss.str(L"");
-	Wss << GameEngine::GetInstance()->GetAmountTime();
+	Wss << L"Theta : " << World->GetPlayer()->GetTheta() << L"°";;
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 3);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 5);
+
+	Wss.clear();
+	Wss.str(L"");
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"Score : " << Player->GetScore();
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 0);
+
+	Wss.clear();
+	Wss.str(L"");
+	Wss << "Time : "
+		<< GameEngine::GetInstance()->GetAmountTime();
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 1);
+}
+
+void Renderer::DrawPlayerStatus(const WorldManager* World)
+{
+
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int LeftTopX = 2;
+	int LeftTopY = GScreen->SceneVerSize + 2;
+	int VerIndex = (GScreen->TotalHorSize - 1) / 3;
+	int RightBottomX = LeftTopX + VerIndex - 2;
+	int RightBottomY = GScreen->TotalVerSize - 1;
+	wstringstream Wss;
+	FPlayer* Player = World->GetPlayer();
+
+	Wss.clear();
+	Wss.str(L"");
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"Hp   : ";
+	
+	int Cnt = Player->GetHp() / 5;
+
+	for (int i = 0; i < Cnt; i++)
+		Wss << L"■";
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), LeftTopX, (LeftTopY + RightBottomY)/2);
+
+	Wss.clear();
+	Wss.str(L"");
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"Bullet: " << Player->GetBullet() << L" / " << Player->GetMaxBullet();
+
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), LeftTopX + 2 * VerIndex, (LeftTopY + RightBottomY) / 2);
 }
 
 void Renderer::DrawPlayerHud(const WorldManager* World)
@@ -834,26 +887,55 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 	}
 }
 
-void Renderer::DrawSceneBorder(const WorldManager* World)
+void Renderer::DrawBorder(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
 	int LeftTopX = 0;
 	int LeftTopY = 0;
 	int SceneRightBottomX = GScreen->SceneHorSize + 1;
 	int SceneRightBottomY = GScreen->SceneVerSize + 1;
+
 	int TotalRightBottomX = GScreen->TotalHorSize;
 	int TotalRightBottomY = GScreen->TotalVerSize;
 
-	GScreen->PrintHor(L'━', LeftTopX, LeftTopY, SceneRightBottomX - LeftTopX, SCREEN_TEXT_COLOR_WHITE);
+	// Scene Border
+	GScreen->PrintHor(L'━', LeftTopX, LeftTopY, TotalRightBottomX - LeftTopX, SCREEN_TEXT_COLOR_WHITE);
 	GScreen->PrintVer(L'┃', SceneRightBottomX, LeftTopY, SceneRightBottomY - LeftTopY, SCREEN_TEXT_COLOR_WHITE);
 	GScreen->PrintHor(L'━', LeftTopX, SceneRightBottomY, SceneRightBottomX - LeftTopX, SCREEN_TEXT_COLOR_WHITE);
 	GScreen->PrintVer(L'┃', LeftTopX, LeftTopY, SceneRightBottomY - LeftTopY, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintVer(L'┃', TotalRightBottomX - 1, LeftTopY, TotalRightBottomY - LeftTopY, SCREEN_TEXT_COLOR_WHITE);
 
 	GScreen->PrintChar(L'┏', LeftTopX, LeftTopY);
-	GScreen->PrintChar(L'┓', SceneRightBottomX, LeftTopY);
+	GScreen->PrintChar(L'┳', SceneRightBottomX, LeftTopY);
+	GScreen->PrintChar(L'┠', LeftTopX, SceneRightBottomY);
+	GScreen->PrintChar(L'┻', SceneRightBottomX, SceneRightBottomY);
 
-	GScreen->PrintChar(L'┗', LeftTopX, SceneRightBottomY);
-	GScreen->PrintChar(L'┛', SceneRightBottomX, SceneRightBottomY);
+	GScreen->PrintChar(L'┓', TotalRightBottomX - 1, LeftTopY);
+
+	// PlayerStatusBorder
+	GScreen->PrintHor(L'━', LeftTopX, TotalRightBottomY - 1, TotalRightBottomX - LeftTopX + 1, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintHor(L'━', SceneRightBottomX + 1, SceneRightBottomY, TotalRightBottomX - SceneRightBottomX, SCREEN_TEXT_COLOR_WHITE);
+	
+	int VerticalIndexX = (TotalRightBottomX - 1) / 3;
+	GScreen->PrintVer(L'┃', VerticalIndexX * 0, SceneRightBottomY + 1, TotalRightBottomY - SceneRightBottomY, SCREEN_TEXT_COLOR_WHITE);
+
+	GScreen->PrintChar(L'┳', VerticalIndexX * 1, SceneRightBottomY);
+	GScreen->PrintVer(L'┃', VerticalIndexX * 1, SceneRightBottomY + 1, TotalRightBottomY - SceneRightBottomY, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintChar(L'┻', VerticalIndexX * 1, TotalRightBottomY-1);
+
+	GScreen->PrintChar(L'┳', VerticalIndexX * 2, SceneRightBottomY);
+	GScreen->PrintVer(L'┃', VerticalIndexX * 2, SceneRightBottomY + 1, TotalRightBottomY - SceneRightBottomY, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintChar(L'┻', VerticalIndexX * 2, TotalRightBottomY-1);
+	
+	GScreen->PrintVer(L'┃', TotalRightBottomX - 1, SceneRightBottomY + 1, TotalRightBottomY - SceneRightBottomY, SCREEN_TEXT_COLOR_WHITE);
+
+	GScreen->PrintChar(L'┗', LeftTopX, TotalRightBottomY-1);
+	GScreen->PrintChar(L'┛', TotalRightBottomX-1, TotalRightBottomY -1);
+	GScreen->PrintChar(L'┫', TotalRightBottomX-1, SceneRightBottomY);
+
+
+	
+
 
 }
 
@@ -865,6 +947,8 @@ void Renderer::DrawMiniMap(const WorldManager* World)
 	Theta = (Theta + 360) % 360;
 	int MiniMapLeftTopX = GScreen->SceneHorSize + 2;
 	int MiniMapLeftTopY = 0;
+	int pivotX = 0;
+	int pivotY = 1;
 
 
 	
@@ -883,7 +967,7 @@ void Renderer::DrawMiniMap(const WorldManager* World)
 				SpriteChar = L'█';
 
 			///GScreen->PrintChar(SpriteChar, j + MiniMapLeftTopX, i);
-			GScreen->PrintChar(SpriteChar, i + MiniMapLeftTopX, j );
+			GScreen->PrintChar(SpriteChar, i + MiniMapLeftTopX + pivotX, j + pivotY);
 		}
 	}
 	wchar_t SpriteChar = L'⮝';
@@ -905,5 +989,5 @@ void Renderer::DrawMiniMap(const WorldManager* World)
 		SpriteChar = L'⮜';
 	}
 
-	GScreen->PrintChar(SpriteChar, PlayerPos.X + MiniMapLeftTopX, PlayerPos.Y);
+	GScreen->PrintChar(SpriteChar, PlayerPos.X + MiniMapLeftTopX + pivotX, PlayerPos.Y + pivotY);
 }

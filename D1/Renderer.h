@@ -26,12 +26,14 @@ public:
 	void									DrawPlayer(const WorldManager* World);
 	void									DrawEnemy(const WorldManager* World);
 	void									DrawInfo(const WorldManager* World);
+	void									DrawGameStatus(const WorldManager* World);
+	void									DrawPlayerStatus(const WorldManager* World);
 	void									DrawPlayerHud(const WorldManager* World);
 	void									SortSprite(vector<int>* OrderVec, vector<double>* DistVec, int Amount);
 	void									DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 	void									DrawPauseMenu(const WorldManager* World);
 	void									DrawMainMenu(const WorldManager* World);
-	void									DrawSceneBorder(const WorldManager* World);
+	void									DrawBorder(const WorldManager* World);
 	void									DrawMiniMap(const WorldManager* World);
 };
 
