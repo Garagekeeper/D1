@@ -30,5 +30,6 @@ public:
 	void				DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, const int Attribute = SCREEN_TEXT_COLOR_WHITE);
 	void				DrawPauseMenu(const WorldManager* World);
 	void				DrawMainMenu(const WorldManager* World);
+	void				DrawSceneBorder(const WorldManager* World);
 };
 

@@ -10,11 +10,14 @@ const double RotationSpeed = 100.0;
 
 
 // 이 타겟들은 순수 노가다를 통해서 찾음
-const int TargetWidth = 138;
-const int TargetHeight = 34;
+const int TargetWidth = 162;
+const int TargetHeight = 45;
 
-const int TargetScreenWidth = 1280;
-const int TargetScreenHeight = 720;
+const int GameSceneWidth = 138;
+const int GameSceneHeight = 34;
+
+const int TargetScreenWidth = 1500;
+const int TargetScreenHeight = 900;
 
 
 const int SCREEN_TEXT_COLOR_WHITE = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;

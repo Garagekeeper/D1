@@ -200,8 +200,8 @@ void FPlayer::Move(const WorldManager* World)
 	// 콘솔 바운더리를 넘어가지는 못한다.
 	double MapMin = ColliderRadius;
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	double MapMaxX = GScreen->HorSize - 0.3;
-	double MapMaxY = GScreen->VerSize - 0.3;
+	double MapMaxX = GScreen->SceneHorSize - 0.3;
+	double MapMaxY = GScreen->SceneVerSize - 0.3;
 
 	if (PlayerPosX < ColliderRadius) PlayerPosX = ColliderRadius;
 	if (PlayerPosX > MapMaxX) PlayerPosX = MapMaxX;

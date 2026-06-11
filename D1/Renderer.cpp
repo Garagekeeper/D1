@@ -21,6 +21,7 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	DrawEnemy(World);
 	DrawInfo(World);
 	DrawPlayerHud(World);
+	DrawSceneBorder(World);
 }
 
 void Renderer::RenderGamePause(const WorldManager* World)
@@ -81,8 +82,8 @@ void Renderer::DrawFloor(const WorldManager* World)
 	float PlayerPosX = PlayerTransform->GetPos().X;
 	float PlayerPosY = PlayerTransform->GetPos().Y;
 
-	const int WIDTH = GScreen->HorSize;
-	const int HEIGHT = GScreen->VerSize;
+	const int WIDTH = GScreen->SceneHorSize;
+	const int HEIGHT = GScreen->SceneVerSize;
 
 	for (int Y = HEIGHT / 2 + 1; Y < HEIGHT; Y++)
 	{
@@ -153,7 +154,7 @@ void Renderer::DrawFloor(const WorldManager* World)
 			// 실제 출력할 좌표
 			int checkerBoard = (std::abs(CellX) + std::abs(CellY)) % 2;
 			wchar_t tileChar = (checkerBoard == 0) ? L'·' : L' ';
-			GScreen->PrintChar(tileChar, X, Y);
+			GScreen->PrintChar(tileChar, X+1, Y+1);
 
 			FloorX += FloorStepX;
 			FloorY += FloorStepY;
@@ -164,8 +165,8 @@ void Renderer::DrawFloor(const WorldManager* World)
 void Renderer::DrawWall(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	const int WIDTH = GScreen->HorSize;
-	const int HEIGHT = GScreen->VerSize;
+	const int WIDTH = GScreen->SceneHorSize;
+	const int HEIGHT = GScreen->SceneVerSize;
 
 	for (int X = 0; X < WIDTH; X++)
 	{
@@ -207,7 +208,7 @@ void Renderer::DrawWall(const WorldManager* World)
 		// 현재 X좌표에서 만난 벽까지의 거리
 		GScreen->Zbuffer[X] = PerpWallDist;
 		//DrawWallVer((OutSide == 1) ? L'\u2588' : L'\u2593', X, DrawStart, DrawEnd, Attribute);
-		DrawWallVer(WallChar, X, DrawStart, DrawEnd, Attribute);
+		DrawWallVer(WallChar, X + 1, DrawStart + 1, DrawEnd + 1, Attribute);
 	}
 }
 
@@ -414,8 +415,8 @@ void Renderer::DrawEnemy(const WorldManager* World)
 	float PlayerPosX = PlayerTransform->GetPos().X;
 	float PlayerPosY = PlayerTransform->GetPos().Y;
 
-	const int WIDTH = GScreen->HorSize;
-	const int HEIGHT = GScreen->VerSize;
+	const int WIDTH = GScreen->SceneHorSize;
+	const int HEIGHT = GScreen->SceneVerSize;
 	const vector<FEnemy*>* EnemyVec = World->GetEnemyVec();
 
 	vector<int>		EnemyOrder(EnemyVec->size());
@@ -456,7 +457,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		// 이 값은 -1 < X < 1인데 화면에는 음수 좌표계가 없으니까 +1
 		// 0 < x < 2 범위의 X를 0~130까지의 정수로 변환
 		// 스프라이트가 찍힐 X 좌표
-		int SpriteScrrenX = int((GScreen->HorSize / 2) * (1 + transformX / transformY));
+		int SpriteScrrenX = int((GScreen->SceneHorSize / 2) * (1 + transformX / transformY));
 
 		//--------------------------
 		//Scailing					|
@@ -476,21 +477,21 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		// 스프라이트의 높이
 		// 어안 렌즈 방지를 위해 실제 거리 말고 transformY 사용
 		// 스프라이트의 높이가 화면에 들어가 있을수록 작아짐( 플레이어로 부터 멀리 있을수록 작아짐)
-		int SpriteHeight = (int)(abs(int(GScreen->VerSize / transformY)) / vDiv);
+		int SpriteHeight = (int)(abs(int(GScreen->SceneVerSize / transformY)) / vDiv);
 		//세로 비율 조정
 
-		int DrawStartY = -SpriteHeight / 2 + GScreen->VerSize / 2 + vMoveScrren;
+		int DrawStartY = -SpriteHeight / 2 + GScreen->SceneVerSize / 2 + vMoveScrren;
 		if (DrawStartY < 0) DrawStartY = 0;
-		int DrawEndY = SpriteHeight / 2 + GScreen->VerSize / 2 + vMoveScrren;
-		if (DrawEndY >= GScreen->VerSize) DrawEndY = GScreen->VerSize - 1;
+		int DrawEndY = SpriteHeight / 2 + GScreen->SceneVerSize / 2 + vMoveScrren;
+		if (DrawEndY >= GScreen->SceneVerSize) DrawEndY = GScreen->SceneVerSize - 1;
 
 		// 스프라이트의 너비
-		int SpriteWidth = (int)(abs(int(GScreen->VerSize / transformY)) / uDiv);
+		int SpriteWidth = (int)(abs(int(GScreen->SceneVerSize / transformY)) / uDiv);
 
 		int DrawStartX = -SpriteWidth / 2 + SpriteScrrenX;
 		if (DrawStartX < 0) DrawStartX = 0;
 		int DrawEndX = SpriteWidth / 2 + SpriteScrrenX;
-		if (DrawEndX >= GScreen->HorSize) DrawEndX = GScreen->HorSize;
+		if (DrawEndX >= GScreen->SceneHorSize) DrawEndX = GScreen->SceneHorSize;
 
 		for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
 		{
@@ -508,10 +509,10 @@ void Renderer::DrawEnemy(const WorldManager* World)
 				// 1. transformY이 0이하면 화면의 뒤쪽
 				// 2. i가 화면에 있는지
 				// 3. 벽보다 가까이 있는지
-				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen->HorSize && transformY < GScreen->Zbuffer[Stripe])
+				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen->SceneHorSize && transformY < GScreen->Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
-					int d = (j - vMoveScrren) * 256 - GScreen->VerSize * 128 + SpriteHeight * 128;
+					int d = (j - vMoveScrren) * 256 - GScreen->SceneVerSize * 128 + SpriteHeight * 128;
 					int texY = ((d * (CurrentSprite->Width)) / SpriteHeight) / 256;
 
 					// 경계 안으로 들어 오도록
@@ -557,7 +558,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					{
 						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
 						// 예시: GScreen.Buffer[j][i] = spriteChar;
-						GScreen->PrintChar(SpriteChar, Stripe, j);
+						GScreen->PrintChar(SpriteChar, Stripe+1, j+1);
 					}
 				}
 			}
@@ -583,7 +584,7 @@ void Renderer::DrawInfo(const WorldManager* World)
 		<< L"| Theta : " << World->GetPlayer()->GetTheta() << L"°";
 
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 0);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 1);
 	Wss.clear();
 	Wss.str(L"");
 	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
@@ -591,13 +592,13 @@ void Renderer::DrawInfo(const WorldManager* World)
 		<< L"| Bullet: " << Player->GetBullet() << L" / " << Player->GetMaxBullet()
 		<< L"| Score : " << Player->GetScore();
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 1);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 2);
 
 	Wss.clear();
 	Wss.str(L"");
 	Wss << GameEngine::GetInstance()->GetAmountTime();
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 0, 2);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), 1, 3);
 }
 
 void Renderer::DrawPlayerHud(const WorldManager* World)
@@ -615,14 +616,14 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 	int SpriteWidth = WeponHudSprite->Width;
 	ECreatureState PlayerState = World->GetPlayer()->GetState();
 
-	int DrawStartY = GScreen->VerSize - SpriteHeight;
+	int DrawStartY = GScreen->SceneVerSize - SpriteHeight;
 	if (DrawStartY < 0) DrawStartY = 0;
-	int DrawEndY = GScreen->VerSize;
+	int DrawEndY = GScreen->SceneVerSize;
 
-	int DrawStartX = GScreen->HorSize / 2 - SpriteWidth / 2;
+	int DrawStartX = GScreen->SceneHorSize / 2 - SpriteWidth / 2;
 	if (DrawStartX < 0) DrawStartX = 0;
-	int DrawEndX = GScreen->HorSize / 2 + SpriteWidth / 2;
-	if (DrawEndX >= GScreen->HorSize) DrawEndX = GScreen->HorSize;
+	int DrawEndX = GScreen->SceneHorSize / 2 + SpriteWidth / 2;
+	if (DrawEndX >= GScreen->SceneHorSize) DrawEndX = GScreen->SceneHorSize;
 
 	for (int Stripe = DrawStartX; Stripe < DrawEndX; Stripe++)
 	{
@@ -630,16 +631,16 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 		{
 			// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
 			// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
-			int texX = (Stripe + SpriteWidth / 2 - GScreen->HorSize / 2);
+			int texX = (Stripe + SpriteWidth / 2 - GScreen->SceneHorSize / 2);
 
 			// 경계 안으로 들어 오도록
 			if (texX < 0) texX = 0;
 			if (texX >= SpriteWidth) texX = SpriteWidth;
 
 			// 2. i가 화면에 있는지
-			if (Stripe >= 0 && Stripe < GScreen->HorSize)
+			if (Stripe >= 0 && Stripe < GScreen->SceneHorSize)
 			{
-				int d = (j + (SpriteHeight - GScreen->VerSize));
+				int d = (j + (SpriteHeight - GScreen->SceneVerSize));
 				int texY = d;
 
 				// 경계 안으로 들어 오도록
@@ -660,7 +661,7 @@ void Renderer::DrawPlayerHud(const WorldManager* World)
 				{
 					// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
 					// 예시: GScreen.Buffer[j][i] = spriteChar;
-					GScreen->PrintChar(SpriteChar, Stripe, j);
+					GScreen->PrintChar(SpriteChar, Stripe+1, j+1);
 				}
 			}
 		}
@@ -693,13 +694,13 @@ void Renderer::DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, con
 void Renderer::DrawPauseMenu(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	int DrawStartX = GScreen->HorSize / 6;
+	int DrawStartX = GScreen->TotalHorSize / 6;
 	int DrawEndX = DrawStartX * 5;
-	int DrawStartY = GScreen->VerSize /5;
+	int DrawStartY = GScreen->TotalVerSize /5;
 	int DrawEndY = DrawStartY * 5;
 
-	int ResumeY = GScreen->VerSize/2;
-	int ResumeX = GScreen->HorSize/2;
+	int ResumeY = GScreen->TotalVerSize /2;
+	int ResumeX = GScreen->TotalHorSize /2;
 	int ExitY = ResumeY + 2;
 	int ExitX = ResumeX;
 
@@ -759,16 +760,18 @@ void Renderer::DrawPauseMenu(const WorldManager* World)
 void Renderer::DrawMainMenu(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	int DrawStartX = GScreen->HorSize / 6;
-	int DrawEndX = DrawStartX * 5;
-	int DrawStartY = GScreen->VerSize / 5;
-	int DrawEndY = DrawStartY * 5;
+	int DrawStartX = GScreen->TotalHorSize / 5;
+	int DrawEndX = DrawStartX * 4;
+	int DrawStartY = GScreen->TotalVerSize / 5;
+	int DrawEndY = DrawStartY * 4;
 
-	int ResumeY = GScreen->VerSize / 2;
-	int ResumeX = GScreen->HorSize / 2;
+	int ResumeY = GScreen->TotalVerSize / 2;
+	int ResumeX = GScreen->TotalHorSize / 2;
 	int ExitY = ResumeY + 2;
 	int ExitX = ResumeX;
 
+
+	// 0 30 60 90 120 150
 	const int ArrowSpace = 5;
 
 	// Draw OutLine
@@ -820,4 +823,27 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 			GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
 			break;
 	}
+}
+
+void Renderer::DrawSceneBorder(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int LeftTopX = 0;
+	int LeftTopY = 0;
+	int SceneRightBottomX = GScreen->SceneHorSize + 1;
+	int SceneRightBottomY = GScreen->SceneVerSize + 1;
+	int TotalRightBottomX = GScreen->TotalHorSize;
+	int TotalRightBottomY = GScreen->TotalVerSize;
+
+	GScreen->PrintHor(L'━', LeftTopX, LeftTopY, SceneRightBottomX - LeftTopX, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintVer(L'┃', SceneRightBottomX, LeftTopY, SceneRightBottomY - LeftTopY, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintHor(L'━', LeftTopX, SceneRightBottomY, SceneRightBottomX - LeftTopX, SCREEN_TEXT_COLOR_WHITE);
+	GScreen->PrintVer(L'┃', LeftTopX, LeftTopY, SceneRightBottomY - LeftTopY, SCREEN_TEXT_COLOR_WHITE);
+
+	GScreen->PrintChar(L'┏', LeftTopX, LeftTopY);
+	GScreen->PrintChar(L'┓', SceneRightBottomX, LeftTopY);
+
+	GScreen->PrintChar(L'┗', LeftTopX, SceneRightBottomY);
+	GScreen->PrintChar(L'┛', SceneRightBottomX, SceneRightBottomY);
+
 }

@@ -35,8 +35,10 @@ bool Screen::Init()
 
 		COORD bSize = { static_cast<SHORT>(TargetWidth), static_cast<SHORT>(TargetHeight) };
 		SetConsoleScreenBufferSize(ConsoleHandle, bSize);
-		HorSize = TargetWidth;
-		VerSize = TargetHeight;
+		TotalHorSize = TargetWidth;
+		TotalVerSize = TargetHeight;
+		SceneHorSize = GameSceneWidth;
+		SceneVerSize = GameSceneHeight;
 
 		//폰트 변경(적용 안됨)
 		//CONSOLE_FONT_INFO fontInfo = { 0, {0,0} };
@@ -85,10 +87,10 @@ bool Screen::Init()
 	
 	}
 
-	CharInfoBuffer = new CHAR_INFO[HorSize * VerSize];
+	CharInfoBuffer = new CHAR_INFO[TotalHorSize * TotalVerSize];
 
 
-	Zbuffer = vector<double>(HorSize);
+	Zbuffer = vector<double>(SceneHorSize);
 	ClearScreen();
 
 	return true;
@@ -103,13 +105,13 @@ void Screen::PrintString(const wstring& str, const int x, const int y, const int
 void Screen::PrintChar(const wchar_t ch, const int X, const int Y, const int Attributes)
 {
 	// 버퍼의 크기를 벗어나면 버퍼에 쓰지 않는다.
-	if (X >= 0 && X < HorSize
-		&& Y >= 0 && Y < VerSize)
+	if (X >= 0 && X < TotalHorSize
+		&& Y >= 0 && Y < TotalVerSize)
 	{
 		// 스크린버퍼에 쓰는게 아니라 내부 버퍼의 기록
 		//InnerBuffer[Y * HorSize + X ] = ch;
-		CharInfoBuffer[Y * HorSize + X].Char.UnicodeChar = ch;
-		CharInfoBuffer[Y * HorSize + X].Attributes = Attributes;
+		CharInfoBuffer[Y * TotalHorSize + X].Char.UnicodeChar = ch;
+		CharInfoBuffer[Y * TotalHorSize + X].Attributes = Attributes;
 	}
 }
 
@@ -131,9 +133,9 @@ void Screen::PrintVer(const wchar_t ch, const int x, const int y, const int leng
 bool Screen::ChangeScreenBuffer()
 {
 	DWORD dwWritenByte = 0;
-	COORD BufferSize = { static_cast<SHORT>(HorSize), static_cast<SHORT>(VerSize) };
+	COORD BufferSize = { static_cast<SHORT>(TotalHorSize), static_cast<SHORT>(TotalVerSize) };
 	COORD BufferCoord = { 0, 0 };
-	SMALL_RECT WriteRegion = { 0, 0, static_cast<SHORT>(HorSize - 1), static_cast<SHORT>(VerSize - 1) };
+	SMALL_RECT WriteRegion = { 0, 0, static_cast<SHORT>(TotalHorSize - 1), static_cast<SHORT>(TotalVerSize - 1) };
 
 	WriteConsoleOutputW(
 		ScreenBuffer[CurrentScreenBufferIndex],
@@ -156,14 +158,14 @@ void Screen::ClearScreen()
 {
 	// 다음 프레임에 쓸 버퍼를 초기화한다.
 	// 공백문자로 채워서 초기화
-	for (int i = 0; i < HorSize * VerSize; i++)
+	for (int i = 0; i < TotalHorSize * TotalVerSize; i++)
 	{
 		CharInfoBuffer[i].Char.UnicodeChar = ' ';
 		CharInfoBuffer[i].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
 	}
 
 	// Z버퍼 초기화
-	for (int i = 0; i < HorSize; i++)
+	for (int i = 0; i < SceneHorSize; i++)
 		Zbuffer[i] = 0.0;
 }
 

@@ -15,8 +15,10 @@ public :
 	int CurrentScreenBufferIndex;
 	// 버퍼의 크기를 가져오기위한 info
 	CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
-	int HorSize;
-	int VerSize;
+	int TotalHorSize;
+	int TotalVerSize;
+	int SceneHorSize;
+	int SceneVerSize;
 	CHAR_INFO* CharInfoBuffer;
 	vector<double> Zbuffer;
 
@@ -26,8 +28,10 @@ public:
 		ScreenBuffer{ nullptr, nullptr },
 		CurrentScreenBufferIndex(0),
 		BufferInfo{},
-		HorSize(0),
-		VerSize(0),
+		TotalHorSize(0),
+		TotalVerSize(0),
+		SceneHorSize(0),
+		SceneVerSize(0),
 		CharInfoBuffer(nullptr)
 	{}
 

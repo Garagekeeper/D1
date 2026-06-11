@@ -6,8 +6,8 @@ FRaycasterResult DDA(const int X, ERayCastLayer TargetLayer, const WorldManager*
 	FRaycasterResult Res;
 
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	const int WIDTH = GScreen->HorSize;
-	const int HEIGHT = GScreen->VerSize;
+	const int WIDTH = GScreen->SceneHorSize;
+	const int HEIGHT = GScreen->SceneVerSize;
 	/*
 	y
 		\	     /

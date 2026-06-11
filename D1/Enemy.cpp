@@ -76,8 +76,8 @@ void FEnemy::Move(WorldManager* World)
 		// 콘솔 바운더리를 넘어가지는 못한다.
 		double MapMin = ColliderRadius;
 		Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-		double MapMaxX = GScreen->HorSize - ColliderRadius;
-		double MapMaxY = GScreen->VerSize - ColliderRadius;
+		double MapMaxX = GScreen->SceneHorSize - ColliderRadius;
+		double MapMaxY = GScreen->SceneVerSize - ColliderRadius;
 
 		if (Pos.X < ColliderRadius || Pos.X > MapMaxX || Pos.Y < ColliderRadius || Pos.Y > MapMaxY)
 		{
@@ -155,8 +155,8 @@ void FEnemy::Move(WorldManager* World)
 		// 콘솔 바운더리를 넘어가지는 못한다.
 		double MapMin = ColliderRadius;
 		Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-		double MapMaxX = GScreen->HorSize - ColliderRadius;
-		double MapMaxY = GScreen->VerSize - ColliderRadius;
+		double MapMaxX = GScreen->SceneHorSize - ColliderRadius;
+		double MapMaxY = GScreen->SceneVerSize - ColliderRadius;
 
 		if (Pos.X < ColliderRadius || Pos.X > MapMaxX || Pos.Y < ColliderRadius || Pos.Y > MapMaxY)
 		{
