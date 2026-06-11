@@ -18,10 +18,14 @@ void Renderer::Init(const WorldManager* World)
 void Renderer::RenderGamePlay(const WorldManager* World)
 {
 	ClearScreen();
+	// INScene
 	Draw3DGrid(World);
 	DrawEnemy(World);
-	DrawInfo(World);
 	DrawPlayerHud(World);
+	DrawOnAtackEffect(World);
+
+	// OutScene
+	DrawInfo(World);
 	DrawBorder(World);
 	DrawMiniMap(World);
 }
@@ -990,4 +994,26 @@ void Renderer::DrawMiniMap(const WorldManager* World)
 	}
 
 	GScreen->PrintChar(SpriteChar, PlayerPos.X + MiniMapLeftTopX + pivotX, PlayerPos.Y + pivotY);
+}
+
+void Renderer::DrawOnAtackEffect(const WorldManager* World)
+{
+	FPlayer* Player = World->GetPlayer();
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	if (Player->GetbBlink())
+	{
+		for (int i = 0; i <= GScreen->SceneHorSize; i++)
+		{
+			for (int j = 0; j <= GScreen->SceneVerSize; j++)
+			{
+				// 픽셀을 띄엄띄엄 칠해서 반투명처럼... (픽셀이 부족해서 실패)
+				if ((j % 2 == 0 && i % 2 != 0) || (j % 2 != 0 && i % 2 == 0))
+					GScreen->PrintChar(L'░', i, j, BACKGROUND_RED | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
+				// 그냥 화면 덮어버리기
+				//GScreen->PrintChar(L'░', i, j, BACKGROUND_RED | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+			}
+		}
+	}
+
 }

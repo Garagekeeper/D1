@@ -8,6 +8,9 @@ class FPlayer : public Creature
 private:
 	const int		BulletMax = 6;
 	int				CurrentBullet = BulletMax;
+	double			BlinkDurationMax = 0.2;
+	bool			bBlink = false;
+	double			CurrenBlinkDuration = BlinkDurationMax;
 public:
 								//constructor
 					FPlayer(FCreatureBaseStat _Stat, FTransform _Transform, FSprite _Sprites)
@@ -20,6 +23,7 @@ public:
 	void			Move(const WorldManager* World);
 	void			UpdateState();
 	void			UpdateStateBehavior(const WorldManager* World);
+	inline bool		GetbBlink() const { return bBlink; }
 	virtual void	Attack(Creature* Target) override;
 	inline int		GetBullet() { return CurrentBullet; }
 	inline int		GetMaxBullet() { return BulletMax; }

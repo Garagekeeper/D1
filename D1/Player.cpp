@@ -217,6 +217,17 @@ void FPlayer::UpdateState()
 	PrevState = State;
 	double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
 	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
+
+	if (bBlink)
+	{
+		CurrenBlinkDuration -= DeltaTime;
+		if (CurrenBlinkDuration <= 0)
+		{
+			CurrenBlinkDuration = BlinkDurationMax;
+			bBlink = false;
+		}
+	}
+
 	if (KeyState.KEYSpaceDown && GetState() == ECreatureState::Idle && CurrentBullet > 0)
 	{
 		SetState(ECreatureState::Attack);
@@ -238,6 +249,7 @@ void FPlayer::UpdateState()
 	else if (State == ECreatureState::OnAttacked)
 	{
 		State = ECreatureState::Idle;
+		bBlink = true;
 	}
 
 	if (KeyState.KEYR)

@@ -35,5 +35,6 @@ public:
 	void									DrawMainMenu(const WorldManager* World);
 	void									DrawBorder(const WorldManager* World);
 	void									DrawMiniMap(const WorldManager* World);
+	void									DrawOnAtackEffect(const WorldManager* World);
 };
 

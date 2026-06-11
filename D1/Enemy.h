@@ -20,6 +20,7 @@ private:
 	double							CurrentAttackDelay = AttackDelayMax;
 	bool							bCanAttack = true;
 	bool							bApplyDamege = false;
+	//TODO Creature로 올리기
 	bool							bBlink = false;
 	double							CurrenBlinkDuration = BlinkDurationMax;
 	ECreatureSpriteIndex			SpriteIndex = ECreatureSpriteIndex::Idle;
