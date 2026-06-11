@@ -9,9 +9,10 @@
 #include "Raycaster.h"
 #include "Utils.h"
 
-void Renderer::Init()
+void Renderer::Init(const WorldManager* World)
 {
 
+	MiniMap = std::vector<std::vector<bool>>(World->mapHeight, std::vector<bool>(World->mapWidth, false));
 }
 
 void Renderer::RenderGamePlay(const WorldManager* World)
@@ -22,6 +23,7 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	DrawInfo(World);
 	DrawPlayerHud(World);
 	DrawSceneBorder(World);
+	DrawMiniMap(World);
 }
 
 void Renderer::RenderGamePause(const WorldManager* World)
@@ -172,6 +174,13 @@ void Renderer::DrawWall(const WorldManager* World)
 	{
 		int OutSide = 0;
 		FRaycasterResult DDARes = DDA(X, ERayCastLayer::WALL, World);
+		if (DDARes.bHit)
+		{
+			if (GetSqrDist(World->GetPlayerPos(), DDARes.MapPos) < SightRange * SightRange)
+			{
+				MiniMap[static_cast<int>(DDARes.MapPos.X)][static_cast<int>(DDARes.MapPos.Y)] = true;
+			}
+		}
 		double PerpWallDist = DDARes.PerpDist;
 
 		// 화면에 그릴 높이 계산 (가까우면 길게)
@@ -694,10 +703,10 @@ void Renderer::DrawWallVer(wchar_t Wchar, int X, int DrawStart, int DrawEnd, con
 void Renderer::DrawPauseMenu(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	int DrawStartX = GScreen->TotalHorSize / 6;
-	int DrawEndX = DrawStartX * 5;
+	int DrawStartX = GScreen->TotalHorSize / 5;
+	int DrawEndX = DrawStartX * 4;
 	int DrawStartY = GScreen->TotalVerSize /5;
-	int DrawEndY = DrawStartY * 5;
+	int DrawEndY = DrawStartY * 4;
 
 	int ResumeY = GScreen->TotalVerSize /2;
 	int ResumeX = GScreen->TotalHorSize /2;
@@ -846,4 +855,55 @@ void Renderer::DrawSceneBorder(const WorldManager* World)
 	GScreen->PrintChar(L'┗', LeftTopX, SceneRightBottomY);
 	GScreen->PrintChar(L'┛', SceneRightBottomX, SceneRightBottomY);
 
+}
+
+void Renderer::DrawMiniMap(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	FPos PlayerPos = World->GetPlayerPos();
+	int Theta = static_cast<int>(World->GetPlayer()->GetTheta()) % 360;
+	Theta = (Theta + 360) % 360;
+	int MiniMapLeftTopX = GScreen->SceneHorSize + 2;
+	int MiniMapLeftTopY = 0;
+
+
+	
+	for (int i = 0; i < World->mapWidth; i++)
+	{
+		for (int j = 0; j < World->mapHeight; j++)
+		{
+			wchar_t SpriteChar = L' ';
+			if (MiniMap[i][j] == true)
+				SpriteChar = L'█';
+
+			if (i == 0 || j == 0)
+				SpriteChar = L'█';
+
+			if (i == World->mapWidth -1 || j == World->mapHeight-1 )
+				SpriteChar = L'█';
+
+			///GScreen->PrintChar(SpriteChar, j + MiniMapLeftTopX, i);
+			GScreen->PrintChar(SpriteChar, i + MiniMapLeftTopX, j );
+		}
+	}
+	wchar_t SpriteChar = L'⮝';
+
+	if (0 <= Theta && Theta < 45)
+	{
+		SpriteChar = L'⮝';
+	}
+	else if (45 <= Theta && Theta < 135)
+	{
+		SpriteChar = L'⮞';
+	}
+	else if (135 <= Theta && Theta < 225)
+	{
+		SpriteChar = L'⮟';
+	}
+	else if (225 <= Theta && Theta <= 315)
+	{
+		SpriteChar = L'⮜';
+	}
+
+	GScreen->PrintChar(SpriteChar, PlayerPos.X + MiniMapLeftTopX, PlayerPos.Y);
 }

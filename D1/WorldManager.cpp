@@ -341,7 +341,7 @@ void WorldManager::HandlePuaeMenu()
 		case EPauseMenu::EPauseMenuLen:
 			break;
 		case EPauseMenu::Resume:
-			GameEngine::GetInstance()->SetIsPuase(false);
+			GameEngine::GetInstance()->SetGameState(EGameState::InGame);
 			break;
 		case EPauseMenu::Exit:
 			GameEngine::GetInstance()->SetIsExit(true);

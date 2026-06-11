@@ -10,13 +10,13 @@ const double RotationSpeed = 100.0;
 
 
 // 이 타겟들은 순수 노가다를 통해서 찾음
-const int TargetWidth = 162;
+const int TargetWidth = 165;
 const int TargetHeight = 45;
 
 const int GameSceneWidth = 138;
 const int GameSceneHeight = 34;
 
-const int TargetScreenWidth = 1500;
+const int TargetScreenWidth = 1550;
 const int TargetScreenHeight = 900;
 
 
@@ -29,6 +29,8 @@ const double PHI = 3.14159265358979323846;
 
 const double AnimBlinkSpeed = 10.0;
 const int BlinkFrequency = 2;
+
+const double SightRange = 5;
 
 struct FKeyState
 {
