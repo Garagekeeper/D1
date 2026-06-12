@@ -177,6 +177,7 @@ void FEnemy::Move(WorldManager* World)
 void FEnemy::UpdateState(WorldManager* World)
 {
 	double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
+	ECreatureState CurrState = GetState();
 	if (bBlink)
 	{
 		CurrenBlinkDuration -= DeltaTime;
@@ -190,51 +191,59 @@ void FEnemy::UpdateState(WorldManager* World)
 	if (CurrentAttackDelay <= 0) bCanAttack = true;
 	PrevState = State;
 
-	if (State == ECreatureState::Dead)
+	if (CurrState == ECreatureState::Dead)
 	{
 		SpriteIndex = ECreatureSpriteIndex::Dead;
 		return;
 	}
-	if (State == ECreatureState::OnAttacked)
+	if (CurrState == ECreatureState::OnDead)
 	{
-		SpriteIndex = ECreatureSpriteIndex::OnAttacked;
-		bBlink = true;
 
-		if (PrevState != ECreatureState::OnAttacked)
-			AmountTime = 0.0;
+		SpriteIndex = ECreatureSpriteIndex::Dead;
 
-		if (AmountTime >= AnimDelay)
+		//TODO 하드코딩 고치기
+		if (AmountTime >= 0.5)
 		{
-			AmountTime = 0.0;
-			State = ECreatureState::Idle;
+			SetState(ECreatureState::Dead);
 		}
 		else
 		{
 			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
-	else if (State == ECreatureState::Idle)
+	else if (CurrState == ECreatureState::OnAttacked)
+	{
+		SpriteIndex = ECreatureSpriteIndex::OnAttacked;
+		bBlink = true;
+
+		if (AmountTime >= AnimDelay)
+		{
+			SetState(ECreatureState::Idle);
+		}
+		else
+		{
+			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
+		}
+	}
+	else if (CurrState == ECreatureState::Idle)
 	{
 		SpriteIndex = ECreatureSpriteIndex::Idle;
 
 		if (CheckPlayerInAttackRange(World))
 		{
-			State = ECreatureState::Attack;
-			AmountTime = 0.0;
+			SetState(ECreatureState::Attack);
 			return;
 		}
 
 		if (CheckPlayerInDetectRange(World))
 		{
-			State = ECreatureState::MoveToTarget;
-			AmountTime = 0.0;
+			SetState(ECreatureState::MoveToTarget);
 			return;
 		}
 
 		// TODO 하드 코딩 고치기
 		if (AmountTime >= 1)
 		{
-			AmountTime = 0.0;
 			// 패트롤 상태가 되면 패트롤 할 방향 정하기
 			if (GetRandRange() < EnemyPatrolPerCentage)
 			{
@@ -272,7 +281,7 @@ void FEnemy::UpdateState(WorldManager* World)
 				FVec NextPlayerDIr = { NextDirX, NextDirY };
 				RotateTo(NextPlayerDIr, FinalTheta);
 
-				State = ECreatureState::Patrol;
+				SetState(ECreatureState::Patrol);
 			}
 		}
 		else
@@ -281,30 +290,26 @@ void FEnemy::UpdateState(WorldManager* World)
 		}
 
 	}
-	else if (State == ECreatureState::Patrol)
+	else if (CurrState == ECreatureState::Patrol)
 	{
 		SpriteIndex = ECreatureSpriteIndex::OnAttacked;
 		if (CheckPlayerInAttackRange(World))
 		{
-			State = ECreatureState::Attack;
-			AmountTime = 0.0;
+			SetState(ECreatureState::Attack);
 			return;
 		}
 
 		if (CheckPlayerInDetectRange(World))
 		{
-			State = ECreatureState::MoveToTarget;
-			AmountTime = 0.0;
+			SetState(ECreatureState::MoveToTarget);
 			return;
 		}
 
 		if (AmountTime > 1)
 		{
-			AmountTime = 0.0;
 			if (GetRandRange() < EnemyIdlePerCentage)
 			{
-				State = ECreatureState::Idle;
-				AmountTime = 0.0;
+				SetState(ECreatureState::Idle);
 			}
 		}
 		else
@@ -312,28 +317,25 @@ void FEnemy::UpdateState(WorldManager* World)
 			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
-	else if (State == ECreatureState::MoveToTarget)
+	else if (CurrState == ECreatureState::MoveToTarget)
 	{
 		SpriteIndex = ECreatureSpriteIndex::Idle;
 		if (CheckPlayerInAttackRange(World))
 		{
-			State = ECreatureState::Attack;
-			AmountTime = 0.0;
+			SetState(ECreatureState::Attack);
 			return;
 		}
 	}
-	else if (State == ECreatureState::Attack)
+	else if (CurrState == ECreatureState::Attack)
 	{
 		SpriteIndex = ECreatureSpriteIndex::OnAttacked;
 		if (!bCanAttack)
 		{
-			State = ECreatureState::Idle;
-			AmountTime = 0.0;
+			SetState(ECreatureState::Idle);
 			return;
 		}
 
 		if (PrevState != ECreatureState::Attack)
-			AmountTime = 0.0;
 
 		if (AmountTime < 1 * 0.5)
 		{
@@ -351,7 +353,6 @@ void FEnemy::UpdateState(WorldManager* World)
 
 		if (AmountTime >= 1)
 		{
-			AmountTime = 0.0;
 			bCanAttack = false;
 			bApplyDamege = false;
 			CurrentAttackDelay = AttackDelayMax;

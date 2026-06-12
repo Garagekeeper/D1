@@ -1,11 +1,12 @@
 #include "Sprite.h"
 
-FSprite::FSprite(double X, double Y, double VMove, std::vector<std::vector<std::wstring>> SpriteTexture)
+FSprite::FSprite(double InX, double InY, double InVMove, int InBaseAttribute, std::vector<std::vector<std::wstring>> InSpriteTexture)
 {
-	this->X = X;
-	this->Y = Y;
-	this->VMove = VMove;
-	this->SpriteTexture = SpriteTexture;
+	X = InX;
+	Y = InY;
+	VMove = InVMove;
+	BaseAttribute = InBaseAttribute;
+	SpriteTexture = InSpriteTexture;
 	Width = static_cast<int>(SpriteTexture[0][0].length());
 	Height = static_cast<int>(SpriteTexture[0].size());
 }

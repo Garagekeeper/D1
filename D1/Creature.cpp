@@ -42,16 +42,19 @@ void Creature::Attack(Creature* Target)
 
 void Creature::OnAttacked(Creature* From)
 {
-	// TODO 무적등 상태 적용
-	// TODO 데미지 계산을 여기서 할지 게임 시스템에서 할지 결정
-	State = ECreatureState::OnAttacked;
-	GetDamage(From->GetAttackDamage(), From);
+	// 죽음과 관련한 상태가 아닐때만 데미지 적용
+	ECreatureState CurrState = GetState();
+	if (CurrState != ECreatureState::OnDead && CurrState != ECreatureState::Dead)
+	{
+		SetState(ECreatureState::OnAttacked);
+		GetDamage(From->GetAttackDamage(), From);
+	}
 }
 
 //TODO Ondead 구현
 void Creature::OnDead()
 {
-	State = ECreatureState::Dead;
+	SetState(ECreatureState::OnDead);
 }
 
 

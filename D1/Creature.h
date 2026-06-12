@@ -12,7 +12,8 @@ struct FCreatureBaseStat
 	int						MaxHp			= 100;
 };
 
-// Move?
+// State변경시 반드시 SetState를 사용할 것
+// State확인시 반드시 GetState를 사용할 것
 enum class ECreatureState
 {
 	Idle = 0,
@@ -30,8 +31,8 @@ enum class ECreatureSpriteIndex
 	Idle = 0,
 	AttackStart = 1,
 	AttackEnd,
-	OnAttacked,
 	Dead,
+	OnAttacked,
 };
 
 class Creature : public PObject
@@ -63,7 +64,7 @@ public:
 	virtual void			OnDead();
 
 	inline ECreatureState	GetState() const { return State; }
-	inline void				SetState(ECreatureState _State) { State = _State; }
+	inline void				SetState(ECreatureState _State) { State = _State; AmountTime = 0.0; }
 
 	inline bool				GetIsInSight() const { return IsInSight; }
 	inline void				SetIsInSight(bool InValue) { IsInSight = InValue; }

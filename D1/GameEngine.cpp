@@ -61,8 +61,9 @@ void GameEngine::GameRun()
 	while (!IsExit)
 	{
 		QueryPerformanceCounter(&CurrentTime);
-		deltaTime = static_cast<double>(CurrentTime.QuadPart - PrevTime.QuadPart) / Frequency.QuadPart;
-		//DeltaTime = 0.001;
+		//deltaTime = static_cast<double>(CurrentTime.QuadPart - PrevTime.QuadPart) / Frequency.QuadPart;
+		//TODO 반드시 완성전에 deltaTime을 원상복구 해놔
+		deltaTime = 0.001;
 		PrevTime = CurrentTime;
 
 		SInputManager->ClearInput();

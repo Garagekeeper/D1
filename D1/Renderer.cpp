@@ -22,7 +22,8 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	Draw3DGrid(World);
 	DrawEnemy(World);
 	DrawPlayerHud(World);
-	DrawOnAtackEffect(World);
+	//보기에 좀 이상함..
+	//DrawOnAtackEffect(World);
 
 	// OutScene
 	DrawInfo(World);
@@ -468,7 +469,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 		// 화면에서 멀때는 화면의 중앙에 가까운곳에 작게 보인다.
 		// transformX / transformY 이게 화면에서 멀수록 가운데로오게 해준다.
 		// 이 값은 -1 < X < 1인데 화면에는 음수 좌표계가 없으니까 +1
-		// 0 < x < 2 범위의 X를 0~130까지의 정수로 변환
+		// 0 < x < 2 범위의 X를 0~SceneHorSize까지의 정수로 변환
 		// 스프라이트가 찍힐 X 좌표
 		int SpriteScrrenX = int((GScreen->SceneHorSize / 2) * (1 + transformX / transformY));
 
@@ -542,6 +543,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 							break;
 						case ECreatureSpriteIndex::AttackStart:
 						case ECreatureSpriteIndex::AttackEnd:
+						case ECreatureSpriteIndex::Dead:
 							break;
 						default:
 							SpriteIndex = ECreatureSpriteIndex::Idle;
@@ -571,7 +573,11 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					{
 						// GScreen의 i(가로), j(세로) 좌표에 글자(spriteChar)를 그리는 함수를 호출하세요.
 						// 예시: GScreen.Buffer[j][i] = spriteChar;
-						GScreen->PrintChar(SpriteChar, Stripe+1, j+1);
+						int Attribute = CurrentSprite->BaseAttribute;
+						if (SpriteChar != L'▒')
+							Attribute = SCREEN_TEXT_COLOR_WHITE;
+
+						GScreen->PrintChar(SpriteChar, Stripe+1, j+1, Attribute);
 					}
 				}
 			}
