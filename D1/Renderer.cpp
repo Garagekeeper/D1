@@ -855,10 +855,6 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 	int DrawStartY = GScreen->TotalVerSize / 5;
 	int DrawEndY = DrawStartY * 4;
 
-	int ResumeY = GScreen->TotalVerSize / 2;
-	int ResumeX = GScreen->TotalHorSize / 2;
-	int ExitY = ResumeY + 2;
-	int ExitX = ResumeX;
 
 
 	// 0 30 60 90 120 150
@@ -881,18 +877,6 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 				GScreen->PrintChar(L'━', j, i);
 			GScreen->PrintChar(L'┛', DrawEndX, i);
 		}
-		else if (i == ResumeY)
-		{
-			GScreen->PrintChar(L'┃', DrawStartX, i);
-			GScreen->PrintString(L"StartGame", ResumeX, ResumeY);
-			GScreen->PrintChar(L'┃', DrawEndX, i);
-		}
-		else if (i == ExitY)
-		{
-			GScreen->PrintChar(L'┃', DrawStartX, i);
-			GScreen->PrintString(L"ExitGame", ExitX, ExitY);
-			GScreen->PrintChar(L'┃', DrawEndX, i);
-		}
 		else
 		{
 			GScreen->PrintChar(L'┃', DrawStartX, i);
@@ -900,19 +884,54 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 		}
 	}
 
-	// Draw Select Arrow
-	switch (World->GetMainIndex())
+	std::wstring DeathArt[] = {
+	L"██████   ██████   ██████  ████   ████     ████   ████   █████   ████    ██",
+	L"██   ██ ██    ██ ██    ██ ██ ██ ██ ██     ██ ██ ██ ██  ██   ██  ██ ██   ██",
+	L"██   ██ ██    ██ ██    ██ ██  ███  ██     ██  ███  ██ ██ ███ ██ ██  ██  ██",
+	L"██   ██ ██    ██ ██    ██ ██       ██     ██       ██ ██     ██ ██   ██ ██",
+	L"██████   ██████   ██████  ██       ██     ██       ██ ██     ██ ██     ███"
+	};
+
+	int ArtWidth = 70; // 아스키아트의 대략적인 글자 수 가로 길이
+	int ArtX = (GScreen->TotalHorSize - ArtWidth) / 2;
+	int ArtY = DrawStartY + ((DrawEndY - DrawStartY) / 2) - 4; // 상하 정중앙 배치 조정
+	int Attr = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+
+	std::wstring StartStr = L"  START GAME  ";
+	std::wstring ExitStr =  L"  EXIT  GAME  ";
+
+	int StartGameY = ArtY + 10;
+	int ExitGameY = StartGameY + 3;
+	int CenterX = GScreen->TotalHorSize / 2;
+	for (int i = 0; i < 5; i++)
 	{
-		case EMainMenu::EMainMenuLen:
-		case EMainMenu::None:
-			break;
-		case EMainMenu::StartGame:
-			GScreen->PrintChar(L'▶', ResumeX - ArrowSpace, ResumeY);
-			break;
-		case EMainMenu::ExitGame:
-			GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
-			break;
+		GScreen->PrintString(DeathArt[i], ArtX, ArtY + i, Attr);
 	}
+
+	if (World->GetMainIndex() == EMainMenu::StartGame)
+	{
+		GScreen->PrintString(L" ▶ " + StartStr + L" ◀", CenterX - (StartStr.size()/2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L"   " + ExitStr + L"  ", CenterX - (ExitStr.size()/2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
+	}
+	else if (World->GetMainIndex() == EMainMenu::ExitGame)
+	{
+		GScreen->PrintString(L"   " + StartStr + L"  ", CenterX - (StartStr.size() / 2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L" ▶ " + ExitStr + L" ◀", CenterX - (ExitStr.size() / 2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
+	}
+
+	//// Draw Select Arrow
+	//switch (World->GetMainIndex())
+	//{
+	//	case EMainMenu::EMainMenuLen:
+	//	case EMainMenu::None:
+	//		break;
+	//	case EMainMenu::StartGame:
+	//		GScreen->PrintChar(L'▶', ResumeX - ArrowSpace, ResumeY);
+	//		break;
+	//	case EMainMenu::ExitGame:
+	//		GScreen->PrintChar(L'▶', ExitX - ArrowSpace, ExitY);
+	//		break;
+	//}
 }
 
 void Renderer::DrawBorder(const WorldManager* World)
@@ -1051,11 +1070,6 @@ void Renderer::DrawDeathMenu(const WorldManager* World)
 	int MinY = GScreen->TotalVerSize / 5;
 	int MaxY = MinY * 4;
 
-	int Msg1X = GScreen->TotalHorSize / 4;
-	int Msg1Y = GScreen->TotalVerSize / 2;
-	int Msg2X = Msg1X;
-	int Msg2Y = (GScreen->TotalVerSize + Msg1Y) / 2;
-
 	const int ArrowSpace = 5;
 
 	// Draw OutLine
@@ -1076,26 +1090,36 @@ void Renderer::DrawDeathMenu(const WorldManager* World)
 				GScreen->PrintChar(L'━', j, i);
 			GScreen->PrintChar(L'┛', MaxX, i);
 		}
-		else if (i == Msg1Y)
-		{
-			GScreen->PrintChar(L'┃', MinX, i);
-			
-			GScreen->PrintString(L"YouDied", Msg1X, Msg1Y);
-			
-			GScreen->PrintChar(L'┃', MaxX, i);
-		}
-		else if (i == Msg2Y)
-		{
-			GScreen->PrintChar(L'┃', MinX, i);
-			GScreen->PrintString(L"Press SpaceBar To Main", Msg2X, Msg2Y);
-			GScreen->PrintChar(L'┃', MaxX, i);
-		}
 		else
 		{
 			GScreen->PrintChar(L'┃', MinX, i);
 			GScreen->PrintChar(L'┃', MaxX, i);
 		}
 	}
+
+	std::wstring DeathArt[] = {
+		L"██    ██  ██████  ██    ██      ██████  ██ ████████ ██████  ",
+		L" ██  ██  ██    ██ ██    ██      ██   ██ ██ ██       ██   ██ ",
+		L"  ████   ██    ██ ██    ██      ██   ██ ██ ██████   ██   ██ ",
+		L"   ██    ██    ██ ██    ██      ██   ██ ██ ██       ██   ██ ",
+		L"   ██     ██████   ██████       ██████  ██ ████████ ██████  "
+	};
+
+	int ArtWidth = 60; // 아스키아트의 대략적인 글자 수 가로 길이
+	int ArtX = (GScreen->TotalHorSize - ArtWidth) / 2;
+	int ArtY = MinY + ((MaxY - MinY) / 2) - 4; // 상하 정중앙 배치 조정
+	int RedAttr = FOREGROUND_RED | FOREGROUND_INTENSITY; // 고휘도 빨간색
+
+	for (int i = 0; i < 5; i++)
+	{
+		GScreen->PrintString(DeathArt[i], ArtX, ArtY + i, RedAttr);
+	}
+
+	// 3. 하단 안내 메시지 (중앙 정렬)
+	std::wstring Msg = L"PRESS SPACEBAR TO MAIN MENU";
+	int MsgX = (GScreen->TotalHorSize - static_cast<int>(Msg.length())) / 2;
+	int MsgY = MaxY - 3;
+	GScreen->PrintString(Msg, MsgX, MsgY, SCREEN_TEXT_COLOR_WHITE);
 }
 
 void Renderer::DrawClearMenu(const WorldManager* world)

@@ -27,7 +27,7 @@ void WorldManager::Init()
 	WorldMap =
 	{
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, // 0
-		{1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1}, // 1
+		{1,2,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,2,1}, // 1
 		{1,0,1,1,0,1,0,1,1,1,1,0,1,1,1,1,0,0,1,0,1,1,0,1}, // 2
 		{1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1,0,1}, // 3
 		{1,0,1,0,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,0,1,0,1}, // 4
@@ -48,7 +48,7 @@ void WorldManager::Init()
 		{1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,1,0,0,1,0,1}, // 19
 		{1,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,0,1}, // 20
 		{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1}, // 21
-		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1}, // 22
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1}, // 22
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}  // 23
 	};
 	//WorldMap =
@@ -215,11 +215,20 @@ void WorldManager::Init()
 				L"  ▒▒▒▒▒▒▒▒  ",
 				}
 			},
-
 		}
 	};
 
 	SpawnEnemy(EnemyStat, EnemyTranform, EnemySprite);
+
+	//FPos KeyPos = { 1.5, 1.5 };
+	//FVec EnemyDirVec = { 0.0, 0.0 };
+	//PlaneSize = 0;
+	//FTransform EnemyTranform =
+	//{
+	//	EnemyPos,
+	//	EnemyDirVec,
+	//	PlaneSize
+	//};
 
 
 	// Pause Loop
@@ -486,6 +495,11 @@ void WorldManager::HandleClear()
 	//TODO Render에서는 상위 기록보여주기
 	GameEngine::GetInstance()->SetIsExit(true);
 	GameEngine::GetInstance()->SetGameState(EGameState::BeforeGame);
+}
+
+void WorldManager::SpawnObject(FTransform EnemyTranform, FSprite EnemySprite)
+{
+	ObjectVec.push_back(new PObject(EnemyTranform, EnemySprite));
 }
 
 std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)

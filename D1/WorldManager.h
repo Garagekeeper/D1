@@ -30,6 +30,7 @@ private:
 	// GameLoop
 	FPlayer*														Player = nullptr;
 	std::vector<FEnemy*>											EnemyVec;
+	std::vector<PObject*>											ObjectVec;
 	std::vector<std::vector<int>>									WorldMap;
 	std::vector<std::vector<std::list<Creature*>>>					CreatureMap;
 	FIntPos															ExitPos;
@@ -61,6 +62,7 @@ public:
 	void															HandleDeathMenu();
 	void															HandleMainMenu();
 	void															HandleClear();
+	void															SpawnObject(FTransform EnemyTranform, FSprite EnemySprite);
 	std::vector<FPos>												FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
 	std::vector<FPos>												CalcPath(std::unordered_map<FPos,FPos>& Parent, FPos DestPos);
 	bool															CanGo(FPos NextPos);
