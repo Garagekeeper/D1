@@ -1,0 +1,12 @@
+100,James
+200,Kim
+500,Son
+100,James
+200,Lee
+500,Oh
+100,Choi
+200,Ju
+500,No
+100,Yu
+200,Kang
+500,Paek

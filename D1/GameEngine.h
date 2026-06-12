@@ -1,5 +1,5 @@
 #pragma once
-
+#include <set>
 #include "InputManager.h"
 #include "WorldManager.h"
 #include "Renderer.h"
@@ -15,12 +15,14 @@ private:
 	Renderer*					SRenderer = nullptr;
 	Screen*						GScreen = nullptr;
 	EGameState					GameState = EGameState::BeforeGame;
+	std::vector<std::pair<int, std::string>> ClearRecordVec;
 
 
 	double						deltaTime = 0.0;
 	bool						IsPause = false;
 	bool						IsExit = false;
 	bool						IsExitComplete = false;
+	const std::string			ClearRecordsPath = ".\\Data\\ClearRecords.txt";
 
 
 								GameEngine() = default;
@@ -31,8 +33,10 @@ public:
 	void						Init();
 	void						GameRun();
 	void						LoopByState();
+	void						ParseRecord(std::string DataString);
 	void static					ClearEngine();
 	void static					StartEngine();
+	std::string					ReadClearRecords(const std::string& path);
 	inline double				GetDeltaTime() const { return deltaTime; }
 
 	inline InputManager*		GetInputManager() const { return SInputManager; }
@@ -47,6 +51,7 @@ public:
 	inline bool					GetIsExitComplete() { return IsExitComplete; }
 	inline void					SetIsExitComplete(bool InValue) { IsExitComplete = InValue; }
 	inline void					SetGameState(EGameState InValue) { GameState = InValue; }
+	inline std::set<int>*		GetClearRecord() { &ClearRecordVec; }
 
 };
 

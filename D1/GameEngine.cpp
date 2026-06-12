@@ -1,4 +1,8 @@
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 #include "GameEngine.h"
+
 
 // 싱글톤은 선언이 끝이 아니라 실제 선언까지 해줘야함\
 // 정확히 말하면 static 멤버는 선언과 생성이 다 되어야함
@@ -47,6 +51,9 @@ void GameEngine::Init()
 
 	if(GScreen)
 		GScreen->Init();
+
+	std::string RecordDataString = ReadClearRecords(ClearRecordsPath);
+	ParseRecord(RecordDataString);
 }
 
 void GameEngine::GameRun()
@@ -98,6 +105,36 @@ void GameEngine::LoopByState()
 	}
 }
 
+void GameEngine::ParseRecord(std::string DataString)
+{
+	if (DataString.empty())
+		return;
+
+	std::stringstream Ss(DataString);
+	std::string RowString;
+	while (Ss >> RowString)
+	{
+		std::string Buf;
+		std::vector<std::string> Info;
+		std::stringstream Ss2(RowString);
+		while (getline(Ss2, Buf, ','))
+		{
+			Info.push_back(Buf);
+		}
+		// 점수 이름순으로 넣기
+		ClearRecordVec.push_back(make_pair(stoi(Info[0]), Info[1]));
+	}
+
+	sort(ClearRecordVec.begin(), ClearRecordVec.end(),
+		[](std::pair<int, std::string> A, std::pair<int, std::string>B)
+		{
+			if (A.first == B.first)
+				return A.second < B.second;
+
+			return A.first > B.first;
+		});
+}
+
 // 이래 하는게 맞는지..?
 void GameEngine::ClearEngine()
 {
@@ -115,4 +152,18 @@ void GameEngine::StartEngine()
 	{
 		Instance = new GameEngine();
 	}
+}
+
+std::string GameEngine::ReadClearRecords(const std::string& Path)
+{
+	std::ifstream InputFile(Path);
+	if (InputFile.is_open())
+	{
+		std::string FileTexts((std::istreambuf_iterator<char>(InputFile)),std::istreambuf_iterator<char>());
+
+		InputFile.close();
+		return FileTexts;
+	}
+
+	return std::string();
 }

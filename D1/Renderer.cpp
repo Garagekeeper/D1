@@ -1107,7 +1107,7 @@ void Renderer::DrawClearMenu(const WorldManager* world)
 	int MaxY = MinY * 4;
 
 	int Msg1X = GScreen->TotalHorSize / 4;
-	int Msg1Y = GScreen->TotalVerSize / 2;
+	int Msg1Y = MinY + 1;
 	int Msg2X = Msg1X;
 	int Msg2Y = (GScreen->TotalVerSize + Msg1Y) / 2;
 
