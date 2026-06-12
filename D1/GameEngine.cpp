@@ -69,7 +69,7 @@ void GameEngine::GameRun()
 		SInputManager->ClearInput();
 		SInputManager->GetInput();
 		LoopByState();
-		AmountTime += deltaTime;
+		
 	}
 }
 
@@ -84,12 +84,6 @@ void GameEngine::LoopByState()
 	{
 		SWorldManager->UpdateGameLoop();
 		SRenderer->RenderGamePlay(SWorldManager);
-
-		if (SInputManager->GetKeyState().KEYEscapeDown)
-		{
-			IsPause = !IsPause;
-			GameState = EGameState::Pause;
-		}
 	}
 	else if (GameState == EGameState::Pause)
 	{

@@ -17,7 +17,7 @@ void Renderer::Init(const WorldManager* World)
 
 void Renderer::RenderGamePlay(const WorldManager* World)
 {
-	ClearScreen();
+	RefreshScreen();
 	// INScene
 	Draw3DGrid(World);
 	DrawEnemy(World);
@@ -29,21 +29,26 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	DrawInfo(World);
 	DrawBorder(World);
 	DrawMiniMap(World);
+
+	if (World->IsPlayerDead())
+	{
+		DrawDethMenu(World);
+	}
 }
 
 void Renderer::RenderGamePause(const WorldManager* World)
 {
-	ClearScreen();
+	RefreshScreen();
 	DrawPauseMenu(World);
 }
 
 void Renderer::RenderBeforeGame(const WorldManager* World)
 {
-	ClearScreen();
+	RefreshScreen();
 	DrawMainMenu(World);
 }
 
-void Renderer::ClearScreen()
+void Renderer::RefreshScreen()
 {
 	GameEngine::GetInstance()->GetScreen()->ChangeScreenBuffer();
 }
@@ -556,7 +561,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 					if (CurrentEnemy->GetbBlink())
 					{
 						// 피격시 깜빡임
-						double TotalTime = GameEngine::GetInstance()->GetAmountTime();
+						double TotalTime = World->GetAmountTime();
 						if (static_cast<int>(TotalTime * AnimBlinkSpeed) % BlinkFrequency == 0)
 						{
 							SpriteChar = L' ';
@@ -645,7 +650,7 @@ void Renderer::DrawGameStatus(const WorldManager* World)
 	Wss.clear();
 	Wss.str(L"");
 	Wss << "Time : "
-		<< GameEngine::GetInstance()->GetAmountTime();
+		<< World->GetAmountTime();
 
 	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 1);
 }
@@ -1031,4 +1036,59 @@ void Renderer::DrawOnAtackEffect(const WorldManager* World)
 		}
 	}
 
+}
+
+void Renderer::DrawDethMenu(const WorldManager* World)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int DrawStartX = GScreen->TotalHorSize / 5;
+	int DrawEndX = DrawStartX * 4;
+	int DrawStartY = GScreen->TotalVerSize / 5;
+	int DrawEndY = DrawStartY * 4;
+
+	int ResumeY = GScreen->TotalVerSize / 2;
+	int ResumeX = GScreen->TotalHorSize / 2;
+	int ExitY = (GScreen->TotalVerSize + ResumeY) / 2;
+	int ExitX = ResumeX;
+
+	const int ArrowSpace = 5;
+
+	// Draw OutLine
+	for (int i = DrawStartY; i <= DrawEndY; i++)
+	{
+		GScreen->PrintHor(L' ', DrawStartX + 1, i, DrawEndX - DrawStartX, 7);
+		if (i == DrawStartY)
+		{
+			GScreen->PrintChar(L'┏', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┓', DrawEndX, i);
+		}
+		else if (i == DrawEndY)
+		{
+			GScreen->PrintChar(L'┗', DrawStartX, i);
+			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┛', DrawEndX, i);
+		}
+		else if (i == ResumeY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			
+			GScreen->PrintString(L"YouDied", ResumeX, ResumeY);
+			
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else if (i == ExitY)
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintString(L"Press SpaceBar To Main()", ExitX, ExitY);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+		else
+		{
+			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintChar(L'┃', DrawEndX, i);
+		}
+	}
 }

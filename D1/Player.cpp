@@ -67,11 +67,20 @@
 
 void FPlayer::Update(const WorldManager* World)
 {
-	UpdateState();
-	Roate();
-	Move(World);
-	Move(World);
-	UpdateStateBehavior(World);
+	if (GetState() != ECreatureState::Dead)
+	{
+		if (GameEngine::GetInstance()->GetInputManager()->GetKeyState().KEYEscapeDown)
+		{
+			GameEngine::GetInstance()->SetIsPuase(true);
+			GameEngine::GetInstance()->SetGameState(EGameState::Pause);
+
+		}
+		
+		UpdateState();
+		Roate();
+		Move(World);
+		UpdateStateBehavior(World);
+	}
 }
 
 void FPlayer::Roate()
@@ -276,6 +285,10 @@ void FPlayer::UpdateStateBehavior(const WorldManager* World)
 				Attack(Target);
 		}
 
+	}
+	else if (GetState() == ECreatureState::OnDead)
+	{
+		SetState(ECreatureState::Dead);
 	}
 }
 

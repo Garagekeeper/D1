@@ -81,7 +81,6 @@ void WorldManager::Init()
 
 	CreatureMap = std::vector<std::vector<std::list<Creature*>>>(mapWidth, std::vector<std::list<Creature*>>(mapHeight, std::list<Creature*>()));
 
-
 	FCreatureBaseStat PlayerStat = { 50, 100, 100 };
 	FPos PlayerPos = { 2.5, 21.5 };
 	FVec PlayerDirVec = { 0.0, -1.0 };
@@ -224,6 +223,7 @@ void WorldManager::Init()
 	// Pause Loop
 	PauseMenuIndex = EPauseMenu::Resume;
 	MainMenuIndex = EMainMenu::StartGame;
+	DeathMenuIndex = EDeathMenu::GotoMain;
 
 }
 
@@ -264,8 +264,16 @@ void WorldManager::UpdateBeforeGameLoop()
 
 void WorldManager::UpdateGameLoop()
 {
-	PlayerUpdate(this);
-	EnemiesUpdate(this);
+	if (IsPlayerDead())
+	{
+		UpdateOnPlayerDeath();
+	}
+	else
+	{
+		PlayerUpdate(this);
+		EnemiesUpdate(this);
+		AmountTime += GameEngine::GetInstance()->GetDeltaTime();
+	}
 }
 
 void WorldManager::UpdatePauseLoop()
@@ -345,20 +353,47 @@ void WorldManager::EnemiesUpdate(WorldManager* World)
 	}
 }
 
+void WorldManager::UpdateOnPlayerDeath()
+{
+	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
+	if (KeyState.KEYSpaceDown)
+	{
+		HandleDeathMenu();
+	}
+	else if (KeyState.DownArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(DeathMenuIndex);
+		int UpperBound = static_cast<int>(EDeathMenu::EDeathMenuLen);
+		if (CurrentIndex + 1 >= UpperBound)
+		{
+			DeathMenuIndex = EDeathMenu::GotoMain;
+		}
+		else
+		{
+			DeathMenuIndex = static_cast<EDeathMenu>(CurrentIndex + 1);
+		}
+	}
+	else if (KeyState.UpArrowDown)
+	{
+		int CurrentIndex = static_cast<int>(DeathMenuIndex);
+		int LowerBound = static_cast<int>(EDeathMenu::None);
+		if (CurrentIndex - 1 <= LowerBound)
+		{
+			DeathMenuIndex = EDeathMenu::GotoMain;
+		}
+		else
+		{
+			DeathMenuIndex = static_cast<EDeathMenu>(CurrentIndex - 1);
+		}
+	}
+}
+
 void WorldManager::SpawnEnemy(FCreatureBaseStat Stat, FTransform EnemyTranform, FSprite EnemySprite)
 {
 	//TODO null check
 	auto NewEnemy = new FEnemy(Stat, EnemyTranform, EnemySprite);
 	CreatureMap[static_cast<int>(EnemyTranform.Pos.Y)][static_cast<int>(EnemyTranform.Pos.X)].push_back(NewEnemy);
 	EnemyVec.push_back(NewEnemy);
-}
-
-void WorldManager::HandleInput()
-{
-	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
-	// TODO GameEngine Run을 종료하도록 변경
-	if (KeyState.QKey)
-		exit(0);
 }
 
 void WorldManager::UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target)
@@ -397,6 +432,15 @@ void WorldManager::HandlePuaeMenu()
 	PauseMenuIndex = EPauseMenu::Resume;
 }
 
+void WorldManager::HandleDeathMenu()
+{
+	if (DeathMenuIndex == EDeathMenu::GotoMain)
+	{
+		GameEngine::GetInstance()->SetIsExit(true);
+		GameEngine::GetInstance()->SetGameState(EGameState::BeforeGame);
+	}
+}
+
 void WorldManager::HandleMainMenu()
 {
 	if (MainMenuIndex == EMainMenu::None || MainMenuIndex == EMainMenu::EMainMenuLen)
@@ -412,6 +456,7 @@ void WorldManager::HandleMainMenu()
 			break;
 		case EMainMenu::ExitGame:
 			GameEngine::GetInstance()->SetIsExit(true);
+			GameEngine::GetInstance()->SetIsExitComplete(true);
 			break;
 	}
 

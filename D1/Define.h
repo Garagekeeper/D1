@@ -50,7 +50,7 @@ struct FKeyState
 	bool DownArrowDown = false;
 	bool DownArrowUP = true;
 	
-	bool KEYSpaceWasDown = false;
+	bool KEYSpaceWasDown = true;
 	bool KEYSpaceDown = false;
 	bool KEYSpaceUp = false;
 	
@@ -80,11 +80,18 @@ enum class EMainMenu
 	EMainMenuLen
 };
 
+enum class EDeathMenu
+{
+	None = 0,
+	GotoMain,
+	EDeathMenuLen,
+};
+
 enum class EGameState
 {
 	BeforeGame,
 	InGame,
-	Pause
+	Pause,
 };
 enum class Env
 {

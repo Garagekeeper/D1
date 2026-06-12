@@ -36,7 +36,8 @@ private:
 	// PauseLoop
 	EPauseMenu 														PauseMenuIndex = EPauseMenu::None;
 	EMainMenu 														MainMenuIndex = EMainMenu::None;
-
+	EDeathMenu 														DeathMenuIndex = EDeathMenu::None;
+	double															AmountTime = 0.0;
 public:
 	const int														mapWidth = 24;
 	const int														mapHeight = 24;
@@ -50,15 +51,16 @@ public:
 	void															UpdatePauseLoop();
 	void															PlayerUpdate(const WorldManager* World);
 	void															EnemiesUpdate(WorldManager* World);
+	void															UpdateOnPlayerDeath();
 	void															SpawnEnemy(FCreatureBaseStat Stat, FTransform EnemyTranform, FSprite EnemySprite);
-	void															HandleInput();
 	void															UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target);
 	void															HandlePuaeMenu();
+	void															HandleDeathMenu();
 	void															HandleMainMenu();
 	std::vector<FPos>												FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
 	std::vector<FPos>												CalcPath(std::unordered_map<FPos,FPos>& Parent, FPos DestPos);
 	bool															CanGo(FPos NextPos);
-
+	inline double													GetAmountTime() const { return AmountTime; }
 	inline FPlayer*													GetPlayer() const { return Player; }
 	inline FTransform*												GetPlayerTransform() const { return Player->GetTransform(); }
 	inline const FPos												GetPlayerPos() const {return Player->GetTransform()->GetPos(); }
@@ -73,5 +75,6 @@ public:
 	inline void														SetPauseIndex(EPauseMenu InVal) { PauseMenuIndex = InVal; }
 	inline const EMainMenu											GetMainIndex() const { return MainMenuIndex; }
 	inline void														SetMainIndex(EPauseMenu InVal) { PauseMenuIndex = InVal; }
+	inline bool														IsPlayerDead() const { return Player->GetState() == ECreatureState::Dead; }
 };
 

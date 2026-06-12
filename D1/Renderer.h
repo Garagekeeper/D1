@@ -15,7 +15,7 @@ public:
 	void									RenderGamePause(const WorldManager* World);
 	void									RenderBeforeGame(const WorldManager* World);
 
-	void									ClearScreen();
+	void									RefreshScreen();
 	void									Draw2DGrid(const WorldManager* World);
 	void									DrawCeiling(const WorldManager* World);
 	void									DrawFloor(const WorldManager* World);
@@ -36,5 +36,6 @@ public:
 	void									DrawBorder(const WorldManager* World);
 	void									DrawMiniMap(const WorldManager* World);
 	void									DrawOnAtackEffect(const WorldManager* World);
+	void									DrawDethMenu(const WorldManager* World);
 };
 
