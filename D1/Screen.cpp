@@ -89,7 +89,6 @@ bool Screen::Init()
 
 	CharInfoBuffer = new CHAR_INFO[TotalHorSize * TotalVerSize];
 
-
 	Zbuffer = vector<double>(SceneHorSize);
 	ClearScreen();
 
