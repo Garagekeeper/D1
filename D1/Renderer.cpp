@@ -513,6 +513,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 			{
 				// 현재 픽셀이 텍스쳐의 가로에서 몇번째인지 확인
 				// (현재 위치- 시작 위치) * 텍스쳐 크기 / 전체 너비
+				// 256 안곱하니까 스프라이트 원래 모양이 안나옴
 				int texX = int(256 * (Stripe - (-SpriteWidth / 2 + SpriteScrrenX)) * (CurrentSprite->Height) / SpriteWidth) / 256;
 				//int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * texWidth / spriteWidth) / 256;
 
@@ -523,7 +524,7 @@ void Renderer::DrawEnemy(const WorldManager* World)
 				// 1. transformY이 0이하면 화면의 뒤쪽
 				// 2. i가 화면에 있는지
 				// 3. 벽보다 가까이 있는지
-				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen->SceneHorSize && transformY < GScreen->Zbuffer[Stripe])
+				if (transformY > 0 && Stripe >= 0 && Stripe < GScreen->SceneHorSize && transformY <= GScreen->Zbuffer[Stripe])
 				{
 					//256 and 128 factors to avoid floats 실수를 피하기 위해서 이걸 곱했다는데 잘 몰루
 					int d = (j - vMoveScrren) * 256 - GScreen->SceneVerSize * 128 + SpriteHeight * 128;
@@ -620,18 +621,26 @@ void Renderer::DrawGameStatus(const WorldManager* World)
 	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 4);
 
 
+/*	FTransform* ETransForm = (*World->GetEnemyVec())[0]->GetTransform();
+	Wss.clear();
+	Wss.str(L"");
+	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
+		<< L"EPos (" << std::setw(2) << ETransForm->GetPos().X << L", " << std::setw(2) << ETransForm->GetPos().Y << L")";
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 5)*/;
+
+
 	Wss.clear();
 	Wss.str(L"");
 	Wss << L"Theta : " << World->GetPlayer()->GetTheta() << L"°";;
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 5);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 6);
 
 	Wss.clear();
 	Wss.str(L"");
 	Wss << std::setfill(L'0') << fixed << setprecision(2) << std::setw(2)
 		<< L"Score : " << Player->GetScore();
 
-	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 0);
+	GameEngine::GetInstance()->GetScreen()->PrintString(Wss.str(), SceneRightBottomX, SceneRightBottomY + 7);
 
 	Wss.clear();
 	Wss.str(L"");

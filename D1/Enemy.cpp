@@ -27,11 +27,12 @@ void FEnemy::Rotate()
 
 void FEnemy::Move(WorldManager* World)
 {
-	if (State == ECreatureState::Dead) return;
-	if (State == ECreatureState::Idle) return;
+	ECreatureState CurrState = GetState();
+	if (CurrState == ECreatureState::Dead) return;
+	if (CurrState == ECreatureState::Idle) return;
 
 
-	if (State == ECreatureState::Patrol)
+	if (CurrState == ECreatureState::Patrol)
 	{
 		FPos NextPos;
 
@@ -93,39 +94,50 @@ void FEnemy::Move(WorldManager* World)
 
 		MoveToWithArray(NextPos, World);
 	}
-	else if (State == ECreatureState::MoveToTarget)
+	else if (CurrState == ECreatureState::MoveToTarget)
 	{
 		if (!CheckPlayerInDetectRange(World))
 		{
-			State = ECreatureState::Idle;
+			SetState(ECreatureState::Idle);
 			AmountTime = 0.0;
 			return;
 		}
 
 		if (CheckPlayerInAttackRange(World))
 		{
-			State = ECreatureState::Attack;
+			SetState(ECreatureState::Attack);
 			AmountTime = 0.0;
 			return;
 		}
 
 		FPos PlayerPos = World->GetPlayerPos();
-		//TODO 같은 셀일때 처리
-		FIntPos NextCell = World->FindPath(Transform.Pos, World->GetPlayerTransform()->Pos, FindDepth)[1];
+		FPos Pos = Transform.Pos;
+		FPos NextCell;
+		FVec DirVec;
+
+		std::vector<FPos> Path = World->FindPath(Transform.Pos, World->GetPlayerTransform()->Pos, FindDepth);
+		if (Path.size() <= 1)
+		{
+			DirVec = { PlayerPos.X - Pos.X, PlayerPos.Y - Pos.Y };
+		}
+		else
+		{
+			NextCell = Path[1];
+			DirVec = {NextCell.X - Transform.Pos.X, NextCell.Y - Transform.Pos.Y };
+		}
 		FPos NextPos;
 
 		double Dx = 0.0;
 		double Dy = 0.0;
 
-		FVec DirVec = { (NextCell.X - static_cast<int>(Transform.Pos.X)),(NextCell.Y - static_cast<int>(Transform.Pos.Y)) };
-		FPos Pos = Transform.Pos;
-		double DirSize = GetSqrLen(DirVec);
+		
+		double DirSize = std::sqrt(GetSqrLen(DirVec));
 		double DeltaTime = GameEngine::GetInstance()->GetDeltaTime();
 
 		Dx = (DirVec.DirX / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
 		Dy = (DirVec.DirY / DirSize) * EnemyMoveBaseSpeed * DeltaTime;
 
-		double ColliderRadius = 1;
+		double ColliderRadius = 0.3;
 
 		// 다음 좌표
 		double NextX = Pos.X + Dx;
@@ -133,24 +145,19 @@ void FEnemy::Move(WorldManager* World)
 
 		// 다음 좌표의 충돌 체크
 		double ColliderEdgeX = NextX + (Dx > 0 ? ColliderRadius : -ColliderRadius);
+		double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
 		if (World->GetWorldMap()[(int)Pos.Y][(int)ColliderEdgeX] != static_cast<int>(Env::WALL))
 		{
 			Pos.X = static_cast<float>(NextX);
 		}
-		else
-		{
-			State = ECreatureState::Idle;
-		}
 
-		double ColliderEdgeY = NextY + (Dy > 0 ? ColliderRadius : -ColliderRadius);
+
+
 		if (World->GetWorldMap()[(int)ColliderEdgeY][(int)Pos.X] != static_cast<int>(Env::WALL))
 		{
 			Pos.Y = static_cast<float>(NextY);
 		}
-		else
-		{
-			State = ECreatureState::Idle;
-		}
+
 
 		// 콘솔 바운더리를 넘어가지는 못한다.
 		double MapMin = ColliderRadius;
@@ -160,7 +167,7 @@ void FEnemy::Move(WorldManager* World)
 
 		if (Pos.X < ColliderRadius || Pos.X > MapMaxX || Pos.Y < ColliderRadius || Pos.Y > MapMaxY)
 		{
-			State = ECreatureState::Idle;
+			SetState(ECreatureState::Idle);
 			if (Pos.X < ColliderRadius) Pos.X = static_cast<float>(ColliderRadius);
 			if (Pos.X > MapMaxX) Pos.X = static_cast<float>(MapMaxX);
 			if (Pos.Y < ColliderRadius) Pos.Y = static_cast<float>(ColliderRadius);
@@ -189,7 +196,7 @@ void FEnemy::UpdateState(WorldManager* World)
 	}
 	if (!bCanAttack) CurrentAttackDelay -= DeltaTime;
 	if (CurrentAttackDelay <= 0) bCanAttack = true;
-	PrevState = State;
+
 
 	if (CurrState == ECreatureState::Dead)
 	{
@@ -208,7 +215,7 @@ void FEnemy::UpdateState(WorldManager* World)
 		}
 		else
 		{
-			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
+  			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
 	else if (CurrState == ECreatureState::OnAttacked)
@@ -335,8 +342,6 @@ void FEnemy::UpdateState(WorldManager* World)
 			return;
 		}
 
-		if (PrevState != ECreatureState::Attack)
-
 		if (AmountTime < 1 * 0.5)
 		{
 			SpriteIndex = ECreatureSpriteIndex::AttackStart;
@@ -363,7 +368,7 @@ void FEnemy::UpdateState(WorldManager* World)
 			AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 		}
 	}
-
+	PrevState = State;
 }
 
 void FEnemy::GetDamage(int Amount, Creature* From)

@@ -44,7 +44,7 @@ void WorldManager::Init()
 		{1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,1}, // 15
 		{1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,1,1}, // 16
 		{1,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1}, // 17
-		{1,0,0,0,0,1,1,0,1,0,1,1,0,0,1,0,1,1,1,0,1,1,0,1}, // 18
+		{1,0,0,0,0,0,0,0,1,0,1,1,0,0,1,0,1,1,1,0,1,1,0,1}, // 18
 		{1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,1,0,0,1,0,1}, // 19
 		{1,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,0,1}, // 20
 		{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1}, // 21
@@ -83,7 +83,7 @@ void WorldManager::Init()
 
 
 	FCreatureBaseStat PlayerStat = { 50, 100, 100 };
-	FPos PlayerPos = { 2, 21 };
+	FPos PlayerPos = { 2.5, 21.5 };
 	FVec PlayerDirVec = { 0.0, -1.0 };
 	double PlaneSize = 0.66;
 	FTransform PlayerTranform =
@@ -135,7 +135,7 @@ void WorldManager::Init()
 	Player = new FPlayer(PlayerStat, PlayerTranform, PlayerWeponHudSprite);
 
 	FCreatureBaseStat EnemyStat = { 10, 200, 200 };
-	FPos EnemyPos = { 2, 18 };
+	FPos EnemyPos = { 2.5, 18.5 };
 	FVec EnemyDirVec = { 0.0, -1.0 };
 	PlaneSize = 0.66;
 	FTransform EnemyTranform =
@@ -164,7 +164,7 @@ void WorldManager::Init()
 				L"▒▒▒▒▒▒▒▒▒▒▒▒",
 				L"▒▓▒▒▒▒▒▒▒▒▓▒",
 				L"▒▒▓▒▒▒▒▒▒▓▒▒",
-				L" ▒▒▓▓▓▓▓▓▒▒",
+				L" ▒▒▓▓▓▓▓▓▒▒ ",
 				L"  ▒▒▒▒▒▒▒▒  ",
 				}
 			},
@@ -179,7 +179,7 @@ void WorldManager::Init()
 				L"▒▒▓▓▓▓▓▓▓▓▒▒",
 				L"▒▒▓░░░░░░▓▒▒",
 				L"▒▒▓░░░░░░▓▒▒",
-				L" ▒▓░░░░░░▓▒",
+				L" ▒▓░░░░░░▓▒ ",
 				L" ▒▓▓▓▓▓▓▓▓▒ ",
 				L"  ▒▒▒▒▒▒▒▒  ",
 			},
@@ -195,7 +195,7 @@ void WorldManager::Init()
 				L"▒▒▒▒▒▒▒▒▒▒▒▒",
 				L"▒▒▒██████▒▒▒",
 				L"▒▒▒██████▒▒▒",
-				L" ▒▒▒▒▒▒▒▒▒▒",
+				L" ▒▒▒▒▒▒▒▒▒▒ ",
 				L"  ▒▒▒▒▒▒▒▒  ",
 			},
 			{
@@ -418,18 +418,18 @@ void WorldManager::HandleMainMenu()
 	MainMenuIndex = EMainMenu::StartGame;
 }
 
-std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
+std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
 {
 	const int DirLen = 8;
 	int Dx[DirLen] = { 0, 1, 0, -1,1,1,-1,-1 };
 	int Dy[DirLen] = { 1, 0, -1, 0,1,-1,1,-1 };
 	std::priority_queue<PQNode> Pq;
-	std::unordered_map<FIntPos, int> Best;
-	std::unordered_map<FIntPos, FIntPos> Parent;
+	std::unordered_map<FPos, int> Best;
+	std::unordered_map<FPos, FPos> Parent;
 
-	FIntPos CurrentPos = { static_cast<int>(InStartPos.X), static_cast<int>(InStartPos.Y) };
-	FIntPos DestPos = { static_cast<int>(InDestPos.X), static_cast<int>(InDestPos.Y) };
-	FIntPos ClosestCellPos = { static_cast<int>(InStartPos.X), static_cast<int>(InStartPos.Y) };
+	FPos CurrentPos = { InStartPos.X, InStartPos.Y };
+	FPos DestPos = { static_cast<int>(InDestPos.X) + 0.5f, static_cast<int>(InDestPos.Y) + 0.5f };
+	FPos ClosestCellPos = { static_cast<int>(InStartPos.X) + 0.5f, static_cast<int>(InStartPos.Y) + 0.5f };
 
 	// 현재 좌표에서 계산한 휴리스틱
 	int ClosetHuristic = GetSqrDist(DestPos, CurrentPos);
@@ -456,7 +456,7 @@ std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int
 		if (Node.Depth > InMaxDepth) break;
 		for (int i = 0; i < DirLen; i++)
 		{
-			FIntPos NextPos = { CurrentPos.X + Dx[i], CurrentPos.Y + Dy[i] };
+			FPos NextPos = { static_cast<int>(CurrentPos.X + Dx[i]) + 0.5, static_cast<int>(CurrentPos.Y + Dy[i]) + 0.5};
 			if (!CanGo(NextPos)) continue;
 
 			// 휴리스틱 갱신
@@ -497,12 +497,12 @@ std::vector<FIntPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int
 	return CalcPath(Parent, DestPos);
 }
 
-std::vector<FIntPos> WorldManager::CalcPath(std::unordered_map<FIntPos, FIntPos>& Parent, FIntPos DestPos)
+std::vector<FPos> WorldManager::CalcPath(std::unordered_map<FPos, FPos>& Parent, FPos DestPos)
 {
-	std::vector<FIntPos> Res;
-	std::vector<FIntPos> ReverseRes;
+	std::vector<FPos> Res;
+	std::vector<FPos> ReverseRes;
 
-	FIntPos Current = DestPos;
+	FPos Current = DestPos;
 	int Cnt = 0;
 	// 부모가 자기자신일 떄까지(시작 좌표까지)
 	while (Parent[Current] != Current)
@@ -514,16 +514,16 @@ std::vector<FIntPos> WorldManager::CalcPath(std::unordered_map<FIntPos, FIntPos>
 	}
 
 	Res.push_back(Current);
-	ReverseRes = std::vector<FIntPos>(Res.rbegin(), Res.rend());
+	ReverseRes = std::vector<FPos>(Res.rbegin(), Res.rend());
 
 
 	return ReverseRes;
 }
 
-bool WorldManager::CanGo(FIntPos NextPos)
+bool WorldManager::CanGo(FPos NextPos)
 {
-	int X = NextPos.X;
-	int Y = NextPos.Y;
+	int X = static_cast<int>(NextPos.X);
+	int Y = static_cast<int>(NextPos.Y);
 
 	if (X < 0 || X > mapHeight) return false;
 	if (Y < 0 || Y > mapHeight) return false;

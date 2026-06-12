@@ -12,7 +12,7 @@ struct FRaycasterResult;
 
 struct PQNode
 {
-	FIntPos Pos = { 0, 0 };
+	FPos Pos = { 0, 0 };
 	int Huristic = 0;
 	int Depth = 0;
 
@@ -55,9 +55,9 @@ public:
 	void															UpdateCreatureMap(FPos Before, FPos After, FEnemy* Target);
 	void															HandlePuaeMenu();
 	void															HandleMainMenu();
-	std::vector<FIntPos>											FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
-	std::vector<FIntPos>											CalcPath(std::unordered_map<FIntPos,FIntPos>& Parent, FIntPos DestPos);
-	bool															CanGo(FIntPos NextPos);
+	std::vector<FPos>												FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth);
+	std::vector<FPos>												CalcPath(std::unordered_map<FPos,FPos>& Parent, FPos DestPos);
+	bool															CanGo(FPos NextPos);
 
 	inline FPlayer*													GetPlayer() const { return Player; }
 	inline FTransform*												GetPlayerTransform() const { return Player->GetTransform(); }
