@@ -2,6 +2,7 @@
 #include <functional>
 #include <cmath>
 #include <limits>
+
 enum class EDir
 {
 	Up,
@@ -10,45 +11,6 @@ enum class EDir
 	Right,
 	EDirLen,
 };
-
-struct FPos
-{
-	float X = 0;
-	float Y = 0;
-
-	bool operator==(const FPos& Others) const
-	{
-		return (std::abs(X - Others.X) < FLT_EPSILON) && (std::abs(Y - Others.Y) < FLT_EPSILON);
-	}
-
-	bool operator!=(const FPos& Others) const
-	{
-		return !(*this == Others);
-	}
-
-	bool operator<(const FPos& Others) const
-	{
-		if (std::abs(X - Others.X) < FLT_EPSILON)
-			return (Y < Others.Y);
-
-		return (X < Others.X);
-	}
-};
-
-namespace std
-{
-	template <>
-	struct hash<FPos>
-	{
-		size_t operator()(const FPos& pos) const noexcept
-		{
-			size_t h1 = hash<float>{}(pos.X);
-			size_t h2 = hash<float>{}(pos.Y);
-			return h1 ^ h2;
-		}
-	};
-}
-
 
 struct FIntPos
 {
@@ -88,6 +50,50 @@ namespace std
 		}
 	};
 }
+
+struct FPos
+{
+	float X = 0;
+	float Y = 0;
+
+	bool operator==(const FPos& Others) const
+	{
+		return (std::abs(X - Others.X) < FLT_EPSILON) && (std::abs(Y - Others.Y) < FLT_EPSILON);
+	}
+
+	bool operator==(const FIntPos& Others) const
+	{
+		return (static_cast<int>(X) == Others.X) && (static_cast<int>(Y) == Others.Y);
+	}
+
+	bool operator!=(const FPos& Others) const
+	{
+		return !(*this == Others);
+	}
+
+	bool operator<(const FPos& Others) const
+	{
+		if (std::abs(X - Others.X) < FLT_EPSILON)
+			return (Y < Others.Y);
+
+		return (X < Others.X);
+	}
+};
+
+namespace std
+{
+	template <>
+	struct hash<FPos>
+	{
+		size_t operator()(const FPos& pos) const noexcept
+		{
+			size_t h1 = hash<float>{}(pos.X);
+			size_t h2 = hash<float>{}(pos.Y);
+			return h1 ^ h2;
+		}
+	};
+}
+
 
 
 struct FVec

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-const double PlayerMoveBaseSpeed = 5.0;
+const double PlayerMoveBaseSpeed = 2.0;
 const double EnemyMoveBaseSpeed = 1.0;
 const double RotationSpeed = 100.0;
 
@@ -97,5 +97,6 @@ enum class Env
 {
 	EMPTY = 0,
 	WALL = 1,
+	EIXT = 2,
 	PLAYER = 9,
 };

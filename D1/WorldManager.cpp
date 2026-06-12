@@ -48,7 +48,7 @@ void WorldManager::Init()
 		{1,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,1,0,0,1,0,1}, // 19
 		{1,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,0,1,0,1}, // 20
 		{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1}, // 21
-		{1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, // 22
+		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1}, // 22
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}  // 23
 	};
 	//WorldMap =
@@ -78,6 +78,8 @@ void WorldManager::Init()
 	//	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, // 22
 	//	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}  // 23
 	//};
+
+	ExitPos = { 22, 22 };
 
 	CreatureMap = std::vector<std::vector<std::list<Creature*>>>(mapWidth, std::vector<std::list<Creature*>>(mapHeight, std::list<Creature*>()));
 
@@ -264,14 +266,19 @@ void WorldManager::UpdateBeforeGameLoop()
 
 void WorldManager::UpdateGameLoop()
 {
-	if (IsPlayerDead())
+	if (GetIsPlayerDead())
 	{
 		UpdateOnPlayerDeath();
+	}
+	else if (IsClear)
+	{
+		UpdateOnClear();
 	}
 	else
 	{
 		PlayerUpdate(this);
 		EnemiesUpdate(this);
+		CheckExitCondition();
 		AmountTime += GameEngine::GetInstance()->GetDeltaTime();
 	}
 }
@@ -388,6 +395,15 @@ void WorldManager::UpdateOnPlayerDeath()
 	}
 }
 
+void WorldManager::UpdateOnClear()
+{
+	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
+	if (KeyState.KEYSpaceDown)
+	{
+		HandleClear();
+	}
+}
+
 void WorldManager::SpawnEnemy(FCreatureBaseStat Stat, FTransform EnemyTranform, FSprite EnemySprite)
 {
 	//TODO null check
@@ -463,13 +479,21 @@ void WorldManager::HandleMainMenu()
 	MainMenuIndex = EMainMenu::StartGame;
 }
 
+void WorldManager::HandleClear()
+{
+	//TODO 게임결과 기록
+	//TODO Render에서는 상위 기록보여주기
+	GameEngine::GetInstance()->SetIsExit(true);
+	GameEngine::GetInstance()->SetGameState(EGameState::BeforeGame);
+}
+
 std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int InMaxDepth)
 {
 	const int DirLen = 8;
 	int Dx[DirLen] = { 0, 1, 0, -1,1,1,-1,-1 };
 	int Dy[DirLen] = { 1, 0, -1, 0,1,-1,1,-1 };
 	std::priority_queue<PQNode> Pq;
-	std::unordered_map<FPos, int> Best;
+	std::unordered_map<FPos, double> Best;
 	std::unordered_map<FPos, FPos> Parent;
 
 	FPos CurrentPos = { InStartPos.X, InStartPos.Y };
@@ -477,8 +501,8 @@ std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int In
 	FPos ClosestCellPos = { static_cast<int>(InStartPos.X) + 0.5f, static_cast<int>(InStartPos.Y) + 0.5f };
 
 	// 현재 좌표에서 계산한 휴리스틱
-	int ClosetHuristic = GetSqrDist(DestPos, CurrentPos);
-	int Huristic = ClosetHuristic;
+	double ClosetHuristic = GetSqrDist(DestPos, CurrentPos);
+	double Huristic = ClosetHuristic;
 	// 시작 죄표를 우선순위 큐에 넣음
 	Pq.push({ CurrentPos, Huristic, 1 });
 
@@ -501,7 +525,7 @@ std::vector<FPos> WorldManager::FindPath(FPos InStartPos, FPos InDestPos, int In
 		if (Node.Depth > InMaxDepth) break;
 		for (int i = 0; i < DirLen; i++)
 		{
-			FPos NextPos = { static_cast<int>(CurrentPos.X + Dx[i]) + 0.5, static_cast<int>(CurrentPos.Y + Dy[i]) + 0.5};
+			FPos NextPos = { static_cast<int>(CurrentPos.X + Dx[i]) + 0.5f, static_cast<int>(CurrentPos.Y + Dy[i]) + 0.5f};
 			if (!CanGo(NextPos)) continue;
 
 			// 휴리스틱 갱신
@@ -575,6 +599,17 @@ bool WorldManager::CanGo(FPos NextPos)
 	if (WorldMap[Y][X] == static_cast<int>(Env::WALL)) return false;
 
 	return true;
+}
+
+bool WorldManager::CheckExitCondition()
+{
+	bool Res = false;
+	//현재는 좌표만 검사. 나중에는 열쇠2개 모으기
+	if (GetPlayerPos() == ExitPos)
+		Res = true;
+
+	IsClear = Res;
+	return Res;
 }
 
 

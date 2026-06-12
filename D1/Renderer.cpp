@@ -30,9 +30,13 @@ void Renderer::RenderGamePlay(const WorldManager* World)
 	DrawBorder(World);
 	DrawMiniMap(World);
 
-	if (World->IsPlayerDead())
+	if (World->GetIsPlayerDead())
 	{
-		DrawDethMenu(World);
+		DrawDeathMenu(World);
+	}
+	else if (World->GetIsClear())
+	{
+		DrawClearMenu(World);
 	}
 }
 
@@ -1013,7 +1017,8 @@ void Renderer::DrawMiniMap(const WorldManager* World)
 		SpriteChar = L'⮜';
 	}
 
-	GScreen->PrintChar(SpriteChar, PlayerPos.X + MiniMapLeftTopX + pivotX, PlayerPos.Y + pivotY);
+	GScreen->PrintChar(SpriteChar, static_cast<int>(PlayerPos.X) + MiniMapLeftTopX + pivotX, 
+		static_cast<int>(PlayerPos.Y) + pivotY);
 }
 
 void Renderer::DrawOnAtackEffect(const WorldManager* World)
@@ -1038,57 +1043,112 @@ void Renderer::DrawOnAtackEffect(const WorldManager* World)
 
 }
 
-void Renderer::DrawDethMenu(const WorldManager* World)
+void Renderer::DrawDeathMenu(const WorldManager* World)
 {
 	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
-	int DrawStartX = GScreen->TotalHorSize / 5;
-	int DrawEndX = DrawStartX * 4;
-	int DrawStartY = GScreen->TotalVerSize / 5;
-	int DrawEndY = DrawStartY * 4;
+	int MinX = GScreen->TotalHorSize / 5;
+	int MaxX = MinX * 4;
+	int MinY = GScreen->TotalVerSize / 5;
+	int MaxY = MinY * 4;
 
-	int ResumeY = GScreen->TotalVerSize / 2;
-	int ResumeX = GScreen->TotalHorSize / 2;
-	int ExitY = (GScreen->TotalVerSize + ResumeY) / 2;
-	int ExitX = ResumeX;
+	int Msg1X = GScreen->TotalHorSize / 4;
+	int Msg1Y = GScreen->TotalVerSize / 2;
+	int Msg2X = Msg1X;
+	int Msg2Y = (GScreen->TotalVerSize + Msg1Y) / 2;
 
 	const int ArrowSpace = 5;
 
 	// Draw OutLine
-	for (int i = DrawStartY; i <= DrawEndY; i++)
+	for (int i = MinY; i <= MaxY; i++)
 	{
-		GScreen->PrintHor(L' ', DrawStartX + 1, i, DrawEndX - DrawStartX, 7);
-		if (i == DrawStartY)
+		GScreen->PrintHor(L' ', MinX + 1, i, MaxX - MinX, 7);
+		if (i == MinY)
 		{
-			GScreen->PrintChar(L'┏', DrawStartX, i);
-			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+			GScreen->PrintChar(L'┏', MinX, i);
+			for (int j = MinX + 1; j <= MaxX - 1; j++)
 				GScreen->PrintChar(L'━', j, i);
-			GScreen->PrintChar(L'┓', DrawEndX, i);
+			GScreen->PrintChar(L'┓', MaxX, i);
 		}
-		else if (i == DrawEndY)
+		else if (i == MaxY)
 		{
-			GScreen->PrintChar(L'┗', DrawStartX, i);
-			for (int j = DrawStartX + 1; j <= DrawEndX - 1; j++)
+			GScreen->PrintChar(L'┗', MinX, i);
+			for (int j = MinX + 1; j <= MaxX - 1; j++)
 				GScreen->PrintChar(L'━', j, i);
-			GScreen->PrintChar(L'┛', DrawEndX, i);
+			GScreen->PrintChar(L'┛', MaxX, i);
 		}
-		else if (i == ResumeY)
+		else if (i == Msg1Y)
 		{
-			GScreen->PrintChar(L'┃', DrawStartX, i);
+			GScreen->PrintChar(L'┃', MinX, i);
 			
-			GScreen->PrintString(L"YouDied", ResumeX, ResumeY);
+			GScreen->PrintString(L"YouDied", Msg1X, Msg1Y);
 			
-			GScreen->PrintChar(L'┃', DrawEndX, i);
+			GScreen->PrintChar(L'┃', MaxX, i);
 		}
-		else if (i == ExitY)
+		else if (i == Msg2Y)
 		{
-			GScreen->PrintChar(L'┃', DrawStartX, i);
-			GScreen->PrintString(L"Press SpaceBar To Main()", ExitX, ExitY);
-			GScreen->PrintChar(L'┃', DrawEndX, i);
+			GScreen->PrintChar(L'┃', MinX, i);
+			GScreen->PrintString(L"Press SpaceBar To Main", Msg2X, Msg2Y);
+			GScreen->PrintChar(L'┃', MaxX, i);
 		}
 		else
 		{
-			GScreen->PrintChar(L'┃', DrawStartX, i);
-			GScreen->PrintChar(L'┃', DrawEndX, i);
+			GScreen->PrintChar(L'┃', MinX, i);
+			GScreen->PrintChar(L'┃', MaxX, i);
+		}
+	}
+}
+
+void Renderer::DrawClearMenu(const WorldManager* world)
+{
+	Screen* GScreen = GameEngine::GetInstance()->GetScreen();
+	int MinX = GScreen->TotalHorSize / 5;
+	int MaxX = MinX * 4;
+	int MinY = GScreen->TotalVerSize / 5;
+	int MaxY = MinY * 4;
+
+	int Msg1X = GScreen->TotalHorSize / 4;
+	int Msg1Y = GScreen->TotalVerSize / 2;
+	int Msg2X = Msg1X;
+	int Msg2Y = (GScreen->TotalVerSize + Msg1Y) / 2;
+
+	const int ArrowSpace = 5;
+
+	// Draw OutLine
+	for (int i = MinY; i <= MaxY; i++)
+	{
+		GScreen->PrintHor(L' ', MinX + 1, i, MaxX - MinX, 7);
+		if (i == MinY)
+		{
+			GScreen->PrintChar(L'┏', MinX, i);
+			for (int j = MinX + 1; j <= MaxX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┓', MaxX, i);
+		}
+		else if (i == MaxY)
+		{
+			GScreen->PrintChar(L'┗', MinX, i);
+			for (int j = MinX + 1; j <= MaxX - 1; j++)
+				GScreen->PrintChar(L'━', j, i);
+			GScreen->PrintChar(L'┛', MaxX, i);
+		}
+		else if (i == Msg1Y)
+		{
+			GScreen->PrintChar(L'┃', MinX, i);
+
+			GScreen->PrintString(L"Congratulation! You Clear The Game", Msg1X, Msg1Y);
+
+			GScreen->PrintChar(L'┃', MaxX, i);
+		}
+		else if (i == Msg2Y)
+		{
+			GScreen->PrintChar(L'┃', MinX, i);
+			GScreen->PrintString(L"Press SpaceBar To Main", Msg2X, Msg2Y);
+			GScreen->PrintChar(L'┃', MaxX, i);
+		}
+		else
+		{
+			GScreen->PrintChar(L'┃', MinX, i);
+			GScreen->PrintChar(L'┃', MaxX, i);
 		}
 	}
 }
