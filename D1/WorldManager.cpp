@@ -400,6 +400,7 @@ void WorldManager::UpdateOnClear()
 	FKeyState KeyState = GameEngine::GetInstance()->GetInputManager()->GetKeyState();
 	if (KeyState.KEYSpaceDown)
 	{
+		GameEngine::GetInstance()->WriteRecord(Player->GetScore(), Player->GetName());
 		HandleClear();
 	}
 }

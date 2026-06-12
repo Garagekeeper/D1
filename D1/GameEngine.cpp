@@ -52,7 +52,7 @@ void GameEngine::Init()
 	if(GScreen)
 		GScreen->Init();
 
-	std::string RecordDataString = ReadClearRecords(ClearRecordsPath);
+	std::string RecordDataString = ReadClearRecords();
 	ParseRecord(RecordDataString);
 }
 
@@ -154,9 +154,9 @@ void GameEngine::StartEngine()
 	}
 }
 
-std::string GameEngine::ReadClearRecords(const std::string& Path)
+std::string GameEngine::ReadClearRecords()
 {
-	std::ifstream InputFile(Path);
+	std::ifstream InputFile(ClearRecordsPath);
 	if (InputFile.is_open())
 	{
 		std::string FileTexts((std::istreambuf_iterator<char>(InputFile)),std::istreambuf_iterator<char>());
@@ -166,4 +166,17 @@ std::string GameEngine::ReadClearRecords(const std::string& Path)
 	}
 
 	return std::string();
+}
+
+void GameEngine::WriteRecord(const int Score, const std::string Name)
+{
+	std::ofstream OutFile(ClearRecordsPath, std::ios::app);
+	if (OutFile.is_open())
+	{
+		OutFile << Score << "," << Name << '\n';
+	}
+	else
+	{
+		printf("파일 생성 실패");
+	}
 }

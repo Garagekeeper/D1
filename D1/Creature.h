@@ -44,6 +44,7 @@ protected:
 	ECreatureState			State;
 	ECreatureState			PrevState = ECreatureState::Idle;
 	bool					IsInSight = false;
+	std::string				Name = "Creature";
 
 public:
 	//constructor
@@ -68,5 +69,6 @@ public:
 
 	inline bool				GetIsInSight() const { return IsInSight; }
 	inline void				SetIsInSight(bool InValue) { IsInSight = InValue; }
+	inline std::string		GetName() { return Name; }
 
 };

@@ -10,3 +10,4 @@
 100,Yu
 200,Kang
 500,Paek
+50,Creature

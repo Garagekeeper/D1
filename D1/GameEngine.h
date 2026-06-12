@@ -16,6 +16,7 @@ private:
 	Screen*						GScreen = nullptr;
 	EGameState					GameState = EGameState::BeforeGame;
 	std::vector<std::pair<int, std::string>> ClearRecordVec;
+	std::string					PlayerName;
 
 
 	double						deltaTime = 0.0;
@@ -36,7 +37,8 @@ public:
 	void						ParseRecord(std::string DataString);
 	void static					ClearEngine();
 	void static					StartEngine();
-	std::string					ReadClearRecords(const std::string& path);
+	void						WriteRecord(const int Score, const std::string Name);
+	std::string					ReadClearRecords();
 	inline double				GetDeltaTime() const { return deltaTime; }
 
 	inline InputManager*		GetInputManager() const { return SInputManager; }
