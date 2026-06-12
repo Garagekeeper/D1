@@ -46,9 +46,9 @@ public:
 	inline Renderer*			GetRenderer() const { return SRenderer; }
 	inline static GameEngine*	GetInstance() { return Instance; }
 	inline Screen*				GetScreen() { return GScreen; }
-	inline bool					GetIsPuase() { return IsPause; }
+	inline bool					GetIsPuase() const { return IsPause; }
 	inline void					SetIsPuase(bool InValue) {IsPause = InValue; }
-	inline bool					GetIsExit() { return IsExit; }
+	inline bool					GetIsExit() const { return IsExit; }
 	inline void					SetIsExit(bool InValue) { IsExit = InValue; }
 	inline bool					GetIsExitComplete() { return IsExitComplete; }
 	inline void					SetIsExitComplete(bool InValue) { IsExitComplete = InValue; }

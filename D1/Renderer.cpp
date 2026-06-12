@@ -910,13 +910,13 @@ void Renderer::DrawMainMenu(const WorldManager* World)
 
 	if (World->GetMainIndex() == EMainMenu::StartGame)
 	{
-		GScreen->PrintString(L" ▶ " + StartStr + L" ◀", CenterX - (StartStr.size()/2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
-		GScreen->PrintString(L"   " + ExitStr + L"  ", CenterX - (ExitStr.size()/2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L" ▶ " + StartStr + L" ◀", CenterX - static_cast<int>(StartStr.size()/2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L"   " + ExitStr + L"  ", CenterX - static_cast<int>(ExitStr.size()/2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
 	}
 	else if (World->GetMainIndex() == EMainMenu::ExitGame)
 	{
-		GScreen->PrintString(L"   " + StartStr + L"  ", CenterX - (StartStr.size() / 2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
-		GScreen->PrintString(L" ▶ " + ExitStr + L" ◀", CenterX - (ExitStr.size() / 2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L"   " + StartStr + L"  ", CenterX - static_cast<int>(StartStr.size() / 2), StartGameY, SCREEN_TEXT_COLOR_WHITE);
+		GScreen->PrintString(L" ▶ " + ExitStr + L" ◀", CenterX - static_cast<int>(ExitStr.size() / 2), ExitGameY, SCREEN_TEXT_COLOR_WHITE);
 	}
 
 	//// Draw Select Arrow
